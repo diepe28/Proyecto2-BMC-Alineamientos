@@ -24,7 +24,7 @@
 
 #include <glib/gi18n.h>
 
-
+// solo archivos necesarios
 int
 main (int argc, char *argv[])
 {
