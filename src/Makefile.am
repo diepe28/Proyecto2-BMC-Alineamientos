@@ -22,7 +22,9 @@ bin_PROGRAMS = proyecto2_bmc_alineamientos
 proyecto2_bmc_alineamientos_SOURCES = \
 	main.c \
 	proyecto2-bmc-alineamientos.h \
-	proyecto2-bmc-alineamientos.c	
+	proyecto2-bmc-alineamientos.c \
+	Globals.h \
+	Globals.c	
 
 
 proyecto2_bmc_alineamientos_LDFLAGS = \

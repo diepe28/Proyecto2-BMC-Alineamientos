@@ -20,17 +20,15 @@
 #include <config.h>
 #include <gtk/gtk.h>
 #include "proyecto2-bmc-alineamientos.h"
-
-
 #include <glib/gi18n.h>
+#include "Globals.h"
 
-// solo archivos necesarios
 int
 main (int argc, char *argv[])
 {
 	Proyecto2bmcalineamientos *app;
 	int status;
-
+	printf("aug: %c\n" , codonToOneLetter ("aug"));
 
 #ifdef ENABLE_NLS
 	bindtextdomain (GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
