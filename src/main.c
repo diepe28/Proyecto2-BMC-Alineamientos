@@ -28,8 +28,7 @@ main (int argc, char *argv[])
 {
 	Proyecto2bmcalineamientos *app;
 	int status;
-	printf("aug: %c\n" , codonToOneLetter ("aug"));
-
+	
 #ifdef ENABLE_NLS
 	bindtextdomain (GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
 	bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
