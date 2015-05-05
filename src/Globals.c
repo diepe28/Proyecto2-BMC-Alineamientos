@@ -92,9 +92,9 @@ char codonToOneLetter(char codon[3]){
 	return AMINO_ACIDS[(16 * valueOfBase(codon[0])) + (4 * valueOfBase(codon[1])) + valueOfBase(codon[0]) ];
 }
 
-char** sequencesFromFile(char * filePath){
-	long fileSize, i = -1, j = -1;
-	char *line1, *line2, **sequences = NULL;
+char* sequenceFromFile(char * filePath, unsigned long *length){
+	unsigned long fileSize = 0, i = 0;
+	char *sequence;
 	FILE * file = fopen(filePath, "r");
 		
 	if(file != NULL){
@@ -102,52 +102,20 @@ char** sequencesFromFile(char * filePath){
 		fileSize = ftell(file);
 		fseek(file, 0L, SEEK_SET);
 
-		line1 = (char*) (malloc(fileSize * sizeof(char)));
-		sequences = (char**) (malloc(2 * sizeof(char*)));
-		if(line1 != NULL){
-			do{
-				line1[++i] = (char) fgetc(file);
-			}
-			while(line1[i] != EOF && line1[i] != '\n');
-
-			//not done reading file, there is a second sequence
-			if(line1[i] != EOF){
-				line2 = (char*) (malloc(fileSize-i * sizeof(char)));
-				do{
-					line2[++j] = (char) fgetc(file);
-				}
-				while(line2[j] != EOF && line2[j] != '\n');
-				
-				sequences[1] = (char*) (malloc(++j * sizeof(char)));
-				strncpy(sequences[1], line2, j);
-				sequences[j-1] = '\0';
-				free(line2);
-			}
-			
-			sequences[0] = (char*) (malloc(++i * sizeof(char)));
-			strncpy(sequences[0], line1, i);
-			sequences[i-1] = '\0';
-			free(line1);
+		sequence = (char*) (malloc((fileSize+1) * sizeof(char)));
+		if(sequence != NULL){
+			while( (sequence[i++] = (char) fgetc(file)) != EOF);
+			sequence[i] = '\0';
 		}
 		fclose(file);
 	}else{
-      perror ( filePath ); /* why didn't the file open? */
+		perror ( filePath ); /* why didn't the file open? */
+		fileSize = 0;
 	}
-	return sequences;
+	*length = fileSize;
+	return sequence;
 }
 
-/*
-	printf("aug: %c\n" , codonToOneLetter ("aug"));
-	char ** sequences = sequencesFromFile("entrada.in");
-	if(sequences != NULL){
-		if(sequences[0] != NULL){
-			printf("sequence[0] %s\n", sequences[0]);
-		}
-		if(sequences[1] != NULL){
-			printf("sequence[1] %s\n", sequences[1]);
-		}
-	}
- */
 
 
 

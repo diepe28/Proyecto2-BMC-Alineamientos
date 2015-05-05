@@ -8,6 +8,6 @@
 #define GLOBALS_H
 
 char codonToOneLetter(char[3]);
-char** sequencesFromFile(char *); 
+char* sequenceFromFile(char *, unsigned long *); 
 
 #endif
