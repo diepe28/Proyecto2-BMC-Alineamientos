@@ -24,7 +24,11 @@ proyecto2_bmc_alineamientos_SOURCES = \
 	proyecto2-bmc-alineamientos.h \
 	proyecto2-bmc-alineamientos.c \
 	Globals.h \
-	Globals.c	
+	Globals.c \
+	AfterMatrixFilling.h \
+	AfterMatrixFilling.c \
+	Cell.c \
+	Cell.h	
 
 
 proyecto2_bmc_alineamientos_LDFLAGS = \
