@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <limits.h>
+#include <gtk/gtk.h>
 
 #define COMES_FROM_DIAGONAL 1
 #define COMES_FROM_LEFT 2
@@ -13,13 +14,13 @@
 #define CELL_H
 
 typedef struct{
-	int value;
-	int flags;
+	gint value;
+	guint flags;
 }Cell;
 
-Cell* cell_new(int, unsigned int);
+Cell* cell_new(gint value, guint flags);
 
-void cell_setFlag(Cell*, unsigned int);
-int cell_isFlagSet(Cell*, unsigned int);
+void cell_setFlag(Cell*, guint flag);
+int cell_isFlagSet(Cell*, guint flag);
 
 #endif

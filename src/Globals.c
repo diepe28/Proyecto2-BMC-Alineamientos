@@ -83,18 +83,18 @@ char AMINO_ACIDS[64]  = {
 };
 
 //  A = 0 , C = 1, G = 2, U = 3
-int valueOfBase(char base){
+gint valueOfBase(gchar base){
 	return base == 'A' ? 0 : base == 'C'? 1 : base == 'G'? 2 : 3;
 }
 
 //*16 + *4 + *1 = INDEX
-char codonToOneLetter(char codon[3]){
+gchar codonToOneLetter(gchar codon[3]){
 	return AMINO_ACIDS[(16 * valueOfBase(codon[0])) + (4 * valueOfBase(codon[1])) + valueOfBase(codon[0]) ];
 }
 
-char* sequenceFromFile(char * filePath, unsigned long *length){
-	unsigned long fileSize = 0, i = 0;
-	char *sequence;
+gchar* sequenceFromFile(gchar * filePath, gulong *length){
+	gulong fileSize = 0, i = 0;
+	gchar *sequence;
 	FILE * file = fopen(filePath, "r");
 		
 	if(file != NULL){
@@ -102,9 +102,9 @@ char* sequenceFromFile(char * filePath, unsigned long *length){
 		fileSize = ftell(file);
 		fseek(file, 0L, SEEK_SET);
 
-		sequence = (char*) (malloc((fileSize+1) * sizeof(char)));
+		sequence = (gchar*) (g_malloc((fileSize+1) * sizeof(gchar)));
 		if(sequence != NULL){
-			while( (sequence[i++] = (char) fgetc(file)) != EOF);
+			while( (sequence[i++] = (gchar) fgetc(file)) != EOF);
 			sequence[i] = '\0';
 		}
 		fclose(file);

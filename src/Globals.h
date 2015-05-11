@@ -3,7 +3,7 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
-char codonToOneLetter(char[3]);
-char* sequenceFromFile(char *, unsigned long *); 
+gchar codonToOneLetter(gchar[3]);
+gchar* sequenceFromFile(gchar *, gulong *); 
 
 #endif
