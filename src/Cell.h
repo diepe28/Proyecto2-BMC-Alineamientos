@@ -5,6 +5,7 @@
 #include <limits.h>
 #include <gtk/gtk.h>
 
+#define NONE 0
 #define COMES_FROM_DIAGONAL 1
 #define COMES_FROM_LEFT 2
 #define COMES_FROM_UP 4

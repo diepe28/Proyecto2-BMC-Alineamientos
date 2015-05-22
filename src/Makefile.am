@@ -28,7 +28,10 @@ proyecto2_bmc_alineamientos_SOURCES = \
 	AfterMatrixFilling.h \
 	AfterMatrixFilling.c \
 	Cell.c \
-	Cell.h	
+	Cell.h \
+	CellFillingSupport.c \
+	CellFillingSupport.h \
+	AlignmentOptions.h	
 
 
 proyecto2_bmc_alineamientos_LDFLAGS = \
