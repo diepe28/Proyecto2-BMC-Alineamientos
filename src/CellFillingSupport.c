@@ -26,12 +26,11 @@ static void fill_interior(Cell*** matrix, ScoringOptions* options, gint x, gint 
 {
 	Cell* newCell = NULL;
 	if (options->gapOpeningPenalty == 0) {
-		gint diagonalValue = ((options->substitutionMatrix != NULL) ? value_from_matrix(seq1[x], seq2[y]) :
-							 ((seq1[x] == seq2[y]) ? options->matchBonus : options->missmatchPenalty)) + matrix[x-1][y-1]->value;
+		gint diagonalValue = ((options->substitutionMatrix != NULL) ? value_from_matrix(seq1[x-1], seq2[y-1]) :
+							 ((seq1[x-1] == seq2[y-1]) ? options->matchBonus : options->missmatchPenalty)) + matrix[x-1][y-1]->value;
 		gint leftValue = options->gapExtensionPenalty + matrix[x][y-1]->value;
 		gint upValue = options->gapExtensionPenalty + matrix[x-1][y]->value;
 		gint bestScore = MAX(diagonalValue, MAX(leftValue, upValue));
-		gint directionFlags = NONE;
 		if (isLocalAlignment && bestScore <= 0)
 			newCell = cell_new (0, NONE);
 		else {

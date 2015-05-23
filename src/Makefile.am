@@ -31,7 +31,9 @@ proyecto2_bmc_alineamientos_SOURCES = \
 	Cell.h \
 	CellFillingSupport.c \
 	CellFillingSupport.h \
-	AlignmentOptions.h	
+	AlignmentOptions.h \
+	FillingAlgorithms.c \
+	FillingAlgorithms.h	
 
 
 proyecto2_bmc_alineamientos_LDFLAGS = \

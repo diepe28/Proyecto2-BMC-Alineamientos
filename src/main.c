@@ -22,7 +22,7 @@
 #include "proyecto2-bmc-alineamientos.h"
 #include <glib/gi18n.h>
 #include "AfterMatrixFilling.h"
-#include "CellFillingSupport.h"
+#include "FillingAlgorithms.h"
 
 int
 main (int argc, char *argv[])
@@ -36,6 +36,7 @@ main (int argc, char *argv[])
 	textdomain (GETTEXT_PACKAGE);
 #endif
 
+	// test();
 	//testGlobalAlingment();
 	//testSemiGlobalAlingment();
 	
