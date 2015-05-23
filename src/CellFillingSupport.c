@@ -17,9 +17,7 @@ static void fill_corner(Cell*** matrix, ScoringOptions* options, gint x, gint y,
 		else if (y == 0)
 			matrix[x][y] = cell_new (options->freeLeftGapsForX ? 0 : (x * options->gapExtensionPenalty), COMES_FROM_UP);
 	}
-	else
-		// TODO Affine function case
-		return;
+	// TODO Affine function case
 }
 
 static void fill_interior(Cell*** matrix, ScoringOptions* options, gint x, gint y, gchar* seq1, gchar* seq2, gboolean isLocalAlignment) 
@@ -40,7 +38,7 @@ static void fill_interior(Cell*** matrix, ScoringOptions* options, gint x, gint 
 			if (bestScore == upValue) cell_setFlag (newCell, COMES_FROM_UP);
 		}
 	}
-	// else
+
     // TODO Affine function case
 	matrix[x][y] = newCell;
 }

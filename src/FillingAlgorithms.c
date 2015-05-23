@@ -1,7 +1,21 @@
 
 #include "FillingAlgorithms.h"
 
-void fill_matrix(Cell*** matrix, ScoringOptions* options, gint startX, gint startY, gint height, gint width, gchar* seq1, gchar* seq2, gboolean isLocalAlignment) 
+// Helper functions
+
+static Cell*** create_matrix(gint height, gint width) 
+{
+	gint i = 0;
+
+	// TODO Return NULL if the requested memory is too much
+	
+	Cell*** matrix = (Cell***) g_malloc(sizeof(Cell**) * height);
+	for (i = 0; i < height; i++)
+		matrix[i] = (Cell**) g_malloc(sizeof(Cell*) * width);
+	return matrix;
+}
+
+static void fill_matrix(Cell*** matrix, ScoringOptions* options, gint startX, gint startY, gint height, gint width, gchar* seq1, gchar* seq2, gboolean isLocalAlignment) 
 {
 	gint i, j = 0;
 	gint xLimit = startX + height;
@@ -11,7 +25,30 @@ void fill_matrix(Cell*** matrix, ScoringOptions* options, gint startX, gint star
 			fill (matrix, options, seq1, seq2, i, j, isLocalAlignment);
 }
 
-// For testing
+// Exposed functions
+
+Cell*** create_similarity_matrix_full(gchar* seq1, gchar* seq2, gint seq1Length, gint seq2Length, ScoringOptions* scoringOptions, gboolean isLocalAlignment, gint numberOfThreads) 
+{
+	Cell*** matrix = create_matrix (seq1Length + 1, seq2Length + 1);
+	
+	if (matrix == NULL) 
+		return NULL;
+		
+	if (numberOfThreads == 1)
+		fill_matrix (matrix, scoringOptions, 0, 0, seq1Length + 1, seq2Length + 1, seq1, seq2, isLocalAlignment);
+	
+	// TODO parallel case
+	
+	return matrix;
+}
+
+Cell*** create_similarity_matrix_kband(gchar* seq1, gchar* seq2, gint seq1Length, gint seq2Length, ScoringOptions* scoringOptions, KBandOptions* kbandOptions, gint numberOfThreads) 
+{
+	// TODO
+	return NULL;
+}
+
+// Testing functions.
 
 static void print(Cell*** matrix, gint m, gint n)
 {
@@ -35,12 +72,9 @@ void test()
 	gchar* seq2 = "ATTGTGATCC";
 	gint size1 = 11;
 	gint size2 = 11;
-
-	// Initialization
-	Cell*** matrix = g_malloc(sizeof(Cell**) * size1);
 	gint i, j = 0;
-	for (i = 0; i < size1; i++)
-		matrix[i] = g_malloc(sizeof(Cell*) * size2);
+	// Initialization
+
 	ScoringOptions* options = g_malloc(sizeof(ScoringOptions));
 	options->matchBonus = 1;
 	options->missmatchPenalty = -1;
@@ -48,10 +82,10 @@ void test()
 	options->gapExtensionPenalty = -2;
 	options->freeLeftGapsForX = TRUE;
 	options->freeLeftGapsForY = TRUE;
-	options->substitutionMatrix = NULL;            
+	options->substitutionMatrix = NULL;
 
 	// Call and printing
-	fill_matrix (matrix, options, 0, 0, size1, size2, seq1, seq2, FALSE);
+	Cell*** matrix = create_similarity_matrix_full (seq1, seq2, 10, 10, options, FALSE, 1);
 	print (matrix, size1, size2);
 	
 	// Cleaning

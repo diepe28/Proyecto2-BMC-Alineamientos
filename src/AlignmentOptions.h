@@ -14,4 +14,9 @@ typedef struct {
 	GHashTable* substitutionMatrix;
 } ScoringOptions;
 
+typedef struct {
+	gint kInitValue;
+	gint kExtensionValue;
+} KBandOptions;
+
 #endif
