@@ -1,5 +1,6 @@
 #include "Cell.h"
 
+const gchar GAP = '_';
 Cell* cell_new(gint value, guint flags){
 	Cell* cell = (Cell*) g_malloc(sizeof(Cell));
 	cell->value = value;

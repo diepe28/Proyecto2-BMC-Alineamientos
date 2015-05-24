@@ -10,10 +10,12 @@
 #define COMES_FROM_LEFT 2
 #define COMES_FROM_UP 4
 #define IS_PAINTED 8
+#define IS_PROCESSED 16
 
 #ifndef CELL_H
 #define CELL_H
 
+extern const gchar GAP;
 typedef struct{
 	gint value;
 	gint value_b;

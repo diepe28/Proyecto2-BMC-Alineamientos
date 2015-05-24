@@ -21,7 +21,7 @@
 #include <gtk/gtk.h>
 #include "proyecto2-bmc-alineamientos.h"
 #include <glib/gi18n.h>
-#include "AfterMatrixFilling.h"
+#include "TestingFunctions.h"
 #include "FillingAlgorithms.h"
 
 int
@@ -39,6 +39,7 @@ main (int argc, char *argv[])
 	//test();
 	//testGlobalAlingment();
 	//testSemiGlobalAlingment();
+	testLocalAlingment();
 	
 	app = proyecto2_bmc_alineamientos_new ();
 	status = g_application_run (G_APPLICATION (app), argc, argv);

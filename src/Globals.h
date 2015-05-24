@@ -1,4 +1,4 @@
-#include "Cell.h"
+#include "Island.h"
 
 #ifndef GLOBALS_H
 #define GLOBALS_H
