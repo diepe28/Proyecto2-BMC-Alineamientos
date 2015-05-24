@@ -94,7 +94,7 @@ gchar codonToOneLetter(gchar codon[3]){
 
 gchar* sequenceFromFile(gchar * filePath, gulong *length){
 	gulong fileSize = 0, i = 0;
-	gchar *sequence;
+	gchar *sequence = NULL;
 	FILE * file = fopen(filePath, "r");
 		
 	if(file != NULL){
@@ -114,6 +114,10 @@ gchar* sequenceFromFile(gchar * filePath, gulong *length){
 	}
 	*length = fileSize;
 	return sequence;
+}
+
+gint valueOfMatrix(gint matrix[26][26], gchar first, gchar second){
+	return matrix[(int) first - 'A'][(int) second - 'A'];
 }
 
 

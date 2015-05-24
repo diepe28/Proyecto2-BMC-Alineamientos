@@ -37,7 +37,9 @@ proyecto2_bmc_alineamientos_SOURCES = \
 	Island.h \
 	Island.c \
 	TestingFunctions.c \
-	TestingFunctions.h	
+	TestingFunctions.h \
+	SubstitutionMatrixes.h \
+	SubstitutionMatrixes.c	
 
 
 proyecto2_bmc_alineamientos_LDFLAGS = \
