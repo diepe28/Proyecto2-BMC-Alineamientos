@@ -1,10 +1,9 @@
 
 #include "CellFillingSupport.h"
 
-static gint value_from_matrix(gchar a, gchar b)
+static gint value_from_matrix(gint (*substitutionMatrix)[26], gchar a, gchar b)
 {
-	// TODO use substitutionMatrix
-	return 0;
+	return substitutionMatrix[(gint)a - 65][(gint)b - 65];
 }
 
 static void fill_corner(Cell*** matrix, ScoringOptions* options, gint x, gint y, gboolean isLocalAlignment) 
@@ -41,7 +40,7 @@ static void fill_corner(Cell*** matrix, ScoringOptions* options, gint x, gint y,
 static void fill_interior(Cell*** matrix, ScoringOptions* options, gint x, gint y, gchar* seq1, gchar* seq2, gboolean isLocalAlignment) 
 {
 	Cell* newCell = NULL;
-	gint fValue = ((options->substitutionMatrix != NULL) ? value_from_matrix(seq1[x-1], seq2[y-1]) :
+	gint fValue = ((options->substitutionMatrix != NULL) ? value_from_matrix(options->substitutionMatrix, seq1[x-1], seq2[y-1]) :
 				  ((seq1[x-1] == seq2[y-1]) ? options->matchBonus : options->missmatchPenalty));
 	if (options->gapOpeningPenalty == 0) {
 		gint diagonalValue = fValue + matrix[x-1][y-1]->value;

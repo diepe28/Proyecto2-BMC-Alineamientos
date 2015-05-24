@@ -121,25 +121,25 @@ static void print(Cell*** matrix, gint m, gint n, gboolean printOthers)
 
 void test() 
 {
-	gchar* seq1 = "TTGCATCGGC";
-	gchar* seq2 = "ATTGTGATCC";
+	gchar* seq1 = "HEAGAWGHEE";
+	gchar* seq2 = "PAWHEAE";
 	gint size1 = 11;
-	gint size2 = 11;
+	gint size2 = 8;
 	gint i, j = 0;
 	// Initialization
 
 	ScoringOptions* options = g_malloc(sizeof(ScoringOptions));
 	options->matchBonus = 1;
 	options->missmatchPenalty = -1;
-	options->gapOpeningPenalty = -2;
-	options->gapExtensionPenalty = -1;
+	options->gapOpeningPenalty = 0;
+	options->gapExtensionPenalty = -3;
 	options->freeLeftGapsForX = FALSE;
 	options->freeLeftGapsForY = FALSE;
-	options->substitutionMatrix = NULL;
+	options->substitutionMatrix = BLOSUM_62;
 
 	// Call and printing
 	Cell*** matrix = create_similarity_matrix_full (seq1, seq2, 10, 10, options, FALSE, 1);
-	print (matrix, size1, size2, TRUE);
+	print (matrix, size1, size2, FALSE);
 	
 	// Cleaning
 	for (i = 0; i < size1; i++) {

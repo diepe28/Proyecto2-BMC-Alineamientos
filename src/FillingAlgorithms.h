@@ -1,6 +1,7 @@
 
 #include <glib.h>
 #include "CellFillingSupport.h"
+#include "SubstitutionMatrixes.h"
 
 #ifndef FILLING_ALGORITHMS_H
 #define FILLING_ALGORITHMS_H

@@ -11,7 +11,7 @@ typedef struct {
 	gint gapExtensionPenalty;
 	gboolean freeLeftGapsForX;
 	gboolean freeLeftGapsForY;
-	GHashTable* substitutionMatrix;
+	gint (*substitutionMatrix)[26];
 } ScoringOptions;
 
 typedef struct {
