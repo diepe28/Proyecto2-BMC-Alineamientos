@@ -36,7 +36,7 @@ main (int argc, char *argv[])
 	textdomain (GETTEXT_PACKAGE);
 #endif
 
-	// test();
+	//test();
 	//testGlobalAlingment();
 	//testSemiGlobalAlingment();
 	
