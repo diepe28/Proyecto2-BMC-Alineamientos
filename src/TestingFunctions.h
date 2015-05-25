@@ -6,5 +6,5 @@
 void testGlobalAlingment();
 void testSemiGlobalAlingment();
 void testLocalAlingment();
-
+void testGNUPLOT();
 #endif

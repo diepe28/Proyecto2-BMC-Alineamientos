@@ -40,7 +40,8 @@ main (int argc, char *argv[])
 	//testGlobalAlingment();
 	//testSemiGlobalAlingment();
 	//testLocalAlingment();
-	printf("%d\n", valueOfMatrix (BLOSUM_62, 'D', 'V'));
+	//printf("%d\n", valueOfMatrix (BLOSUM_62, 'D', 'V'));
+	testGNUPLOT();
 	
 	app = proyecto2_bmc_alineamientos_new ();
 	status = g_application_run (G_APPLICATION (app), argc, argv);

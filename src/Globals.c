@@ -121,6 +121,45 @@ gint valueOfMatrix(gint matrix[26][26], gchar first, gchar second){
 }
 
 
+void testGNUPLOT(){
+	char * commandsForGnuplot[] = {
+		"set terminal png large size 1920, 1080",
+		"set output \"printme.png\"",
+		"set xrange [0:6]",
+		"set yrange [0:1500]",
+		"set style line 1 lc rgb '#0060ad' lt 1 lw 2 pt 7 ps 1.5", //blue
+		"set style line 2 lc rgb '#dd181f' lt 1 lw 2 pt 7 ps 1.5", //red
+		"set style line 3 lc rgb '#33CC33' lt 1 lw 2 pt 7 ps 1.5", //green
+		"set title \"Curva de aceleracion\"",
+		"set xlabel \"Cantidad de hilos\"",
+		"set ylabel \"Tiempo en milisegundos\"",
+		"unset key",
+		"plot 'data.temp' index 0 with linespoints ls 1, '' index 1 with linespoints ls 2, '' index 2 with linespoints ls 3 "};
+	int numPoints = 6;
+	int numCommands = 12;
+	
+    long xvals[6] = {1,    5 ,    1,   5,   1,  5};
+    long yvals[6] = {1000, 1000,  700, 700, 600, 600};
+    FILE * temp = fopen("data.temp", "w");
+    /*Opens an interface that one can use to send commands as if they were typing into the
+     *     gnuplot command line.  "The -persistent" keeps the plot open even after your
+     *     C program terminates.
+     */
+    FILE * gnuplotPipe = popen ("gnuplot -persistent", "w");
+    int i;
+    for (i=0; i < numPoints; i++){
+		fprintf(temp, "%ld %ld \n", xvals[i], yvals[i]); //Write the data to a temporary file
+		if( (i+1) % 2 == 0)
+			fprintf(temp, "\n\n"); //Write the data to a temporary file
+    }
+	
+    for (i=0; i < numCommands; i++){
+		fprintf(gnuplotPipe, "%s \n", commandsForGnuplot[i]); //Send commands to gnuplot one by one.
+    }
+
+	fclose(temp);
+	pclose(gnuplotPipe);
+}
 
 
 
