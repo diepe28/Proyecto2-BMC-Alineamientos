@@ -41,7 +41,11 @@ main (int argc, char *argv[])
 	//testSemiGlobalAlingment();
 	//testLocalAlingment();
 	//printf("%d\n", valueOfMatrix (BLOSUM_62, 'D', 'V'));
-	testGNUPLOT();
+	//testGNUPLOT();
+	long times[] = {50000,4000,3000,3250,35000};
+	int n = 5;
+	
+	createBenchmarkGraph(&times, n);
 	
 	app = proyecto2_bmc_alineamientos_new ();
 	status = g_application_run (G_APPLICATION (app), argc, argv);

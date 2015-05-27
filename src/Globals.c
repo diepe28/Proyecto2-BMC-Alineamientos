@@ -120,6 +120,58 @@ gint valueOfMatrix(gint matrix[26][26], gchar first, gchar second){
 	return matrix[(int) first - 'A'][(int) second - 'A'];
 }
 
+int createBenchmarkGraph(long* times, int n){
+	char * commandsForGnuplot[] = {
+		"set terminal png large size 1920, 1080",
+		"set output \"printme.png\"",
+		"set style line 1 lc rgb '#0060ad' lt 1 lw 2 pt 7 ps 1.5", //blue
+		"set style line 2 lc rgb '#33CC33' lt 1 lw 2 pt 7 ps 1.5", //green
+		"set title \"Curva de aceleracion\"",
+		"set xlabel \"Cantidad de hilos\"",
+		"set ylabel \"Tiempo en milisegundos\"",
+		"unset key",
+		"plot 'data.temp' index 0 with linespoints ls 1, '' index 1 with linespoints ls 2"};
+	
+	FILE * gnuplotPipe = popen ("gnuplot -persistent", "w");
+	FILE * tempFile = fopen("data.temp", "w");
+	char xRangeCommand[30], yRangeCommand[50];
+	
+	int i = 0, numCommands = 9, minTimeIndex = 0, maxTimeIndex = 0;
+	long maxTime = 0, minTime = LONG_MAX, yMargin;
+
+	//finding min and max time
+	for(i =0; i < n; i++){
+		if(times[i] > maxTime){
+			maxTime = times[i];
+			maxTimeIndex = i;
+		}
+		if(times[i] < minTime){
+			minTime = times[i];
+			minTimeIndex = i;
+		}
+	}
+	
+	yMargin = (maxTime - minTime) / 4;
+	sprintf (xRangeCommand, "set xrange [%d:%d]", 0, n+1);
+	sprintf (yRangeCommand, "set yrange [%ld:%ld]", minTime - yMargin, maxTime + yMargin);
+	
+	
+	if(gnuplotPipe != NULL && tempFile != NULL){
+		for(i=0; i < n; i++){
+			fprintf(tempFile, "%d %ld \n", i+1, times[i]); //Write the data to a temporary file
+		}
+		
+		fprintf(gnuplotPipe, "%s \n", xRangeCommand);
+		fprintf(gnuplotPipe, "%s \n", yRangeCommand);
+		for (i=0; i < numCommands; i++){
+			fprintf(gnuplotPipe, "%s \n", commandsForGnuplot[i]); //Send commands to gnuplot one by one.
+		}
+
+		fclose(tempFile);
+		pclose(gnuplotPipe);
+	}
+	return 0;
+}
 
 void testGNUPLOT(){
 	char * commandsForGnuplot[] = {
