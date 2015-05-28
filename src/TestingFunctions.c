@@ -411,3 +411,106 @@ void testLocalAlingment(){
 
 	g_free(mat);
 }
+
+// Test functions for filling matrix
+
+static void print(Cell*** matrix, gint m, gint n, gboolean printOthers)
+{
+	gint i, j = 0;
+	if (!printOthers) {
+		for (i = 0; i < m; i++) 
+		{
+			printf("Row %d:\n", i);
+			for (j = 0; j < n; j++) {
+				printf("[%d][%d] = %d   ", i, j, matrix[i][j]->value);
+				if (cell_isFlagSet (matrix[i][j], COMES_FROM_DIAGONAL)) printf("D "); else printf("  ");
+				if (cell_isFlagSet (matrix[i][j], COMES_FROM_UP)) printf("U "); else printf("  ");
+				if (cell_isFlagSet (matrix[i][j], COMES_FROM_LEFT)) printf("L "); else printf("  ");
+				puts("");
+			}
+		}
+	} else {
+		puts("First table");
+
+		for (i = 0; i < m; i++) 
+		{
+			printf("Row %d:\n", i);
+			for (j = 0; j < n; j++) {
+				if (matrix[i][j]->value > MIN_VALUE + 100)
+					printf("[%d][%d] = %d   ", i, j, matrix[i][j]->value);
+				else
+					printf("[%d][%d] = -Inf   ", i, j);
+				if (cell_isFlagSet (matrix[i][j], COMES_FROM_DIAGONAL)) printf("A "); else printf("  ");
+				if (cell_isFlagBSet (matrix[i][j], COMES_FROM_DIAGONAL)) printf("V "); else printf("  ");
+				if (cell_isFlagCSet (matrix[i][j], COMES_FROM_DIAGONAL)) printf("R "); else printf("  ");
+				puts("");
+			}
+		}
+
+		puts("Second table");
+
+		for (i = 0; i < m; i++) 
+		{
+			printf("Row %d:\n", i);
+			for (j = 0; j < n; j++) {
+				if (matrix[i][j]->value_b > MIN_VALUE + 100)
+					printf("[%d][%d] = %d   ", i, j, matrix[i][j]->value_b);
+				else
+					printf("[%d][%d] = -Inf   ", i, j);
+				if (cell_isFlagSet (matrix[i][j], COMES_FROM_LEFT)) printf("A "); else printf("  ");
+				if (cell_isFlagBSet (matrix[i][j], COMES_FROM_LEFT)) printf("V "); else printf("  ");
+				if (cell_isFlagCSet (matrix[i][j], COMES_FROM_LEFT)) printf("R "); else printf("  ");
+				puts("");
+			}
+		}
+
+		puts("Third table");
+
+		for (i = 0; i < m; i++) 
+		{
+			printf("Row %d:\n", i);
+			for (j = 0; j < n; j++) {
+				if (matrix[i][j]->value_c > MIN_VALUE + 100)
+					printf("[%d][%d] = %d   ", i, j, matrix[i][j]->value_c);
+				else
+					printf("[%d][%d] = -Inf   ", i, j);
+				if (cell_isFlagSet (matrix[i][j], COMES_FROM_UP)) printf("A "); else printf("  ");
+				if (cell_isFlagBSet (matrix[i][j], COMES_FROM_UP)) printf("V "); else printf("  ");
+				if (cell_isFlagCSet (matrix[i][j], COMES_FROM_UP)) printf("R "); else printf("  ");
+				puts("");
+			}
+		}
+	}
+}
+
+void testFillingMatrix() 
+{
+	gchar* seq1 = "HEAGAWGHEE";
+	gchar* seq2 = "PAWHEAE";
+	gint size1 = 11;
+	gint size2 = 8;
+	gint i, j = 0;
+	// Initialization
+
+	ScoringOptions* options = g_malloc(sizeof(ScoringOptions));
+	options->matchBonus = 1;
+	options->missmatchPenalty = -1;
+	options->gapOpeningPenalty = 0;
+	options->gapExtensionPenalty = -3;
+	options->freeLeftGapsForX = FALSE;
+	options->freeLeftGapsForY = FALSE;
+	options->substitutionMatrix = BLOSUM_62;
+
+	// Call and printing
+	Cell*** matrix = create_similarity_matrix_full (seq1, seq2, 10, 10, options, FALSE, 1);
+	print (matrix, size1, size2, FALSE);
+	
+	// Cleaning
+	for (i = 0; i < size1; i++) {
+		for (j = 0; j < size2; j++)
+			g_free(matrix[i][j]);
+		g_free(matrix[i]);
+	}
+	g_free(matrix);
+	g_free(options);
+}

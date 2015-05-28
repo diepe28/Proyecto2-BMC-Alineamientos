@@ -22,7 +22,6 @@
 #include "proyecto2-bmc-alineamientos.h"
 #include <glib/gi18n.h>
 #include "TestingFunctions.h"
-#include "FillingAlgorithms.h"
 
 int
 main (int argc, char *argv[])
@@ -36,7 +35,7 @@ main (int argc, char *argv[])
 	textdomain (GETTEXT_PACKAGE);
 #endif
 
-	//test();
+	//testFillingMatrix ();
 	//testGlobalAlingment();
 	//testSemiGlobalAlingment();
 	//testLocalAlingment();
