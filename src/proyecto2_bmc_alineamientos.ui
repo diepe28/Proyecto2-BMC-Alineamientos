@@ -533,7 +533,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkSpinButton" id="spNThreads">
+                      <object class="GtkSpinButton" id="sbNThreads">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="adjustment">aNThreads</property>
@@ -993,6 +993,8 @@
     <property name="title" translatable="yes">Alineamientos</property>
     <property name="modal">True</property>
     <property name="window_position">center</property>
+    <property name="default_width">800</property>
+    <property name="default_height">600</property>
     <property name="destroy_with_parent">True</property>
     <property name="type_hint">dialog</property>
     <property name="skip_taskbar_hint">True</property>
@@ -1017,7 +1019,7 @@
                 <property name="can_focus">False</property>
                 <property name="spacing">8</property>
                 <child>
-                  <object class="GtkScrolledWindow" id="scrolls">
+                  <object class="GtkScrolledWindow" id="panelResScrolls">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="shadow_type">in</property>
@@ -1025,6 +1027,8 @@
                       <object class="GtkTreeView" id="gridview">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
+                        <property name="hexpand">True</property>
+                        <property name="vexpand">True</property>
                         <property name="enable_grid_lines">both</property>
                         <child internal-child="selection">
                           <object class="GtkTreeSelection" id="gridview-selection"/>
@@ -1417,7 +1421,31 @@
           </packing>
         </child>
         <child>
-          <placeholder/>
+          <object class="GtkScrolledWindow" id="panelPerScrolls">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="margin_left">4</property>
+            <property name="margin_right">4</property>
+            <property name="margin_top">4</property>
+            <property name="margin_bottom">4</property>
+            <property name="shadow_type">in</property>
+            <child>
+              <object class="GtkViewport" id="viewport">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <child>
+                  <object class="GtkImage" id="image">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="stock">gtk-missing-image</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="position">1</property>
+          </packing>
         </child>
         <child type="tab">
           <object class="GtkLabel" id="lPanelPerLeyend">
