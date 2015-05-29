@@ -141,8 +141,6 @@ Cell*** create_similarity_matrix_kband(gchar* seq1, gchar* seq2, gint seq1Length
 		if (bestScore >= nextKBound)
 			return matrix;
 		k += kbandOptions->kExtensionValue;
-
-		print_matrix (matrix, seq1Length + 1, seq2Length + 1);
 	}
 
 	if (numberOfThreads == 1)
