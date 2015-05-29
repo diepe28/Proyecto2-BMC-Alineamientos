@@ -70,6 +70,8 @@ proyecto2_bmc_alineamientos_new_window (GApplication *app,
 
 	
 	/* ANJUTA: Widgets initialization for proyecto2_bmc_alineamientos.ui - DO NOT REMOVE */
+	
+	on_window_init (builder);
 
 	g_object_unref (builder);
 	

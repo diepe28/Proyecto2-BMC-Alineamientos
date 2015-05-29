@@ -124,19 +124,21 @@ int createBenchmarkGraph(long* times, int n){
 	char * commandsForGnuplot[] = {
 		"set terminal png large size 1920, 1080",
 		"set output \"printme.png\"",
-		"set style line 1 lc rgb '#0060ad' lt 1 lw 2 pt 7 ps 1.5", //blue
+		"set style line 1 lc rgb 'black' lt 1 lw 2 pt 7 ps 1", //0060ad blue
 		"set style line 2 lc rgb '#33CC33' lt 1 lw 2 pt 7 ps 1.5", //green
 		"set title \"Curva de aceleracion\"",
 		"set xlabel \"Cantidad de hilos\"",
 		"set ylabel \"Tiempo en milisegundos\"",
 		"unset key",
-		"plot 'data.temp' index 0 with linespoints ls 1, '' index 1 with linespoints ls 2"};
+		"set offset 1,1,1,1",
+		"plot 'data.temp' index 0 with linespoints ls 1, 'data.temp' using 1:2:(sprintf(\"(%d, %d)\", $1, $2)) with labels offset char 2,2 notitle"};
+		//"plot 'data.temp' index 0 with linespoints ls 1, '' index 1 with linespoints ls 2"};
 	
 	FILE * gnuplotPipe = popen ("gnuplot -persistent", "w");
 	FILE * tempFile = fopen("data.temp", "w");
-	char xRangeCommand[30], yRangeCommand[50];
+	char xRangeCommand[30], yRangeCommand[50], lowestPoint[150], highestPoint[150];
 	
-	int i = 0, numCommands = 9, minTimeIndex = 0, maxTimeIndex = 0;
+	int i = 0, numCommands = 10, minTimeIndex = 0, maxTimeIndex = 0;
 	long maxTime = 0, minTime = LONG_MAX, yMargin;
 
 	//finding min and max time
@@ -154,7 +156,10 @@ int createBenchmarkGraph(long* times, int n){
 	yMargin = (maxTime - minTime) / 4;
 	sprintf (xRangeCommand, "set xrange [%d:%d]", 0, n+1);
 	sprintf (yRangeCommand, "set yrange [%ld:%ld]", minTime - yMargin, maxTime + yMargin);
-	
+	sprintf (lowestPoint, "set object circle at first %d,%ld radius char 1.5 fillcolor rgb '#007A00' fillstyle solid noborder",
+	         minTimeIndex+1, minTime);
+	sprintf (highestPoint, "set object circle at first %d,%ld radius char 1.5 fillcolor rgb 'red' fillstyle solid noborder",
+	         maxTimeIndex+1, maxTime);
 	
 	if(gnuplotPipe != NULL && tempFile != NULL){
 		for(i=0; i < n; i++){
@@ -163,6 +168,8 @@ int createBenchmarkGraph(long* times, int n){
 		
 		fprintf(gnuplotPipe, "%s \n", xRangeCommand);
 		fprintf(gnuplotPipe, "%s \n", yRangeCommand);
+		fprintf(gnuplotPipe, "%s \n", lowestPoint);
+		fprintf(gnuplotPipe, "%s \n", highestPoint);
 		for (i=0; i < numCommands; i++){
 			fprintf(gnuplotPipe, "%s \n", commandsForGnuplot[i]); //Send commands to gnuplot one by one.
 		}

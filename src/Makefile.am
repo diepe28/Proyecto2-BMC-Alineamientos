@@ -39,7 +39,9 @@ proyecto2_bmc_alineamientos_SOURCES = \
 	TestingFunctions.c \
 	TestingFunctions.h \
 	SubstitutionMatrixes.h \
-	SubstitutionMatrixes.c	
+	SubstitutionMatrixes.c \
+	proyecto2_bmc_alineamientos.callbacks.c \
+	proyecto2_bmc_alineamientos.handlers.c	
 
 
 proyecto2_bmc_alineamientos_LDFLAGS = \

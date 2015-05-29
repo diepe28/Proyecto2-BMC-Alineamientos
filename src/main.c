@@ -41,8 +41,8 @@ main (int argc, char *argv[])
 	//testLocalAlingment();
 	//printf("%d\n", valueOfMatrix (BLOSUM_62, 'D', 'V'));
 	//testGNUPLOT();
-	long times[] = {50000,4000,3000,3250,35000};
-	int n = 5;
+	long times[] = {4800,4900,4400,4300,4250,4200,4000,4050};
+	int n = 8;
 	
 	// createBenchmarkGraph(&times, n);
 	
