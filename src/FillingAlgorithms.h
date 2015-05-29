@@ -1,4 +1,5 @@
 
+#include <math.h>
 #include <glib.h>
 #include "CellFillingSupport.h"
 #include "SubstitutionMatrixes.h"

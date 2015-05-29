@@ -422,10 +422,14 @@ static void print(Cell*** matrix, gint m, gint n, gboolean printOthers)
 		{
 			printf("Row %d:\n", i);
 			for (j = 0; j < n; j++) {
-				printf("[%d][%d] = %d   ", i, j, matrix[i][j]->value);
-				if (cell_isFlagSet (matrix[i][j], COMES_FROM_DIAGONAL)) printf("D "); else printf("  ");
-				if (cell_isFlagSet (matrix[i][j], COMES_FROM_UP)) printf("U "); else printf("  ");
-				if (cell_isFlagSet (matrix[i][j], COMES_FROM_LEFT)) printf("L "); else printf("  ");
+				if (matrix[i][j] != NULL && matrix[i][j]->value > MIN_VALUE + 100) {
+					printf("[%d][%d] = %d   ", i, j, matrix[i][j]->value);
+					if (cell_isFlagSet (matrix[i][j], COMES_FROM_DIAGONAL)) printf("D "); else printf("  ");
+					if (cell_isFlagSet (matrix[i][j], COMES_FROM_UP)) printf("U "); else printf("  ");
+					if (cell_isFlagSet (matrix[i][j], COMES_FROM_LEFT)) printf("L "); else printf("  ");
+				}
+				else
+					printf("[%d][%d] = -Inf   ", i, j);
 				puts("");
 			}
 		}
@@ -436,7 +440,7 @@ static void print(Cell*** matrix, gint m, gint n, gboolean printOthers)
 		{
 			printf("Row %d:\n", i);
 			for (j = 0; j < n; j++) {
-				if (matrix[i][j]->value > MIN_VALUE + 100)
+				if (matrix[i][j] != NULL && matrix[i][j]->value > MIN_VALUE + 100)
 					printf("[%d][%d] = %d   ", i, j, matrix[i][j]->value);
 				else
 					printf("[%d][%d] = -Inf   ", i, j);
@@ -485,10 +489,10 @@ static void print(Cell*** matrix, gint m, gint n, gboolean printOthers)
 
 void testFillingMatrix() 
 {
-	gchar* seq1 = "HEAGAWGHEE";
-	gchar* seq2 = "PAWHEAE";
-	gint size1 = 11;
-	gint size2 = 8;
+	gchar* seq2 = "TTGCATCGGCG";
+	gchar* seq1 = "ATTGTGATCCGGGGGGGG";
+	gint size2 = 12;
+	gint size1 = 19;
 	gint i, j = 0;
 	// Initialization
 
@@ -496,21 +500,29 @@ void testFillingMatrix()
 	options->matchBonus = 1;
 	options->missmatchPenalty = -1;
 	options->gapOpeningPenalty = 0;
-	options->gapExtensionPenalty = -3;
+	options->gapExtensionPenalty = -2;
 	options->freeLeftGapsForX = FALSE;
 	options->freeLeftGapsForY = FALSE;
-	options->substitutionMatrix = BLOSUM_62;
+	options->substitutionMatrix = NULL;
+
+	KBandOptions* kbandOptions = g_malloc(sizeof(KBandOptions));
+	kbandOptions->kInitValue = 3;
+	kbandOptions->kExtensionValue = 1;
 
 	// Call and printing
-	Cell*** matrix = create_similarity_matrix_full (seq1, seq2, 10, 10, options, FALSE, 1);
+	// Cell*** matrix = create_similarity_matrix_full (seq1, seq2, 10, 10, options, FALSE, 1);
+	Cell*** matrix = create_similarity_matrix_kband (seq1, seq2, 18, 11, options, kbandOptions, 1);
 	print (matrix, size1, size2, FALSE);
 	
 	// Cleaning
 	for (i = 0; i < size1; i++) {
-		for (j = 0; j < size2; j++)
-			g_free(matrix[i][j]);
+		for (j = 0; j < size2; j++) {
+			if (matrix[i][j] != NULL)
+				g_free(matrix[i][j]);
+		}
 		g_free(matrix[i]);
 	}
 	g_free(matrix);
 	g_free(options);
+	g_free(kbandOptions);
 }

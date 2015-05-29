@@ -43,7 +43,8 @@ proyecto2_bmc_alineamientos_SOURCES = \
 
 
 proyecto2_bmc_alineamientos_LDFLAGS = \
-	-Wl,--export-dynamic
+	-Wl,--export-dynamic \
+	-lm
 
 proyecto2_bmc_alineamientos_LDADD = $(PROYECTO2_BMC_ALINEAMIENTOS_LIBS)
 
