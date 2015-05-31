@@ -41,7 +41,9 @@ proyecto2_bmc_alineamientos_SOURCES = \
 	SubstitutionMatrixes.h \
 	SubstitutionMatrixes.c \
 	proyecto2_bmc_alineamientos.callbacks.c \
-	proyecto2_bmc_alineamientos.handlers.c	
+	proyecto2_bmc_alineamientos.handlers.c \
+	proyecto2_bmc_alineamientos.handlers.h \
+	AlignmentOptions.c	
 
 
 proyecto2_bmc_alineamientos_LDFLAGS = \

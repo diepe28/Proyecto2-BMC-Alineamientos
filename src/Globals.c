@@ -132,15 +132,16 @@ int createBenchmarkGraph(long* times, int n){
 		"unset key",
 		"set offset 1,1,1,1",
 		"plot 'data.temp' index 0 with linespoints ls 1, 'data.temp' using 1:2:(sprintf(\"(%d, %d)\", $1, $2)) with labels offset char 2,2 notitle"};
-		//"plot 'data.temp' index 0 with linespoints ls 1, '' index 1 with linespoints ls 2"};
 	
-	FILE * gnuplotPipe = popen ("gnuplot -persistent", "w");
-	FILE * tempFile = fopen("data.temp", "w");
 	char xRangeCommand[30], yRangeCommand[50], lowestPoint[150], highestPoint[150];
-	
 	int i = 0, numCommands = 10, minTimeIndex = 0, maxTimeIndex = 0;
 	long maxTime = 0, minTime = LONG_MAX, yMargin;
+	FILE * gnuplotPipe = popen ("gnuplot -persistent", "w");
+	FILE * tempFile = fopen("data.temp", "w");
 
+	if(gnuplotPipe == NULL || tempFile == NULL)
+		return 1;
+	
 	//finding min and max time
 	for(i =0; i < n; i++){
 		if(times[i] > maxTime){
@@ -161,65 +162,145 @@ int createBenchmarkGraph(long* times, int n){
 	sprintf (highestPoint, "set object circle at first %d,%ld radius char 1.5 fillcolor rgb 'red' fillstyle solid noborder",
 	         maxTimeIndex+1, maxTime);
 	
-	if(gnuplotPipe != NULL && tempFile != NULL){
-		for(i=0; i < n; i++){
-			fprintf(tempFile, "%d %ld \n", i+1, times[i]); //Write the data to a temporary file
-		}
-		
-		fprintf(gnuplotPipe, "%s \n", xRangeCommand);
-		fprintf(gnuplotPipe, "%s \n", yRangeCommand);
-		fprintf(gnuplotPipe, "%s \n", lowestPoint);
-		fprintf(gnuplotPipe, "%s \n", highestPoint);
-		for (i=0; i < numCommands; i++){
-			fprintf(gnuplotPipe, "%s \n", commandsForGnuplot[i]); //Send commands to gnuplot one by one.
-		}
-
-		fclose(tempFile);
-		pclose(gnuplotPipe);
+	
+	for(i=0; i < n; i++){
+		fprintf(tempFile, "%d %ld \n", i+1, times[i]); //Write the data to a temporary file
 	}
+	
+	fprintf(gnuplotPipe, "%s \n", xRangeCommand);
+	fprintf(gnuplotPipe, "%s \n", yRangeCommand);
+	fprintf(gnuplotPipe, "%s \n", lowestPoint);
+	fprintf(gnuplotPipe, "%s \n", highestPoint);
+	for (i=0; i < numCommands; i++){
+		fprintf(gnuplotPipe, "%s \n", commandsForGnuplot[i]); //Send commands to gnuplot one by one.
+	}
+
+	fclose(tempFile);
+	pclose(gnuplotPipe);
+	
 	return 0;
 }
 
-void testGNUPLOT(){
+int createBenchmarkGraphKBand(long* times, long* timesKBand, int n){
 	char * commandsForGnuplot[] = {
 		"set terminal png large size 1920, 1080",
 		"set output \"printme.png\"",
-		"set xrange [0:6]",
-		"set yrange [0:1500]",
-		"set style line 1 lc rgb '#0060ad' lt 1 lw 2 pt 7 ps 1.5", //blue
-		"set style line 2 lc rgb '#dd181f' lt 1 lw 2 pt 7 ps 1.5", //red
-		"set style line 3 lc rgb '#33CC33' lt 1 lw 2 pt 7 ps 1.5", //green
+		"set style line 1 lc rgb '#0060ad' lt 1 lw 2 pt 7 ps 1", //black
+		"set style line 2 lc rgb '#33CC33' lt 1 lw 2 pt 7 ps 1.5", //green
 		"set title \"Curva de aceleracion\"",
 		"set xlabel \"Cantidad de hilos\"",
 		"set ylabel \"Tiempo en milisegundos\"",
-		"unset key",
-		"plot 'data.temp' index 0 with linespoints ls 1, '' index 1 with linespoints ls 2, '' index 2 with linespoints ls 3 "};
-	int numPoints = 6;
-	int numCommands = 12;
+		"set key box height 3",
+		"set offset 1,1,1,1",
+		//"plot 'data.temp' index 0 with linespoints ls 1, '' index 1 with linespoints ls 2, 'data.temp' using 1:2:(sprintf(\"(%d, %d)\", $1, $2)) with labels offset char 2,2 notitle "};
+		"plot 'data.temp' index 0 with linespoints ls 1 title \"Full Matrix\" , '' index 1 with linespoints ls 2 title \"Using K-Band\""};
 	
-    long xvals[6] = {1,    5 ,    1,   5,   1,  5};
-    long yvals[6] = {1000, 1000,  700, 700, 600, 600};
-    FILE * temp = fopen("data.temp", "w");
-    /*Opens an interface that one can use to send commands as if they were typing into the
-     *     gnuplot command line.  "The -persistent" keeps the plot open even after your
-     *     C program terminates.
-     */
-    FILE * gnuplotPipe = popen ("gnuplot -persistent", "w");
-    int i;
-    for (i=0; i < numPoints; i++){
-		fprintf(temp, "%ld %ld \n", xvals[i], yvals[i]); //Write the data to a temporary file
-		if( (i+1) % 2 == 0)
-			fprintf(temp, "\n\n"); //Write the data to a temporary file
-    }
+	char xRangeCommand[30], yRangeCommand[50],
+		lowestPointFull[150],  highestPointFull[150],
+		lowestPointLabelFull[150],  highestPointLabelFull[150],
 	
-    for (i=0; i < numCommands; i++){
+		lowestPointKBand[150], highestPointKBand[150],	
+		lowestPointKLabelBand[150], highestPointLabelKBand[150];
+	
+	int i = 0, numCommands = 10, minTimeIndexFull = 0, maxTimeIndexFull = 0,
+			minTimeIndexKBand = 0, maxTimeIndexKBand = 0;
+	
+	long maxTimeTotal, minTimeTotal, yMargin, yMarginForLabel,
+		 maxTimeFull = times[0],  minTimeFull = times[0],
+		 maxTimeKBand = timesKBand[0], minTimeKBand = timesKBand[0];
+	
+	FILE * gnuplotPipe = popen ("gnuplot -persistent", "w");
+	FILE * tempFile = fopen("data.temp", "w");
+
+	if(gnuplotPipe == NULL || tempFile == NULL)
+		return 1;
+	
+	//finding min and max time in both times
+	for(i =1; i < n; i++){
+		//Full matrix
+		if(times[i] > maxTimeFull){
+			maxTimeFull = times[i];
+			maxTimeIndexFull = i;
+		}
+		if(times[i] < minTimeFull){
+			minTimeFull = times[i];
+			minTimeIndexFull = i;
+		}
+
+		//Kband
+		if(timesKBand[i] > maxTimeKBand){
+			maxTimeKBand = timesKBand[i];
+			maxTimeIndexKBand = i;
+		}
+		if(timesKBand[i] < minTimeKBand){
+			minTimeKBand = timesKBand[i];
+			minTimeIndexKBand = i;
+		}
+	}
+	maxTimeTotal = maxTimeFull > maxTimeKBand? maxTimeFull : maxTimeKBand;
+	minTimeTotal = minTimeFull < minTimeKBand? minTimeFull : minTimeKBand;
+	
+	yMargin = (maxTimeTotal - minTimeTotal) / 4;
+	yMarginForLabel = (maxTimeTotal - minTimeTotal + 2*yMargin) / 20;
+	sprintf (xRangeCommand, "set xrange [%d:%d]", 0, n+1);
+	sprintf (yRangeCommand, "set yrange [%ld:%ld]", minTimeTotal - yMargin, maxTimeTotal + yMargin);
+	
+
+	// Min, max points and labels of them using full matrix
+	sprintf (lowestPointFull, "set object circle at first %d,%ld radius char 1.5 fillcolor rgb '#007A00' fillstyle solid noborder",
+	         minTimeIndexFull+1, minTimeFull);
+	sprintf (highestPointFull, "set object circle at first %d,%ld radius char 1.5 fillcolor rgb 'red' fillstyle solid noborder",
+	         maxTimeIndexFull+1, maxTimeFull);
+	
+	sprintf (lowestPointLabelFull, "set label \"(%d,%ld) \" at %d,%ld",
+	         minTimeIndexFull+1, minTimeFull, minTimeIndexFull+1, minTimeFull + yMarginForLabel);
+	sprintf (highestPointLabelFull, "set label \"(%d,%ld) \" at %d,%ld",
+	         maxTimeIndexFull+1, maxTimeFull, maxTimeIndexFull+1, maxTimeFull + yMarginForLabel);
+
+	// Min, max points and labels of them using kband
+	sprintf (lowestPointKBand, "set object circle at first %d,%ld radius char 1.5 fillcolor rgb '#007A00' fillstyle solid noborder",
+	         minTimeIndexKBand+1, minTimeKBand);
+	sprintf (highestPointKBand, "set object circle at first %d,%ld radius char 1.5 fillcolor rgb 'red' fillstyle solid noborder",
+	         maxTimeIndexKBand+1, maxTimeKBand);
+
+	sprintf (lowestPointKLabelBand, "set label \"(%d,%ld) \" at %d,%ld",
+	         minTimeIndexKBand+1, minTimeKBand, minTimeIndexKBand+1, minTimeKBand + yMarginForLabel);
+	sprintf (highestPointLabelKBand,"set label \"(%d,%ld) \" at %d,%ld",
+	         maxTimeIndexKBand+1, maxTimeKBand, maxTimeIndexKBand+1, maxTimeKBand + yMarginForLabel);
+	
+	//Write the data of full calc to temporary file
+	for(i=0; i < n; i++){
+		fprintf(tempFile, "%d %ld \n", i+1, times[i]); 
+	}
+
+	fprintf(tempFile, "\n\n");
+	//Write the data of kband to to temporary file
+	for(i=0; i < n; i++){
+		fprintf(tempFile, "%d %ld \n", i+1, timesKBand[i]);
+	}
+	
+	fprintf(gnuplotPipe, "%s \n", xRangeCommand);
+	fprintf(gnuplotPipe, "%s \n", yRangeCommand);
+	
+	fprintf(gnuplotPipe, "%s \n", lowestPointFull);
+	fprintf(gnuplotPipe, "%s \n", lowestPointLabelFull);
+	fprintf(gnuplotPipe, "%s \n", highestPointFull);
+	fprintf(gnuplotPipe, "%s \n", highestPointLabelFull);
+
+	fprintf(gnuplotPipe, "%s \n", lowestPointKBand);
+	fprintf(gnuplotPipe, "%s \n", lowestPointKLabelBand);
+	fprintf(gnuplotPipe, "%s \n", highestPointKBand);
+	fprintf(gnuplotPipe, "%s \n", highestPointLabelKBand);
+	
+	for (i=0; i < numCommands; i++){
 		fprintf(gnuplotPipe, "%s \n", commandsForGnuplot[i]); //Send commands to gnuplot one by one.
-    }
+	}
 
-	fclose(temp);
+	fclose(tempFile);
 	pclose(gnuplotPipe);
+	
+	return 0;
 }
-
 
 
 

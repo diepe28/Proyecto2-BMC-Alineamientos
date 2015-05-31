@@ -9,7 +9,7 @@ static void printMatrix(int n, int m,Cell*** matrix){
 	for(i = 0; i < n+1; i++){
 		for(j = 0; j < m+1; j++){
 			if(cell_isFlagSet (matrix[i][j], IS_PAINTED))
-				printf("%d\t", matrix[i][j]->value);
+				printf("%d\t", matrix[i][j]->value_a);
 			else
 				printf(".\t");
 		}
@@ -20,54 +20,25 @@ static void printMatrix(int n, int m,Cell*** matrix){
 
 
 void testGlobalAlingment(){
-	gchar * up = "ATTGT";
-	gchar * left = "TTGCA";
-	gint i , j, gapPenalty = -2;
-	gint n = strlen(up), m = strlen(left);
+	gchar* seq2 = "TTGCATCGGCG";
+	gchar* seq1 = "ATTGTGATCCGGGGGGGG";
+	gint n = 12;
+	gint m = 19;
+	gint i, j = 0;
+	// Initialization
 
-	Cell ***  mat = (Cell***) (g_malloc((n+1)* sizeof(Cell*)));
-	for(i = 0; i < n+1; i++){
-		mat[i] = (Cell**) (g_malloc((m+1)* sizeof(Cell*)));
-	}       
+	ScoringOptions* options = g_malloc(sizeof(ScoringOptions));
+	options->matchBonus = 1;
+	options->missmatchPenalty = -1;
+	options->gapOpeningPenalty = 0;
+	options->gapExtensionPenalty = -2;
+	options->freeLeftGapsForX = FALSE;
+	options->freeLeftGapsForY = FALSE;
+	options->substitutionMatrix = NULL;
 
-	mat[0][0] = cell_new (0,0);
-	//first row and first col
-	for(i = 1; i < n+1; i++){
-		mat[0][i] = cell_new (gapPenalty * i, COMES_FROM_LEFT );
-		mat[i][0] = cell_new (gapPenalty * i, COMES_FROM_UP);
-	}
-
-	mat[1][1] = cell_new (-1, COMES_FROM_DIAGONAL);
-	mat[1][2] = cell_new (-1, COMES_FROM_DIAGONAL);
-	mat[1][3] = cell_new (-3, COMES_FROM_DIAGONAL | COMES_FROM_LEFT);
-	mat[1][4] = cell_new (-5, COMES_FROM_LEFT);
-	mat[1][5] = cell_new (-7, COMES_FROM_LEFT | COMES_FROM_DIAGONAL);
-
-	mat[2][1] = cell_new (-3, COMES_FROM_UP | COMES_FROM_DIAGONAL);
-	mat[2][2] = cell_new (0, COMES_FROM_DIAGONAL);
-	mat[2][3] = cell_new (0, COMES_FROM_DIAGONAL);
-	mat[2][4] = cell_new (-2, COMES_FROM_LEFT);
-	mat[2][5] = cell_new (-4, COMES_FROM_LEFT | COMES_FROM_DIAGONAL);
-	
-	mat[3][1] = cell_new (-5, COMES_FROM_DIAGONAL | COMES_FROM_UP);
-	mat[3][2] = cell_new (-2, COMES_FROM_UP);
-	mat[3][3] = cell_new (-1, COMES_FROM_DIAGONAL);
-	mat[3][4] = cell_new (1, COMES_FROM_DIAGONAL);
-	mat[3][5] = cell_new (-1, COMES_FROM_LEFT);
-	
-	mat[4][1] = cell_new (-7, COMES_FROM_DIAGONAL | COMES_FROM_UP);
-	mat[4][2] = cell_new (-4, COMES_FROM_UP);
-	mat[4][3] = cell_new (-3, COMES_FROM_DIAGONAL | COMES_FROM_UP);
-	mat[4][4] = cell_new (-1, COMES_FROM_UP);
-	mat[4][5] = cell_new (-0, COMES_FROM_DIAGONAL);
-
-	mat[5][1] = cell_new (-7, COMES_FROM_DIAGONAL);
-	mat[5][2] = cell_new (-6, COMES_FROM_UP);
-	mat[5][3] = cell_new (-5, COMES_FROM_DIAGONAL | COMES_FROM_UP);
-	mat[5][4] = cell_new (-3, COMES_FROM_UP);
-	mat[5][5] = cell_new (-2, COMES_FROM_UP);
-
-	char** sequences = afterMatrixFilling_findGlobalAlignment (mat, up, left, n, m);
+	Cell*** matrix = create_similarity_matrix_full(seq1, seq2, n, m, options, FALSE, 1);
+	char** sequences = afterMatrixFilling_find_NW_Alignment (matrix, seq1, seq2, n, m,
+	                                                         FALSE, FALSE, FALSE);
 
 	printf("Text1: %s\n", sequences[0]);
 	printf("Text2: %s\n", sequences[1]);
@@ -78,15 +49,15 @@ void testGlobalAlingment(){
 	
 	for(i = 0; i < n+1; i++){
 		for(j = 0; j < m+1; j++){
-			g_free(mat[i][j]);
+			g_free(matrix[i][j]);
 		}
 	}
 
 	for(i = 0; i < n+1; i++){
-		g_free(mat[i]);
+		g_free(matrix[i]);
 	}
 
-	g_free(mat);
+	g_free(matrix);
 }
 
 
@@ -222,7 +193,7 @@ void testSemiGlobalAlingment(){
 	printf("\n");
 	for(i = 0; i < n+1; i++){
 		for(j = 0; j < m+1; j++){
-			printf("%d\t", mat[i][j]->value);
+			printf("%d\t", mat[i][j]->value_a);
 		}
 		printf("\n");
 	}
@@ -384,7 +355,7 @@ void testLocalAlingment(){
 	printf("\n");
 	for(i = 0; i < n+1; i++){
 		for(j = 0; j < m+1; j++){
-			printf("%d\t", mat[i][j]->value);
+			printf("%d\t", mat[i][j]->value_a);
 		}
 		printf("\n");
 	}
@@ -422,11 +393,11 @@ static void print(Cell*** matrix, gint m, gint n, gboolean printOthers)
 		{
 			printf("Row %d:\n", i);
 			for (j = 0; j < n; j++) {
-				if (matrix[i][j] != NULL && matrix[i][j]->value > MIN_VALUE + 100) {
-					printf("[%d][%d] = %d   ", i, j, matrix[i][j]->value);
-					if (cell_isFlagSet (matrix[i][j], COMES_FROM_DIAGONAL)) printf("D "); else printf("  ");
-					if (cell_isFlagSet (matrix[i][j], COMES_FROM_UP)) printf("U "); else printf("  ");
-					if (cell_isFlagSet (matrix[i][j], COMES_FROM_LEFT)) printf("L "); else printf("  ");
+				if (matrix[i][j] != NULL && matrix[i][j]->value_a > MIN_VALUE + 100) {
+					printf("[%d][%d] = %d   ", i, j, matrix[i][j]->value_a);
+					if (cell_isFlagASet (matrix[i][j], COMES_FROM_DIAGONAL)) printf("D "); else printf("  ");
+					if (cell_isFlagASet (matrix[i][j], COMES_FROM_UP)) printf("U "); else printf("  ");
+					if (cell_isFlagASet (matrix[i][j], COMES_FROM_LEFT)) printf("L "); else printf("  ");
 				}
 				else
 					printf("[%d][%d] = -Inf   ", i, j);
@@ -440,8 +411,8 @@ static void print(Cell*** matrix, gint m, gint n, gboolean printOthers)
 		{
 			printf("Row %d:\n", i);
 			for (j = 0; j < n; j++) {
-				if (matrix[i][j] != NULL && matrix[i][j]->value > MIN_VALUE + 100)
-					printf("[%d][%d] = %d   ", i, j, matrix[i][j]->value);
+				if (matrix[i][j] != NULL && matrix[i][j]->value_a > MIN_VALUE + 100)
+					printf("[%d][%d] = %d   ", i, j, matrix[i][j]->value_a);
 				else
 					printf("[%d][%d] = -Inf   ", i, j);
 				if (cell_isFlagSet (matrix[i][j], COMES_FROM_DIAGONAL)) printf("A "); else printf("  ");

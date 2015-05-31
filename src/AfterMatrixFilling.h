@@ -6,22 +6,14 @@
 //given the matrix of global alignment (NW) and the the sequences
 //it finds the alignment of the two sequences and returns it in a two
 //length vector of char*. Seq1 = up, N-length, seq2 = left, M-length
-gchar** afterMatrixFilling_findGlobalAlignment(Cell*** matrix, 
+gchar** afterMatrixFilling_find_NW_Alignment(Cell*** matrix, 
                                               gchar* upSequence,
                                               gchar* leftSequence,
                                               gint n,
-                                              gint m);
-
-//given the matrix of global alignment (NW) and the the sequences
-//it finds the alignment of the two sequences and returns it in a two
-//length vector of char*. Seq1 = up, N-length, seq2 = left, M-length
-gchar** afterMatrixFilling_findSemiGlobalAlignment(Cell*** matrix,
-                                                  gchar* upSequence,
-                                                  gchar* leftSequence,
-                                                  gint n,
-                                                  gint m,
-                                                  gboolean freeRightGapsUp,
-                                                  gboolean freeRightGapsLeft);
+                                              gint m,
+                                              gboolean freeRightGapsUp,
+                                              gboolean freeRightGapsLeft,
+                                              gboolean blockOfGaps);
 
 //given the matrix of local alignment (SW) and the the sequences
 //it finds the islands with value >= minScore, within the matrix
@@ -33,5 +25,6 @@ GSList* afterMatrixFilling_findLocalAlignments(Cell*** matrix,
                                               gint n,
                                               gint m,
                                               gint minScore);
+
 
 #endif

@@ -19,4 +19,18 @@ typedef struct {
 	gint kExtensionValue;
 } KBandOptions;
 
+ScoringOptions* ScoringOptions_new(
+	gint matchBonus,
+	gint missmatchPenalty,
+	gint gapOpeningPenalty,
+	gint gapExtensionPenalty,
+	gboolean freeLeftGapsForX,
+	gboolean freeLeftGapsForY
+);
+
+KBandOptions* KBandOptions_new(
+	gint kInitValue,
+	gint kExtensionValue
+);
+
 #endif
