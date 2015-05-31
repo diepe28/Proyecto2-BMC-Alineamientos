@@ -35,29 +35,7 @@ main (int argc, char *argv[])
 	textdomain (GETTEXT_PACKAGE);
 #endif
 
-	//testFillingMatrix ();
 	testGlobalAlingment();
-	//testSemiGlobalAlingment();
-	//testLocalAlingment();
-	//printf("%d\n", valueOfMatrix (BLOSUM_62, 'D', 'V'));
-	//testGNUPLOT();
-	long times[] = {
-		4800,4900,4400,4300,4250,4200,4000,4010,4020,4050,
-		4800,4900,4400,4300,4250,4200,4000,4010,4020,4050,
-		4800,4900,4400,4300,4250,4200,4000,4010,4020,4050,
-		4800,4900,4400,4300,4250,4200,4000,4010,4020,4050,
-		4800,4900,4400,4300,4250,4200,4000,4010,4020,4050
-	};
-	long kband[] = {
-		3800,3900,3400,3300,3250,3200,3000,3050,3080, 3100,
-		3800,3900,3400,3300,3250,3200,3000,3050,3080, 3100,
-		3800,3900,3400,3300,3250,3200,3000,3050,3080, 3100,
-		3800,3900,3400,3300,3250,3200,3000,3050,3080, 3100,
-		3800,3900,3400,3300,3250,3200,3000,3050,3080, 3100
-	};
-	int n = 50;
-	
-	//createBenchmarkGraphKBand(&times, &kband, n);
 	
 	app = proyecto2_bmc_alineamientos_new ();
 	status = g_application_run (G_APPLICATION (app), argc, argv);

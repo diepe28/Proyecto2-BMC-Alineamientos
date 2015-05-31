@@ -31,8 +31,9 @@ Cell* triple_cell_new(gint value_a, gint value_b, gint value_c, guint flags_a, g
 void cell_setFlagA(Cell*, guint flag);
 void cell_setFlagB(Cell*, guint flag);
 void cell_setFlagC(Cell*, guint flag);
-int cell_isFlagASet(Cell*, guint flag);
-int cell_isFlagBSet(Cell*, guint flag);
-int cell_isFlagCSet(Cell*, guint flag);
-
+void cell_setFlag(Cell*, guint flag, char matrix);
+gboolean cell_isFlagASet(Cell*, guint flag);
+gboolean cell_isFlagBSet(Cell*, guint flag);
+gboolean cell_isFlagCSet(Cell*, guint flag);
+gboolean cell_isFlagSet(Cell*, guint flag, char matrix);
 #endif

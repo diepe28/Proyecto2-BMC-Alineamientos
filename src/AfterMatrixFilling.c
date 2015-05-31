@@ -26,24 +26,27 @@ static gchar ** alignmentFromPoint(Cell*** matrix, gchar* upSequence, gchar* lef
 
 	//While not int matrix[0][0]
 	while(i > 0 || j > 0){
-		if(currentMatrix == 'A'){
-			cell_setFlagA(matrix[i][j], IS_PAINTED);
-			if(cell_isFlagASet (matrix[i][j], COMES_FROM_DIAGONAL)){
-				newUpSeq[upIndex--] = upSequence[--j];
-				newLeftSeq[leftIndex--] = leftSequence[--i];
-				continue;
-			}
-			if(cell_isFlagASet (matrix[i][j], COMES_FROM_LEFT)){
-				newUpSeq[upIndex--] = upSequence[--j];
-				newLeftSeq[leftIndex--] = GAP;
-				continue;
-			}
-			if(cell_isFlagASet (matrix[i][j], COMES_FROM_UP)){
-				newUpSeq[upIndex--] = GAP;
-				newLeftSeq[leftIndex--] = leftSequence[--i];
-			}
+		if(!blockOfGaps)
+			currentMatrix = 'A';
+		
+		cell_setFlag(matrix[i][j], IS_PAINTED, currentMatrix);
+		if(cell_isFlagSet (matrix[i][j], COMES_FROM_DIAGONAL, currentMatrix)){
+			newUpSeq[upIndex--] = upSequence[--j];
+			newLeftSeq[leftIndex--] = leftSequence[--i];
+			currentMatrix = 'A';
+			continue;
 		}
-	
+		if(cell_isFlagSet (matrix[i][j], COMES_FROM_LEFT, currentMatrix)){
+			newUpSeq[upIndex--] = upSequence[--j];
+			newLeftSeq[leftIndex--] = GAP;
+			currentMatrix = 'B';
+			continue;
+		}
+		if(cell_isFlagSet (matrix[i][j], COMES_FROM_UP, currentMatrix)){
+			newUpSeq[upIndex--] = GAP;
+			newLeftSeq[leftIndex--] = leftSequence[--i];
+			currentMatrix = 'C';	
+		}
 	}
 
 	alignmentLength = (n+m) -leftIndex;
