@@ -99,6 +99,51 @@ static void fill_antidiagonal(Cell*** matrix, gint n, gchar* seq1, gchar* seq2, 
 	}
 }
 
+// Parallel-helper functions
+
+static void* fill_strips(void* arguments) 
+{
+	puts("Hello from thread");
+	pthread_exit((void *) 0);
+}
+
+static void fill_matrix_parallel(Cell*** matrix, ScoringOptions* options, gint height, gint width, gchar* seq1, gchar* seq2, gboolean isLocalAlignment, gint numberOfThreads)
+{
+	gint i = 0;
+	pthread_t** threads = (pthread_t**) g_malloc(sizeof(pthread_t*) * numberOfThreads);
+	FullFillParameters** parameters = (FullFillParameters**) g_malloc(sizeof(FullFillParameters*) * numberOfThreads);
+	
+	pthread_attr_t attr;
+	pthread_attr_init(&attr);
+	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+
+	for (i = 0; i < numberOfThreads; i++) {
+		parameters[i] = (FullFillParameters*) g_malloc(sizeof(FullFillParameters));
+		parameters[i]->matrix = matrix;
+		parameters[i]->options = options;
+		parameters[i]->seq1 = seq1;
+		parameters[i]->seq2 = seq2;
+		parameters[i]->isLocalAlignment = isLocalAlignment;
+		// TODO assign proper boundaries for each thread
+
+		threads[i] = (pthread_t*) g_malloc(sizeof(pthread_t));
+		if (pthread_create(threads[i], &attr, fill_strips, (void*)parameters[i]))
+			puts("ERROR from pthread_create()");
+	}
+
+	pthread_attr_destroy(&attr);
+	for (i = 0; i < numberOfThreads; i++) {
+		if (pthread_join(*(threads[i]), NULL))
+			puts("ERROR from pthread_join()");
+		g_free(threads[i]);
+		g_free(parameters[i]);
+	}
+	g_free(threads);
+	g_free(parameters);
+
+	puts("Everything was good");
+}
+
 // Exposed functions
 
 Cell*** create_similarity_matrix_full(gchar* seq1, gchar* seq2, gint seq1Length, gint seq2Length, ScoringOptions* scoringOptions, gboolean isLocalAlignment, gint numberOfThreads) 
@@ -110,8 +155,8 @@ Cell*** create_similarity_matrix_full(gchar* seq1, gchar* seq2, gint seq1Length,
 		
 	if (numberOfThreads == 1)
 		fill_matrix (matrix, scoringOptions, 0, 0, seq1Length + 1, seq2Length + 1, seq1, seq2, isLocalAlignment);
-	
-	// TODO parallel case
+	else
+		fill_matrix_parallel (matrix, scoringOptions, seq1Length + 1, seq2Length + 1, seq1, seq2, isLocalAlignment, numberOfThreads);
 	
 	return matrix;
 }
@@ -146,7 +191,7 @@ Cell*** create_similarity_matrix_kband(gchar* seq1, gchar* seq2, gint seq1Length
 	if (numberOfThreads == 1)
 		fill_matrix (matrix, scoringOptions, 0, 0, seq1Length + 1, seq2Length + 1, seq1, seq2, FALSE);
 	else
-		; // TODO Parallel case
+		fill_matrix_parallel (matrix, scoringOptions, seq1Length + 1, seq2Length + 1, seq1, seq2, FALSE, numberOfThreads);
 	
 	return matrix;
 }

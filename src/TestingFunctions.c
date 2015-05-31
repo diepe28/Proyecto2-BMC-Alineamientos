@@ -510,9 +510,9 @@ void testFillingMatrix()
 	kbandOptions->kExtensionValue = 1;
 
 	// Call and printing
-	// Cell*** matrix = create_similarity_matrix_full (seq1, seq2, 10, 10, options, FALSE, 1);
-	Cell*** matrix = create_similarity_matrix_kband (seq1, seq2, 18, 11, options, kbandOptions, 1);
-	print (matrix, size1, size2, FALSE);
+	Cell*** matrix = create_similarity_matrix_full (seq1, seq2, 18, 11, options, FALSE, 10);
+	//Cell*** matrix = create_similarity_matrix_kband (seq1, seq2, 18, 11, options, kbandOptions, 1);
+	//print (matrix, size1, size2, FALSE);
 	
 	// Cleaning
 	for (i = 0; i < size1; i++) {
