@@ -36,7 +36,7 @@ main (int argc, char *argv[])
 #endif
 
 	//testFillingMatrix ();
-	//testGlobalAlingment();
+	testGlobalAlingment();
 	//testSemiGlobalAlingment();
 	//testLocalAlingment();
 	//printf("%d\n", valueOfMatrix (BLOSUM_62, 'D', 'V'));
@@ -57,7 +57,7 @@ main (int argc, char *argv[])
 	};
 	int n = 50;
 	
-	createBenchmarkGraphKBand(&times, &kband, n);
+	//createBenchmarkGraphKBand(&times, &kband, n);
 	
 	app = proyecto2_bmc_alineamientos_new ();
 	status = g_application_run (G_APPLICATION (app), argc, argv);

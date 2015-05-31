@@ -17,21 +17,21 @@
 
 extern const gchar GAP;
 typedef struct{
-	gint value;
+	gint value_a;
 	gint value_b;
 	gint value_c;
-	guint flags;
+	guint flags_a;
 	guint flags_b;
 	guint flags_c;
 }Cell;
 
-Cell* cell_new(gint value, guint flags);
+Cell* cell_new(gint value_a, guint flags_a);
 Cell* triple_cell_new(gint value_a, gint value_b, gint value_c, guint flags_a, guint flags_b, guint flags_c);
 
-void cell_setFlag(Cell*, guint flag);
+void cell_setFlagA(Cell*, guint flag);
 void cell_setFlagB(Cell*, guint flag);
 void cell_setFlagC(Cell*, guint flag);
-int cell_isFlagSet(Cell*, guint flag);
+int cell_isFlagASet(Cell*, guint flag);
 int cell_isFlagBSet(Cell*, guint flag);
 int cell_isFlagCSet(Cell*, guint flag);
 
