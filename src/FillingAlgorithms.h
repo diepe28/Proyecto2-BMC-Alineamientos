@@ -15,6 +15,15 @@ typedef struct {
 	gchar* seq1;
 	gchar* seq2;
 	gboolean isLocalAlignment;
+	gint basicBlockWidth;
+	gint widthExcess;
+	gint totalWidth;
+	gint strip1Start;
+	gint strip1Height;
+	gint strip2Start;
+	gint strip2Height;
+	sem_t* signalSemaphore;
+	sem_t* waitingSemaphore;
 } FullFillParameters;
 
 Cell*** create_similarity_matrix_full(gchar* seq1, gchar* seq2, gint seq1Length, gint seq2Length, ScoringOptions* scoringOptions, gboolean isLocalAlignment, gint numberOfThreads);

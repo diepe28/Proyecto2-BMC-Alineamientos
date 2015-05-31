@@ -101,11 +101,38 @@ static void fill_antidiagonal(Cell*** matrix, gint n, gchar* seq1, gchar* seq2, 
 
 // Parallel-helper functions
 
+static void fill_strip(FullFillParameters* params, gboolean firstStrip) 
+{
+	gint startX = firstStrip ? params->strip1Start : params->strip2Start;
+	gint startY = 0;
+	gint blockHeight = firstStrip ? params->strip1Height : params->strip2Height;
+	gint blockWidth = 0;
+	gint n = params->widthExcess;
+	
+	while (startY < params->totalWidth) {
+		if (startX != 0)
+			if (sem_wait(params->waitingSemaphore))
+				puts("ERROR from sem_wait()");
+		blockWidth = (n > 0) ? (params->basicBlockWidth + 1) : params->basicBlockWidth;
+		fill_matrix (params->matrix, params->options, startX, startY, blockHeight, blockWidth, params->seq1, params->seq2, params->isLocalAlignment);
+		startY += blockWidth;
+		n--;
+		if (sem_post(params->signalSemaphore))
+			puts("ERROR from sem_post()");
+	}
+}
+
 static void* fill_strips(void* parameters) 
 {
 	FullFillParameters* params = (FullFillParameters*) parameters;
 	printf("Thread %d started processing... \n", params->threadID);
 
+	if (params->strip1Height != 0)
+		fill_strip (params, TRUE);
+
+	if (params->strip2Height != 0)
+		fill_strip (params, FALSE);
+	
 	printf("Thread %d finished processing... \n", params->threadID);
 	pthread_exit((void *) 0);
 }
@@ -120,6 +147,27 @@ static void fill_matrix_parallel(Cell*** matrix, ScoringOptions* options, gint h
 	pthread_attr_init(&attr);
 	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 
+	gint basicBlockWidth = width / numberOfThreads;
+	gint basicBlockHeight = height / (2 * numberOfThreads);
+	gint widthExcess = width % numberOfThreads;
+	gint heightExcess = height % (2 * numberOfThreads);
+
+	sem_t** semaphores = (sem_t**) g_malloc(sizeof(sem_t*) * numberOfThreads);
+	for (i = 0; i < numberOfThreads; i++) {
+		semaphores[i] = (sem_t*) g_malloc(sizeof(sem_t));
+		if (sem_init(semaphores[i], FALSE, 0))
+			puts("ERROR from sem_init()");
+	}
+
+	// Test
+	printf("Width=%d \n", width);
+	printf("Height=%d \n", height);
+	printf("BasicBlockWidth=%d \n", basicBlockWidth);
+	printf("BasicBlockHeight=%d \n", basicBlockHeight);
+	printf("WidthExcess=%d \n", widthExcess);
+	printf("HeightExcess=%d \n", heightExcess);
+	// Test
+	
 	for (i = 0; i < numberOfThreads; i++) {
 		parameters[i] = (FullFillParameters*) g_malloc(sizeof(FullFillParameters));
 		parameters[i]->threadID = i;
@@ -128,7 +176,23 @@ static void fill_matrix_parallel(Cell*** matrix, ScoringOptions* options, gint h
 		parameters[i]->seq1 = seq1;
 		parameters[i]->seq2 = seq2;
 		parameters[i]->isLocalAlignment = isLocalAlignment;
-		// TODO assign proper boundaries for each thread
+		parameters[i]->basicBlockWidth = basicBlockWidth;
+		parameters[i]->widthExcess = widthExcess;
+		parameters[i]->totalWidth = width;
+		parameters[i]->strip1Start = i * basicBlockHeight + MIN(i, heightExcess);
+		parameters[i]->strip1Height = (i < heightExcess) ? (basicBlockHeight + 1) : (basicBlockHeight);
+		parameters[i]->strip2Start = (i + numberOfThreads) * basicBlockHeight + MIN((i + numberOfThreads), heightExcess);
+		parameters[i]->strip2Height = ((i + numberOfThreads) < heightExcess) ? (basicBlockHeight + 1) : (basicBlockHeight);
+		parameters[i]->signalSemaphore = semaphores[i];
+		parameters[i]->waitingSemaphore = (i == 0) ? semaphores[numberOfThreads-1] : semaphores[i-1];
+
+		// Test
+		printf("Thread %d strip1Start=%d \n", i, parameters[i]->strip1Start);
+		printf("Thread %d strip1Height=%d \n",  i, parameters[i]->strip1Height);
+		printf("Thread %d strip2Start=%d \n", i, parameters[i]->strip2Start);
+		printf("Thread %d strip2Height=%d \n",  i, parameters[i]->strip2Height);
+		puts("");
+		// Test
 
 		threads[i] = (pthread_t*) g_malloc(sizeof(pthread_t));
 		if (pthread_create(threads[i], &attr, fill_strips, (void*)parameters[i]))
@@ -144,6 +208,13 @@ static void fill_matrix_parallel(Cell*** matrix, ScoringOptions* options, gint h
 	}
 	g_free(threads);
 	g_free(parameters);
+
+	for (i = 0; i < numberOfThreads; i++) {
+		if (sem_destroy(semaphores[i]))
+			puts("ERROR from sem_destroy()");
+		g_free(semaphores[i]);
+	}
+	g_free(semaphores);
 
 	puts("Paralel processing finished...");
 }

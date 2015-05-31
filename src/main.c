@@ -35,7 +35,8 @@ main (int argc, char *argv[])
 	textdomain (GETTEXT_PACKAGE);
 #endif
 
-	testGlobalAlingment();
+	testFillingMatrix ();
+	//testGlobalAlingment();
 	
 	app = proyecto2_bmc_alineamientos_new ();
 	status = g_application_run (G_APPLICATION (app), argc, argv);
