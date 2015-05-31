@@ -9,6 +9,7 @@
 #define FILLING_ALGORITHMS_H
 
 typedef struct {
+	gint threadID;
 	Cell*** matrix;
 	ScoringOptions* options;
 	gchar* seq1;

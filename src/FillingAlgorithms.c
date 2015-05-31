@@ -101,9 +101,12 @@ static void fill_antidiagonal(Cell*** matrix, gint n, gchar* seq1, gchar* seq2, 
 
 // Parallel-helper functions
 
-static void* fill_strips(void* arguments) 
+static void* fill_strips(void* parameters) 
 {
-	puts("Hello from thread");
+	FullFillParameters* params = (FullFillParameters*) parameters;
+	printf("Thread %d started processing... \n", params->threadID);
+
+	printf("Thread %d finished processing... \n", params->threadID);
 	pthread_exit((void *) 0);
 }
 
@@ -119,6 +122,7 @@ static void fill_matrix_parallel(Cell*** matrix, ScoringOptions* options, gint h
 
 	for (i = 0; i < numberOfThreads; i++) {
 		parameters[i] = (FullFillParameters*) g_malloc(sizeof(FullFillParameters));
+		parameters[i]->threadID = i;
 		parameters[i]->matrix = matrix;
 		parameters[i]->options = options;
 		parameters[i]->seq1 = seq1;
@@ -141,7 +145,7 @@ static void fill_matrix_parallel(Cell*** matrix, ScoringOptions* options, gint h
 	g_free(threads);
 	g_free(parameters);
 
-	puts("Everything was good");
+	puts("Paralel processing finished...");
 }
 
 // Exposed functions
