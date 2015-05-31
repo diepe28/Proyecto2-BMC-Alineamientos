@@ -8,7 +8,7 @@ static void printMatrix(int n, int m,Cell*** matrix){
 	printf("\n");
 	for(i = 0; i < n+1; i++){
 		for(j = 0; j < m+1; j++){
-			if(cell_isFlagSet (matrix[i][j], IS_PAINTED))
+			if(cell_isFlagASet (matrix[i][j], IS_PAINTED))
 				printf("%d\t", matrix[i][j]->value_a);
 			else
 				printf(".\t");
@@ -200,7 +200,7 @@ void testSemiGlobalAlingment(){
 	printf("\n");
 	
 	
-	char** sequences = afterMatrixFilling_findSemiGlobalAlignment (mat, up, left, n, m, 0, 1);
+	char** sequences = NULL; //afterMatrixFilling_findSemiGlobalAlignment (mat, up, left, n, m, 0, 1);
 
 	printf("Text1: %s\n", sequences[0]);
 	printf("Text2: %s\n", sequences[1]);
@@ -415,7 +415,7 @@ static void print(Cell*** matrix, gint m, gint n, gboolean printOthers)
 					printf("[%d][%d] = %d   ", i, j, matrix[i][j]->value_a);
 				else
 					printf("[%d][%d] = -Inf   ", i, j);
-				if (cell_isFlagSet (matrix[i][j], COMES_FROM_DIAGONAL)) printf("A "); else printf("  ");
+				if (cell_isFlagASet (matrix[i][j], COMES_FROM_DIAGONAL)) printf("A "); else printf("  ");
 				if (cell_isFlagBSet (matrix[i][j], COMES_FROM_DIAGONAL)) printf("V "); else printf("  ");
 				if (cell_isFlagCSet (matrix[i][j], COMES_FROM_DIAGONAL)) printf("R "); else printf("  ");
 				puts("");
@@ -432,7 +432,7 @@ static void print(Cell*** matrix, gint m, gint n, gboolean printOthers)
 					printf("[%d][%d] = %d   ", i, j, matrix[i][j]->value_b);
 				else
 					printf("[%d][%d] = -Inf   ", i, j);
-				if (cell_isFlagSet (matrix[i][j], COMES_FROM_LEFT)) printf("A "); else printf("  ");
+				if (cell_isFlagASet (matrix[i][j], COMES_FROM_LEFT)) printf("A "); else printf("  ");
 				if (cell_isFlagBSet (matrix[i][j], COMES_FROM_LEFT)) printf("V "); else printf("  ");
 				if (cell_isFlagCSet (matrix[i][j], COMES_FROM_LEFT)) printf("R "); else printf("  ");
 				puts("");
@@ -449,7 +449,7 @@ static void print(Cell*** matrix, gint m, gint n, gboolean printOthers)
 					printf("[%d][%d] = %d   ", i, j, matrix[i][j]->value_c);
 				else
 					printf("[%d][%d] = -Inf   ", i, j);
-				if (cell_isFlagSet (matrix[i][j], COMES_FROM_UP)) printf("A "); else printf("  ");
+				if (cell_isFlagASet (matrix[i][j], COMES_FROM_UP)) printf("A "); else printf("  ");
 				if (cell_isFlagBSet (matrix[i][j], COMES_FROM_UP)) printf("V "); else printf("  ");
 				if (cell_isFlagCSet (matrix[i][j], COMES_FROM_UP)) printf("R "); else printf("  ");
 				puts("");

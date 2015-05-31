@@ -12,9 +12,9 @@ static void print_matrix(Cell*** matrix, gint m, gint n)
 		for (j = 0; j < n; j++) {
 			if (matrix[i][j] != NULL && matrix[i][j]->value_a > MIN_VALUE + 100) {
 				printf("[%d][%d] = %d   ", i, j, matrix[i][j]->value_a);
-				if (cell_isFlagSet (matrix[i][j], COMES_FROM_DIAGONAL)) printf("D "); else printf("  ");
-				if (cell_isFlagSet (matrix[i][j], COMES_FROM_UP)) printf("U "); else printf("  ");
-				if (cell_isFlagSet (matrix[i][j], COMES_FROM_LEFT)) printf("L "); else printf("  ");
+				if (cell_isFlagASet (matrix[i][j], COMES_FROM_DIAGONAL)) printf("D "); else printf("  ");
+				if (cell_isFlagASet (matrix[i][j], COMES_FROM_UP)) printf("U "); else printf("  ");
+				if (cell_isFlagASet (matrix[i][j], COMES_FROM_LEFT)) printf("L "); else printf("  ");
 			}
 			else
 				printf("[%d][%d] = -Inf   ", i, j);

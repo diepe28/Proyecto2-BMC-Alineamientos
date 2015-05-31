@@ -35,14 +35,34 @@ void cell_setFlagC(Cell *this, guint option) {
 	this->flags_c |= option;
 }
 
-gint cell_isFlagASet(Cell *this, guint option){
+void cell_setFlag(Cell* this, guint flag, char matrix){
+	switch(matrix){
+		case 'A' :
+			cell_setFlagA (this, flag);
+			break;
+		case 'B':
+			cell_setFlagB (this, flag);
+			break;
+		case 'C':
+			cell_setFlagC (this, flag);
+			break;
+	}
+}
+
+gboolean cell_isFlagASet(Cell *this, guint option){
 	return (this->flags_a & option) != 0;
 }
 
-gint cell_isFlagBSet(Cell *this, guint option) {
+gboolean cell_isFlagBSet(Cell *this, guint option) {
 	return (this->flags_b & option) != 0;
 }
 
-gint cell_isFlagCSet(Cell *this, guint option) {
+gboolean cell_isFlagCSet(Cell *this, guint option) {
 	return (this->flags_c & option) != 0;
+}
+
+gboolean cell_isFlagSet(Cell* this, guint flag, char matrix){
+	return matrix == 'A'? cell_isFlagASet (this,flag) :
+		   matrix == 'B'? cell_isFlagBSet (this,flag) :
+		cell_isFlagCSet (this, flag);
 }
