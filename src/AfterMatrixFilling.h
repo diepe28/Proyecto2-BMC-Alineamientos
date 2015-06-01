@@ -9,8 +9,8 @@
 gchar** afterMatrixFilling_find_NW_Alignment(Cell*** matrix, 
                                               gchar* upSequence,
                                               gchar* leftSequence,
-                                              gint n,
-                                              gint m,
+                                              gint rows,
+                                              gint cols,
                                               gboolean freeRightGapsUp,
                                               gboolean freeRightGapsLeft,
                                               gboolean blockOfGaps);

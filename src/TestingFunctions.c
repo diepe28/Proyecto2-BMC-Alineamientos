@@ -8,7 +8,12 @@ static void printMatrix(int n, int m,Cell*** matrix){
 	printf("\n");
 	for(i = 0; i < n+1; i++){
 		for(j = 0; j < m+1; j++){
-			if(cell_isFlagASet (matrix[i][j], IS_PAINTED))
+			if(TRUE || cell_isFlagASet (matrix[i][j], IS_PAINTED))
+				/*printf("%d%C\t", matrix[i][j]->value_A, 
+				       cell_isFlagASet (matrix[i][j], COMES_FROM_DIAGONAL)? 'D' :
+					   cell_isFlagASet (matrix[i][j], COMES_FROM_LEFT)? 'L' :
+					   cell_isFlagASet (matrix[i][j], COMES_FROM_UP)? 'U' :
+					       'n');*/
 				printf("%d\t", matrix[i][j]->value_a);
 			else
 				printf(".\t");
@@ -20,25 +25,26 @@ static void printMatrix(int n, int m,Cell*** matrix){
 
 
 void testGlobalAlingment(){
-	gchar* seq2 = "TTGCATCGGCG";
-	gchar* seq1 = "ATTGTGATCCGGGGGGGG";
-	gint n = 12;
-	gint m = 19;
+	gchar* v = "TCTGAGGTAGA";
+	gchar* w = "TATCTAGAGGTAGA";	
+	gint wLength = strlen(w);
+	gint vLength = strlen(v);
 	gint i, j = 0;
 	// Initialization
 
 	ScoringOptions* options = g_malloc(sizeof(ScoringOptions));
 	options->matchBonus = 1;
 	options->missmatchPenalty = -1;
-	options->gapOpeningPenalty = 0;
-	options->gapExtensionPenalty = -2;
+	options->gapOpeningPenalty = -2;
+	options->gapExtensionPenalty = -1;
 	options->freeLeftGapsForX = FALSE;
 	options->freeLeftGapsForY = FALSE;
 	options->substitutionMatrix = NULL;
 
-	Cell*** matrix = create_similarity_matrix_full(seq1, seq2, n, m, options, FALSE, 1);
-	char** sequences = afterMatrixFilling_find_NW_Alignment (matrix, seq1, seq2, n, m,
-	                                                         FALSE, FALSE, FALSE);
+	Cell*** matrix = create_similarity_matrix_full(w, v, wLength, vLength, options, FALSE, 1);
+	printMatrix(wLength, vLength, matrix);
+	char** sequences = afterMatrixFilling_find_NW_Alignment (matrix, v, w, wLength, vLength,
+	                                                         FALSE, FALSE, TRUE);
 
 	printf("Text1: %s\n", sequences[0]);
 	printf("Text2: %s\n", sequences[1]);
@@ -47,13 +53,13 @@ void testGlobalAlingment(){
 	g_free(sequences[1]);
 	g_free(sequences);
 	
-	for(i = 0; i < n+1; i++){
-		for(j = 0; j < m+1; j++){
+	for(i = 0; i < wLength+1; i++){
+		for(j = 0; j < vLength+1; j++){
 			g_free(matrix[i][j]);
 		}
 	}
 
-	for(i = 0; i < n+1; i++){
+	for(i = 0; i < wLength+1; i++){
 		g_free(matrix[i]);
 	}
 

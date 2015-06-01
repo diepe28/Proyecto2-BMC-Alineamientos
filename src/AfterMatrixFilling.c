@@ -1,58 +1,109 @@
 #include "AfterMatrixFilling.h"
 
+static gint getMaxValue(Cell*** matrix, gboolean blockOfGaps, gint i, gint j, gchar* currentMatrix){
+	gint valueA = matrix[i][j]->value_a;
+	if(blockOfGaps){	
+		gint valueB = matrix[i][j]->value_b;
+		gint valueC = matrix[i][j]->value_c;
+		if(valueC >= valueB && valueC >= valueA){
+			*currentMatrix = 'C';
+			return valueC;
+		}
+		if(valueB >= valueA && valueB >= valueC){
+			*currentMatrix = 'B';
+			return valueB;
+		}
+	}
+	*currentMatrix = 'A';
+	return valueA;
+
+}
+
 static gchar ** alignmentFromPoint(Cell*** matrix, gchar* upSequence, gchar* leftSequence,
-                                   gint n, gint m, gint startRow, gint startCol,
+                                   gint rows, gint cols, gint startRow, gint startCol,
                                    gboolean blockOfGaps, char currentMatrix){
 
-	guint i, j, upIndex = n + m-1, leftIndex = n + m-1, alignmentLength;
+	guint i, j, upIndex = rows + cols-1, leftIndex = rows + cols-1, 
+		alignmentLength = 0, startIndex = 0;
 	gchar ** sequences = (gchar**) (g_malloc( 2 * sizeof(gchar*)));
-	gchar * newUpSeq = (gchar*) (g_malloc((n + m) * sizeof(gchar))); 
-	gchar * newLeftSeq = (gchar*) (g_malloc((n + m) * sizeof(gchar)));
+	gchar * newUpSeq = (gchar*) (g_malloc((rows + cols) * sizeof(gchar))); 
+	gchar * newLeftSeq = (gchar*) (g_malloc((rows + cols) * sizeof(gchar)));
 
-	i = n;
-	j = m;
+	i = rows;
+	j = cols;
 
-	//Inserting m - startCol rigth gaps in left
-	while(startCol++ < m){
-		newUpSeq[upIndex--] = GAP;
-		newLeftSeq[leftIndex--] = leftSequence[--i];
-	}
-
-	//Inserting n - startRow rigth gaps in left 
-	while(startRow++ < n){
+	//Inserting cols - startCol rigth gaps in upSequence
+	while(startCol++ < cols){
+		alignmentLength++;
 		newLeftSeq[leftIndex--] = GAP;
 		newUpSeq[upIndex--] = upSequence[--j];
 	}
 
-	//While not int matrix[0][0]
-	while(i > 0 || j > 0){
-		if(!blockOfGaps)
-			currentMatrix = 'A';
-		
-		cell_setFlag(matrix[i][j], IS_PAINTED, currentMatrix);
-		if(cell_isFlagSet (matrix[i][j], COMES_FROM_DIAGONAL, currentMatrix)){
-			newUpSeq[upIndex--] = upSequence[--j];
-			newLeftSeq[leftIndex--] = leftSequence[--i];
-			currentMatrix = 'A';
-			continue;
+	//Inserting rows - startRow rigth gaps in left 
+	while(startRow++ < rows){
+		alignmentLength++;
+		newUpSeq[upIndex--] = GAP;
+		newLeftSeq[leftIndex--] = leftSequence[--i];		
+	}
+
+	if(!blockOfGaps){
+		//While not int matrix[0][0]
+		while(i > 0 || j > 0){
+			alignmentLength++;
+			cell_setFlagA (matrix[i][j], IS_PAINTED);
+			if(cell_isFlagASet (matrix[i][j], COMES_FROM_DIAGONAL)){
+				newUpSeq[upIndex--] = upSequence[--j];
+				newLeftSeq[leftIndex--] = leftSequence[--i];
+				continue;
+			}
+			if(cell_isFlagASet (matrix[i][j], COMES_FROM_LEFT)){
+				newUpSeq[upIndex--] = upSequence[--j];
+				newLeftSeq[leftIndex--] = GAP;
+				continue;
+			}
+			if(cell_isFlagASet (matrix[i][j], COMES_FROM_UP)){
+				newUpSeq[upIndex--] = GAP;
+				newLeftSeq[leftIndex--] = leftSequence[--i];
+			}
 		}
-		if(cell_isFlagSet (matrix[i][j], COMES_FROM_LEFT, currentMatrix)){
-			newUpSeq[upIndex--] = upSequence[--j];
-			newLeftSeq[leftIndex--] = GAP;
-			currentMatrix = 'B';
-			continue;
-		}
-		if(cell_isFlagSet (matrix[i][j], COMES_FROM_UP, currentMatrix)){
-			newUpSeq[upIndex--] = GAP;
-			newLeftSeq[leftIndex--] = leftSequence[--i];
-			currentMatrix = 'C';	
+	}else{//block of gaps
+		while(i > 0 || j > 0){
+			alignmentLength++;
+			cell_setFlag (matrix[i][j], IS_PAINTED, currentMatrix);
+			if(currentMatrix == 'A'){
+				if(!cell_isFlagASet (matrix[i][j], COMES_FROM_DIAGONAL)){
+						currentMatrix = cell_isFlagBSet (matrix[i][j], COMES_FROM_DIAGONAL)?
+						'B' : 'C';
+				}
+				newUpSeq[upIndex--] = upSequence[--j];
+				newLeftSeq[leftIndex--] = leftSequence[--i];
+				continue;
+			}
+			if(currentMatrix == 'B'){
+				if(!cell_isFlagBSet (matrix[i][j], COMES_FROM_LEFT)){
+						currentMatrix = cell_isFlagASet (matrix[i][j], COMES_FROM_LEFT)?
+						'A' : 'C';
+				}
+				newUpSeq[upIndex--] = upSequence[--j];
+				newLeftSeq[leftIndex--] = GAP;
+				continue;
+			}
+			if(currentMatrix == 'C'){
+				if(!cell_isFlagCSet (matrix[i][j], COMES_FROM_UP)){
+						currentMatrix = cell_isFlagASet (matrix[i][j], COMES_FROM_UP)?
+						'A' : 'B';
+				}
+				newUpSeq[upIndex--] = GAP;
+				newLeftSeq[leftIndex--] = leftSequence[--i];
+			}
 		}
 	}
 
-	alignmentLength = (n+m) -leftIndex;
-		
-	memcpy(newUpSeq, newUpSeq+upIndex+1, alignmentLength);
-	memcpy(newLeftSeq, newLeftSeq+leftIndex+1, alignmentLength);
+	startIndex = (rows+cols) - alignmentLength;
+	for(i = 0; i < alignmentLength; i++){
+		newUpSeq[i] = newUpSeq[startIndex + i];
+		newLeftSeq[i] = newLeftSeq[startIndex + i];
+	}
 	newUpSeq[alignmentLength] = '\0';
 	newLeftSeq[alignmentLength] = '\0';
 
@@ -62,81 +113,67 @@ static gchar ** alignmentFromPoint(Cell*** matrix, gchar* upSequence, gchar* lef
 	return sequences;
 }
 
-
-gchar** afterMatrixFilling_findSemiGlobalAlignment(Cell*** matrix,
+gchar** afterMatrixFilling_find_NW_Alignment(Cell*** matrix,
                                                   gchar* upSequence,
                                                   gchar* leftSequence,
-                                                  gint n,
-                                                  gint m,
+                                                  gint rows,
+                                                  gint cols,
                                                   gboolean freeRightGapsUp,
                                                   gboolean freeRightGapsLeft,
                                                   gboolean blockOfGaps){
 
-	guint i, j, maxInLastRowIndex = n, maxInLastColIndex = m;
-	gint maxInLastRow, maxInLastCol;
-	
-	maxInLastRowIndex = n;
-	maxInLastColIndex = m;
+	guint i, j, maxInLastRowIndex = rows, maxInLastColIndex = cols;
+	gint maxInLastRow, maxInLastCol, currentMax;
+	gchar currentMatrix = 'A';
+
+	//yes, row with cols and col with rows
+	maxInLastRowIndex = cols;
+	maxInLastColIndex = rows;
+
+	currentMax = getMaxValue (matrix, blockOfGaps, rows,cols, &currentMatrix);
 	
 	if(freeRightGapsLeft){
-		//find the max in the last row
-		maxInLastRow = matrix[n][0]->value_a;
+		//find the max in the last row of all 3 matrixes or just in A		
+		maxInLastRow = getMaxValue(matrix, blockOfGaps, rows, 0, &currentMatrix);
 		maxInLastRowIndex = 0;
-		for(i = 1; i < n+1; i++){
-			if(matrix[n][i]->value_a > maxInLastRow){
-				maxInLastRow = matrix[n][i]->value_a;
-				maxInLastRowIndex = i;
+		for(j = 1; j < cols+1; j++){
+			currentMax = getMaxValue(matrix, blockOfGaps, rows, j, &currentMatrix);
+			if(currentMax > maxInLastRow){
+				maxInLastRow = currentMax;
+				maxInLastRowIndex = j;
 			}
 		}
 	}
 
 	if(freeRightGapsUp){
 		//find the max in the last col
-		maxInLastCol = matrix[0][m]->value_a;
+		maxInLastCol = getMaxValue(matrix, blockOfGaps, 0, cols, &currentMatrix);
 		maxInLastColIndex = 0;
-		for(i = 1; i < m+1; i++){
-			if(matrix[i][m]->value_a > maxInLastCol){
-				maxInLastCol = matrix[i][m]->value_a;
+		for(i = 1; i < rows+1; i++){
+			currentMax = getMaxValue(matrix, blockOfGaps, i, cols, &currentMatrix);
+			if(currentMax > maxInLastCol){
+				maxInLastCol = currentMax;
 				maxInLastColIndex = i;
 			}
 		}
 	}
 
-	i = maxInLastRowIndex;
-	j = maxInLastColIndex;
-	
+	//yes, i with col and j with row. 
+	i = maxInLastColIndex;
+	j = maxInLastRowIndex;
+
 	if(freeRightGapsLeft && freeRightGapsUp){
 		if(maxInLastCol > maxInLastRow){
 			i = maxInLastColIndex;
-			j = m;
+			j = cols;
 		}else{
 			j = maxInLastRowIndex;
-			i = n;
+			i = rows;
 		}
 	}
 
-	return alignmentFromPoint(matrix, upSequence, leftSequence, n, m, i, j, blockOfGaps, ' ');
+	return alignmentFromPoint(matrix, upSequence, leftSequence, rows, cols, i, j, blockOfGaps, currentMatrix);
 }
-
-
-gchar** afterMatrixFilling_find_NW_Alignment(Cell*** matrix,
-                                           gchar* upSequence,
-                                           gchar* leftSequence,
-                                           gint n, gint m,
-                                           gboolean freeRightGapsUp,
-                                           gboolean freeRightGapsLeft,
-                                           gboolean blockOfGaps){
-	
-	if(freeRightGapsLeft || freeRightGapsLeft){
-		return afterMatrixFilling_findSemiGlobalAlignment(matrix, upSequence,
-		                                                  leftSequence, n, m,
-		                                                  freeRightGapsUp, 
-		                                                  freeRightGapsLeft, blockOfGaps);
-	}
-
-	return alignmentFromPoint(matrix, upSequence, leftSequence, n, m, n, m, blockOfGaps, 'A');
-}
-
 
 ////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////LOCAL ALIGNMENT///////////////////////////////
