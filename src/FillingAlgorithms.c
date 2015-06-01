@@ -46,8 +46,10 @@ static void fill_matrix(Cell*** matrix, ScoringOptions* options, gint startX, gi
 	gint xLimit = startX + height;
 	gint yLimit = startY + width;
 	for (i = startX; i < xLimit; i++)
-		for (j = startY; j < yLimit; j++)
+		for (j = startY; j < yLimit; j++) {
+			printf("Computing [%d][%d]\n", i, j);
 			fill (matrix, options, seq1, seq2, i, j, isLocalAlignment);
+		}
 }
 
 static void fill_kband_boundaries(Cell*** matrix, gint seq1Length, gint seq2Length, gint k) 
@@ -115,6 +117,7 @@ static void fill_strip(FullFillParameters* params, gboolean firstStrip)
 				puts("ERROR from sem_wait()");
 		blockWidth = (n > 0) ? (params->basicBlockWidth + 1) : params->basicBlockWidth;
 		fill_matrix (params->matrix, params->options, startX, startY, blockHeight, blockWidth, params->seq1, params->seq2, params->isLocalAlignment);
+		printf("Block finished from thread %d \n", params->threadID);
 		startY += blockWidth;
 		n--;
 		if (sem_post(params->signalSemaphore))
@@ -159,14 +162,14 @@ static void fill_matrix_parallel(Cell*** matrix, ScoringOptions* options, gint h
 			puts("ERROR from sem_init()");
 	}
 
-	// Test
+	// Debug
 	printf("Width=%d \n", width);
 	printf("Height=%d \n", height);
 	printf("BasicBlockWidth=%d \n", basicBlockWidth);
 	printf("BasicBlockHeight=%d \n", basicBlockHeight);
 	printf("WidthExcess=%d \n", widthExcess);
 	printf("HeightExcess=%d \n", heightExcess);
-	// Test
+	// Debug
 	
 	for (i = 0; i < numberOfThreads; i++) {
 		parameters[i] = (FullFillParameters*) g_malloc(sizeof(FullFillParameters));
@@ -186,13 +189,13 @@ static void fill_matrix_parallel(Cell*** matrix, ScoringOptions* options, gint h
 		parameters[i]->signalSemaphore = semaphores[i];
 		parameters[i]->waitingSemaphore = (i == 0) ? semaphores[numberOfThreads-1] : semaphores[i-1];
 
-		// Test
+		// Debug
 		printf("Thread %d strip1Start=%d \n", i, parameters[i]->strip1Start);
 		printf("Thread %d strip1Height=%d \n",  i, parameters[i]->strip1Height);
 		printf("Thread %d strip2Start=%d \n", i, parameters[i]->strip2Start);
 		printf("Thread %d strip2Height=%d \n",  i, parameters[i]->strip2Height);
 		puts("");
-		// Test
+		// Debug
 
 		threads[i] = (pthread_t*) g_malloc(sizeof(pthread_t));
 		if (pthread_create(threads[i], &attr, fill_strips, (void*)parameters[i]))

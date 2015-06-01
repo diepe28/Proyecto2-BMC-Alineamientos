@@ -35,7 +35,7 @@ main (int argc, char *argv[])
 	textdomain (GETTEXT_PACKAGE);
 #endif
 
-	testFillingMatrix ();
+	//testFillingMatrix ();
 	//testGlobalAlingment();
 	
 	app = proyecto2_bmc_alineamientos_new ();

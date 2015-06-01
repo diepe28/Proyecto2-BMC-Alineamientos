@@ -460,8 +460,8 @@ static void print(Cell*** matrix, gint m, gint n, gboolean printOthers)
 
 void testFillingMatrix() 
 {
-	gchar* seq1 = "ATTGTGATCGG";
-	gchar* seq2 = "TTGCATCGG";
+	gchar* seq1 = "ACTGACGTCAG";
+	gchar* seq2 = "CAGTTTTCTCA";
 	gint size1 = strlen(seq1)+1;
 	gint size2 = strlen(seq2)+1;
 	gint i, j = 0;
@@ -481,9 +481,9 @@ void testFillingMatrix()
 	kbandOptions->kExtensionValue = 1;
 
 	// Call and printing
-	Cell*** matrix = create_similarity_matrix_full (seq1, seq2, size1-1, size2-1, options, FALSE, 2);
+	Cell*** matrix = create_similarity_matrix_full (seq1, seq2, size1-1, size2-1, options, FALSE, 1);
 	//Cell*** matrix = create_similarity_matrix_kband (seq1, seq2, 18, 11, options, kbandOptions, 1);
-	//print (matrix, size1, size2, FALSE);
+	print (matrix, size1, size2, FALSE);
 	
 	// Cleaning
 	for (i = 0; i < size1; i++) {
