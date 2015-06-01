@@ -25,13 +25,17 @@ void on_cbKBand_toggled(GtkCheckButton* sender) {
 void on_btGlobalAlignNW_clicked(GtkButton* sender) {
 	gchar* v = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txV()));
 	gchar* w = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txW()));
-
+	gint vtype = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbVInputType()));
+	gint wtype = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbWInputType()));
+	
 	gint matchbonus = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbMatch()));
 	gint missmatchbonus = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbMissmatch()));
 	gint gappenalty1 = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbF()));
 	gint gappenalty2 = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbK()));
 	gboolean freeleftgapsv = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(app_builder_get_cbVLeftFG()));
 	gboolean freeleftgapsw = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(app_builder_get_cbWLeftFG()));
+	gboolean freerightgapsv = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(app_builder_get_cbVRightFG()));
+	gboolean freerightgapsw = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(app_builder_get_cbWRightFG()));
 	gint numberOfThreads = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbNThreads()));
 	
 	ScoringOptions* options = ScoringOptions_new(
@@ -42,18 +46,20 @@ void on_btGlobalAlignNW_clicked(GtkButton* sender) {
 		freeleftgapsv,
 		freeleftgapsw
 	);
-	
-	Cell*** matrix = create_similarity_matrix_full(
+
+	app_widget_show_nwpopup(
 		v,
 		w,
 		strlen(v),
 		strlen(w),
+		vtype,
+		wtype,
 		options,
+		freerightgapsv,
+		freerightgapsw,
 		FALSE,
 		numberOfThreads
 	);
-
-	app_widget_show_popup(matrix);
 
 	g_critical("btGlobalAlignNW clicked");
 }

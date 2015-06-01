@@ -1,5 +1,10 @@
 #include "Globals.h"
 
+char* SEQUENCE_TYPES[2] = {
+	"ADN",
+	"Prote\xEDna"
+};
+
 char AMINO_ACIDS[64]  = {
 	'K', //0-  AAA: Lysine 
 	'N', //1-  AAC: Asparagine 
@@ -302,5 +307,7 @@ int createBenchmarkGraphKBand(long* times, long* timesKBand, int n){
 	return 0;
 }
 
-
+gchar* APP_SEQUENCE_TYPE(gint stype) {
+	return SEQUENCE_TYPES[stype];
+}
 

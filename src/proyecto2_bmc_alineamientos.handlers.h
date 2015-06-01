@@ -18,9 +18,32 @@ GObject* app_builder_get_sbF();
 GObject* app_builder_get_sbK();
 GObject* app_builder_get_cbVLeftFG();
 GObject* app_builder_get_cbWLeftFG();
+GObject* app_builder_get_cbVRightFG();
+GObject* app_builder_get_cbWRightFG();
 GObject* app_builder_get_sbNThreads();
 GObject* app_builder_get_cbSubstitutionMatrix();
-void app_widget_show_popup(Cell*** datasource);
+GObject* app_builder_get_cbVInputType();
+GObject* app_builder_get_cbWInputType();
+GObject* app_builder_get_lAlgorithmValue();
+GObject* app_builder_get_lVLengthValue();
+GObject* app_builder_get_lWLengthValue();
+GObject* app_builder_get_lVTypeValue();
+GObject* app_builder_get_lWTypeValue();
+GObject* app_builder_get_lVNew();
+GObject* app_builder_get_lWNew();
+void app_widget_show_nwpopup(
+	gchar* seq1,
+	gchar* seq2,
+	gint seq1Length,
+	gint seq2Length,
+	gint seq1Type,
+	gint seq2Type,
+	ScoringOptions* scoringOptions,
+  gboolean freeRightGapsUp,
+  gboolean freeRightGapsLeft,
+	gboolean isLocalAlignment,
+	gint numberOfThreads
+);
 gint app_entry_set_source(GtkEntry* entry, gchar* source);
 
 #endif

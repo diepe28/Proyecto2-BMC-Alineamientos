@@ -1,4 +1,5 @@
 #include <gtk/gtk.h>
+#include "Globals.h"
 #include "proyecto2-bmc-alineamientos.h"
 #include "proyecto2_bmc_alineamientos.handlers.h"
 
@@ -59,21 +60,114 @@ GObject* app_builder_get_cbWLeftFG() {
 	return gtk_builder_get_object(builder, "cbWLeftFG");
 }
 /* ---------------------------------------------------------------- */
+GObject* app_builder_get_cbVRightFG() {
+	return gtk_builder_get_object(builder, "cbVRightFG");
+}
+/* ---------------------------------------------------------------- */
+GObject* app_builder_get_cbWRightFG() {
+	return gtk_builder_get_object(builder, "cbWRightFG");
+}
+/* ---------------------------------------------------------------- */
 GObject* app_builder_get_sbNThreads() {
 	return gtk_builder_get_object(builder, "sbNThreads");
 }
 /* ---------------------------------------------------------------- */
-
 GObject* app_builder_get_cbSubstitutionMatrix() {
 	return gtk_builder_get_object(builder, "cbSubstitutionMatrix");
+}
+/* ---------------------------------------------------------------- */
+GObject* app_builder_get_cbVInputType() {
+	return gtk_builder_get_object(builder, "cbVInputType");
+}
+/* ---------------------------------------------------------------- */
+GObject* app_builder_get_cbWInputType() {
+	return gtk_builder_get_object(builder, "cbWInputType");
 }
 /* ---------------------------------------------------------------- */
 GObject* app_builder_get_popup() {
 	return gtk_builder_get_object(builder, "popup");
 }
 /* ---------------------------------------------------------------- */
-void app_widget_show_popup(Cell*** datasource) {
+GObject* app_builder_get_lAlgorithmValue() {
+	return gtk_builder_get_object(builder, "lAlgorithmValue");
+}
+/* ---------------------------------------------------------------- */
+GObject* app_builder_get_lVNew() {
+	return gtk_builder_get_object(builder, "lVNew");
+}
+/* ---------------------------------------------------------------- */
+GObject* app_builder_get_lWNew() {
+	return gtk_builder_get_object(builder, "lWNew");
+}
+/* ---------------------------------------------------------------- */
+GObject* app_builder_get_lVLengthValue() {
+	return gtk_builder_get_object(builder, "lVLengthValue");
+}
+/* ---------------------------------------------------------------- */
+GObject* app_builder_get_lWLengthValue() {
+	return gtk_builder_get_object(builder, "lWLengthValue");
+}
+/* ---------------------------------------------------------------- */
+GObject* app_builder_get_lVTypeValue() {
+	return gtk_builder_get_object(builder, "lVTypeValue");
+}
+/* ---------------------------------------------------------------- */
+GObject* app_builder_get_lWTypeValue() {
+	return gtk_builder_get_object(builder, "lWTypeValue");
+}
+/* ---------------------------------------------------------------- */
+void app_widget_show_nwpopup(
+	gchar* seq1,
+	gchar* seq2,
+	gint seq1Length,
+	gint seq2Length,
+	gint seq1Type,
+	gint seq2Type,
+	ScoringOptions* scoringOptions,
+  gboolean freeRightGapsUp,
+  gboolean freeRightGapsLeft,
+	gboolean isLocalAlignment,
+	gint numberOfThreads
+) {
+	Cell*** matrix = create_similarity_matrix_full(
+		seq2,
+		seq1,
+		seq2Length,
+		seq1Length,
+		scoringOptions,
+		isLocalAlignment,
+		numberOfThreads
+	);
+
+	char** newseqs = afterMatrixFilling_find_NW_Alignment(
+		matrix,
+		seq1,
+		seq2,
+		seq2Length,
+		seq1Length,
+		freeRightGapsUp,
+		freeRightGapsLeft,
+		TRUE
+	);
+	
 	GtkWidget* popup = GTK_WIDGET(app_builder_get_popup());
+
+	gtk_label_set_text(GTK_LABEL(app_builder_get_lAlgorithmValue()), "Needleman-Wunsch");
+	
+	gchar* sSeq1Length = (gchar*) g_malloc(sizeof(gchar) * (log10(seq1Length) + 1));
+	gchar* sSeq2Length = (gchar*) g_malloc(sizeof(gchar) * (log10(seq2Length) + 1));
+
+	sprintf(sSeq1Length, "%d", seq1Length);
+	sprintf(sSeq2Length, "%d", seq2Length);
+
+	gtk_label_set_text(GTK_LABEL(app_builder_get_lVLengthValue()), sSeq1Length);
+	gtk_label_set_text(GTK_LABEL(app_builder_get_lWLengthValue()), sSeq2Length);
+	
+	gtk_label_set_text(GTK_LABEL(app_builder_get_lVTypeValue()), APP_SEQUENCE_TYPE(seq1Type));
+	gtk_label_set_text(GTK_LABEL(app_builder_get_lWTypeValue()), APP_SEQUENCE_TYPE(seq1Type));
+	
+	gtk_label_set_text(GTK_LABEL(app_builder_get_lVNew()), newseqs[0]);
+	gtk_label_set_text(GTK_LABEL(app_builder_get_lWNew()), newseqs[1]);
 
 	gtk_widget_show_all(popup);
 }

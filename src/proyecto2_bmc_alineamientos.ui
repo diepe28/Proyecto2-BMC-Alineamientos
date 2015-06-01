@@ -1314,6 +1314,7 @@
                       <object class="GtkLabel" id="lVNew">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="xalign">0</property>
                         <attributes>
                           <attribute name="font-desc" value="Courier 10 Pitch 9"/>
                         </attributes>
@@ -1328,6 +1329,7 @@
                       <object class="GtkLabel" id="lWNew">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="xalign">0</property>
                         <attributes>
                           <attribute name="font-desc" value="Courier 10 Pitch 9"/>
                         </attributes>
