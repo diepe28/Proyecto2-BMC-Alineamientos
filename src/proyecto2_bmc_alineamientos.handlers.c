@@ -117,12 +117,12 @@ GObject* app_builder_get_lWTypeValue() {
 }
 /* ---------------------------------------------------------------- */
 void app_widget_show_nwpopup(
-	gchar* seq1,
-	gchar* seq2,
-	gint seq1Length,
-	gint seq2Length,
-	gint seq1Type,
-	gint seq2Type,
+	gchar* v, // v is up sequence
+	gchar* w,
+	gint lengthV,
+	gint lengthW,
+	gint vType,
+	gint wType,
 	ScoringOptions* scoringOptions,
   gboolean freeRightGapsUp,
   gboolean freeRightGapsLeft,
@@ -130,10 +130,10 @@ void app_widget_show_nwpopup(
 	gint numberOfThreads
 ) {
 	Cell*** matrix = create_similarity_matrix_full(
-		seq2,
-		seq1,
-		seq2Length,
-		seq1Length,
+		w,
+		v,
+		lengthW,
+		lengthV,
 		scoringOptions,
 		isLocalAlignment,
 		numberOfThreads
@@ -141,30 +141,30 @@ void app_widget_show_nwpopup(
 
 	char** newseqs = afterMatrixFilling_find_NW_Alignment(
 		matrix,
-		seq1,
-		seq2,
-		seq2Length,
-		seq1Length,
+		v,
+		w,
+		lengthW,
+		lengthV,
 		freeRightGapsUp,
 		freeRightGapsLeft,
-		TRUE
+		FALSE
 	);
 	
 	GtkWidget* popup = GTK_WIDGET(app_builder_get_popup());
 
 	gtk_label_set_text(GTK_LABEL(app_builder_get_lAlgorithmValue()), "Needleman-Wunsch");
 	
-	gchar* sSeq1Length = (gchar*) g_malloc(sizeof(gchar) * (log10(seq1Length) + 1));
-	gchar* sSeq2Length = (gchar*) g_malloc(sizeof(gchar) * (log10(seq2Length) + 1));
+	gchar* sSeq1Length = (gchar*) g_malloc(sizeof(gchar) * (log10(lengthV) + 1));
+	gchar* sSeq2Length = (gchar*) g_malloc(sizeof(gchar) * (log10(lengthW) + 1));
 
-	sprintf(sSeq1Length, "%d", seq1Length);
-	sprintf(sSeq2Length, "%d", seq2Length);
+	sprintf(sSeq1Length, "%d", lengthV);
+	sprintf(sSeq2Length, "%d", lengthW);
 
 	gtk_label_set_text(GTK_LABEL(app_builder_get_lVLengthValue()), sSeq1Length);
 	gtk_label_set_text(GTK_LABEL(app_builder_get_lWLengthValue()), sSeq2Length);
 	
-	gtk_label_set_text(GTK_LABEL(app_builder_get_lVTypeValue()), APP_SEQUENCE_TYPE(seq1Type));
-	gtk_label_set_text(GTK_LABEL(app_builder_get_lWTypeValue()), APP_SEQUENCE_TYPE(seq1Type));
+	gtk_label_set_text(GTK_LABEL(app_builder_get_lVTypeValue()), APP_SEQUENCE_TYPE(vType));
+	gtk_label_set_text(GTK_LABEL(app_builder_get_lWTypeValue()), APP_SEQUENCE_TYPE(wType));
 	
 	gtk_label_set_text(GTK_LABEL(app_builder_get_lVNew()), newseqs[0]);
 	gtk_label_set_text(GTK_LABEL(app_builder_get_lWNew()), newseqs[1]);
