@@ -74,7 +74,7 @@ static gint number_of_antidiagonals(gint seq1Length, gint seq2Length)
 	return seq1Length + seq2Length + 1;
 }
 
-static void fill_antidiagonal(Cell*** matrix, gint n, gchar* seq1, gchar* seq2, gint seq1Length, gint seq2Length, gint k, ScoringOptions* scoringOptions) 
+static void fill_antidiagonal(Cell*** matrix, gint n, gchar* seq1, gchar* seq2, gint seq1Length, gint seq2Length, gint k, ScoringOptions* scoringOptions, sem_t* waitingSemaphore, sem_t* signalSemaphore) 
 {
 	gint lowerBound, upperBound, i_init, j_init, i, j = 0;
 	if (seq1Length < seq2Length) {
@@ -97,7 +97,12 @@ static void fill_antidiagonal(Cell*** matrix, gint n, gchar* seq1, gchar* seq2, 
 	for (i = i_init, j = j_init; i >= 0 && j <= seq2Length && (i - j) >= lowerBound; i--, j++) {
 		if (matrix[i][j] != NULL)
 			g_free (matrix[i][j]);
+		if (waitingSemaphore != NULL && i != 0 && (i-1)-j >= lowerBound && sem_wait(waitingSemaphore))
+			puts("ERROR from sem_wait()");
+		printf("Computing [%d][%d]\n", i, j);
 		fill (matrix, scoringOptions, seq1, seq2, i, j, FALSE);
+		if (signalSemaphore != NULL && i != seq1Length && (i+1)-j <= upperBound && sem_post(signalSemaphore))
+			puts("ERROR from sem_post()");
 	}
 }
 
@@ -222,6 +227,83 @@ static void fill_matrix_parallel(Cell*** matrix, ScoringOptions* options, gint h
 	puts("Paralel processing finished...");
 }
 
+static void* kband_worker(void* parameters) 
+{
+	KBandFillParameters* params = (KBandFillParameters*) parameters;
+	printf("Kband Thread %d started processing... \n", params->threadID);
+
+	gint i = params->threadID;
+	if (params->k != 0) {
+		while (i < number_of_antidiagonals (params->seq1Length, params->seq2Length)) {
+			fill_antidiagonal (params->matrix, i, params->seq1, params->seq2, params->seq1Length, params->seq2Length, params->k, params->options, params->waitingSemaphore, params->signalSemaphore);
+			printf("Kband Thread %d computed antidiagonal %d... \n", params->threadID, i);
+			i += params->numberOfThreads;
+		}
+	} else if (params->threadID == 0) {
+		for (i = 0; i < number_of_antidiagonals (params->seq1Length, params->seq2Length); i++)
+				fill_antidiagonal (params->matrix, i, params->seq1, params->seq2, params->seq1Length, params->seq2Length, params->k, params->options, NULL, NULL);
+	}
+	
+	printf("Kband Thread %d finished processing... \n", params->threadID);
+	pthread_exit((void *) 0);
+}
+
+static void fill_kband_parallel(Cell*** matrix, gchar* seq1, gchar* seq2, gint seq1Length, gint seq2Length, ScoringOptions* options, gint k, gint numberOfThreads) 
+{
+	gint i = 0;
+	pthread_t** threads = (pthread_t**) g_malloc(sizeof(pthread_t*) * numberOfThreads);
+	KBandFillParameters** parameters = (KBandFillParameters**) g_malloc(sizeof(KBandFillParameters*) * numberOfThreads);
+	
+	pthread_attr_t attr;
+	pthread_attr_init(&attr);
+	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+
+	sem_t** semaphores = (sem_t**) g_malloc(sizeof(sem_t*) * numberOfThreads);
+	for (i = 0; i < numberOfThreads; i++) {
+		semaphores[i] = (sem_t*) g_malloc(sizeof(sem_t));
+		if (sem_init(semaphores[i], FALSE, 0))
+			puts("ERROR from sem_init()");
+	}
+	
+	for (i = 0; i < numberOfThreads; i++) {
+		parameters[i] = (KBandFillParameters*) g_malloc(sizeof(KBandFillParameters));
+		parameters[i]->threadID = i;
+		parameters[i]->matrix = matrix;
+		parameters[i]->options = options;
+		parameters[i]->seq1 = seq1;
+		parameters[i]->seq2 = seq2;
+	    parameters[i]->seq1Length = seq1Length;
+		parameters[i]->seq2Length = seq2Length;
+		parameters[i]->k = k;
+		parameters[i]->numberOfThreads = numberOfThreads;
+		parameters[i]->signalSemaphore = semaphores[i];
+		parameters[i]->waitingSemaphore = (i == 0) ? semaphores[numberOfThreads-1] : semaphores[i-1];
+
+		threads[i] = (pthread_t*) g_malloc(sizeof(pthread_t));
+		if (pthread_create(threads[i], &attr, kband_worker, (void*)parameters[i]))
+			puts("ERROR from pthread_create()");
+	}
+
+	pthread_attr_destroy(&attr);
+	for (i = 0; i < numberOfThreads; i++) {
+		if (pthread_join(*(threads[i]), NULL))
+			puts("ERROR from pthread_join()");
+		g_free(threads[i]);
+		g_free(parameters[i]);
+	}
+	g_free(threads);
+	g_free(parameters);
+
+	for (i = 0; i < numberOfThreads; i++) {
+		if (sem_destroy(semaphores[i]))
+			puts("ERROR from sem_destroy()");
+		g_free(semaphores[i]);
+	}
+	g_free(semaphores);
+
+	puts("Paralel processing finished...");
+}
+
 // Exposed functions
 
 Cell*** create_similarity_matrix_full(gchar* seq1, gchar* seq2, gint seq1Length, gint seq2Length, ScoringOptions* scoringOptions, gboolean isLocalAlignment, gint numberOfThreads) 
@@ -255,15 +337,16 @@ Cell*** create_similarity_matrix_kband(gchar* seq1, gchar* seq2, gint seq1Length
 		fill_kband_boundaries (matrix, seq1Length, seq2Length, k);
 		if (numberOfThreads == 1) {
 			for (i = 0; i < number_of_antidiagonals (seq1Length, seq2Length); i++)
-				fill_antidiagonal (matrix, i, seq1, seq2, seq1Length, seq2Length, k, scoringOptions);
+				fill_antidiagonal (matrix, i, seq1, seq2, seq1Length, seq2Length, k, scoringOptions, NULL, NULL);
 		}
 		else
-			; // TODO Parallel case.
+			fill_kband_parallel (matrix, seq1, seq2, seq1Length, seq2Length, scoringOptions, k, numberOfThreads);
 		gint bestScore = matrix[seq1Length][seq2Length]->value_a;
 		gint nextKBound = (2*(k + 1) + maxLength - minLength)*scoringOptions->gapExtensionPenalty + (minLength - (k + 1))*scoringOptions->matchBonus;
 		if (bestScore >= nextKBound)
 			return matrix;
 		k += kbandOptions->kExtensionValue;
+		print_matrix (matrix, seq1Length+1, seq2Length+1);
 	}
 
 	if (numberOfThreads == 1)
