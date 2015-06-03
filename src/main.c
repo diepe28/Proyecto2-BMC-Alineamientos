@@ -34,13 +34,6 @@ main (int argc, char *argv[])
 	bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
 	textdomain (GETTEXT_PACKAGE);
 #endif
-	int xs[6] = {5, 4, 3, 2, 1, 0};
-	int ys[6] = {4, 3, 2, 1, 0, 0};
-	int alignmentLength = 6;
-	int rows = 5, cols = 11;
-	
-	createBirdWatchGraph(xs, ys, alignmentLength, rows,  cols);
-	
 	app = proyecto2_bmc_alineamientos_new ();
 	status = g_application_run (G_APPLICATION (app), argc, argv);
 	g_object_unref (app);

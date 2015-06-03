@@ -139,7 +139,7 @@ void app_widget_show_nwpopup(
 		numberOfThreads
 	);
 
-	char** newseqs = afterMatrixFilling_find_NW_Alignment(
+	Island* globalAl = afterMatrixFilling_find_NW_Alignment(
 		matrix,
 		v,
 		w,
@@ -149,6 +149,8 @@ void app_widget_show_nwpopup(
 		freeRightGapsLeft,
 		FALSE
 	);
+
+	gint result = createBirdWatchGraph(globalAl, lengthW,  lengthV, FALSE);
 	
 	GtkWidget* popup = GTK_WIDGET(app_builder_get_popup());
 
@@ -166,8 +168,8 @@ void app_widget_show_nwpopup(
 	gtk_label_set_text(GTK_LABEL(app_builder_get_lVTypeValue()), APP_SEQUENCE_TYPE(vType));
 	gtk_label_set_text(GTK_LABEL(app_builder_get_lWTypeValue()), APP_SEQUENCE_TYPE(wType));
 	
-	gtk_label_set_text(GTK_LABEL(app_builder_get_lVNew()), newseqs[0]);
-	gtk_label_set_text(GTK_LABEL(app_builder_get_lWNew()), newseqs[1]);
+	gtk_label_set_text(GTK_LABEL(app_builder_get_lVNew()), globalAl->upSequence);
+	gtk_label_set_text(GTK_LABEL(app_builder_get_lWNew()), globalAl->leftSequence);
 
 	gtk_widget_show_all(popup);
 }

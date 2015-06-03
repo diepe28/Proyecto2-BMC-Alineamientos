@@ -4,9 +4,9 @@
 #define AFTER_MATRIX_FILLING_H
 
 //given the matrix of global alignment (NW) and the the sequences
-//it finds the alignment of the two sequences and returns it in a two
-//length vector of char*. Seq1 = up, N-length, seq2 = left, M-length
-gchar** afterMatrixFilling_find_NW_Alignment(Cell*** matrix, 
+//it finds the alignment of the two sequences and returns and Island
+// Seq1 = up, N-length, seq2 = left, M-length
+Island* afterMatrixFilling_find_NW_Alignment(Cell*** matrix, 
                                               gchar* upSequence,
                                               gchar* leftSequence,
                                               gint rows,

@@ -11,6 +11,7 @@ typedef struct{
 	gint startCol;
 	gint startRow;
 	gchar* islandPath; //given in D,U,L chars, Diagonal, Up, Left 
+	GSList* points; // and int list of x1,y1,x2,y2,...,xn,yn
 }Island;
 
 Island* island_new(gint startRow, gint startCol, gint maxValue, gint length, gchar* islandPath,

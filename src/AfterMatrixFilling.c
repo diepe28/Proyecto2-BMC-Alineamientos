@@ -19,21 +19,27 @@ static gint getMaxValue(Cell*** matrix, gboolean blockOfGaps, gint i, gint j, gc
 
 }
 
-static gchar ** alignmentFromPoint(Cell*** matrix, gchar* upSequence, gchar* leftSequence,
+static Island* alignmentFromPoint(Cell*** matrix, gchar* upSequence, gchar* leftSequence,
                                    gint rows, gint cols, gint startRow, gint startCol,
                                    gboolean blockOfGaps, char currentMatrix){
 
 	guint i, j, upIndex = rows + cols-1, leftIndex = rows + cols-1, 
 		alignmentLength = 0, startIndex = 0;
-	gchar ** sequences = (gchar**) (g_malloc( 2 * sizeof(gchar*)));
+	Island * island = (Island*) (g_malloc(sizeof(Island)));
 	gchar * newUpSeq = (gchar*) (g_malloc((rows + cols) * sizeof(gchar))); 
 	gchar * newLeftSeq = (gchar*) (g_malloc((rows + cols) * sizeof(gchar)));
-
+	island->points = NULL; island->islandPath = NULL;
+	island->startCol = startCol;
+	island->startRow = startRow;
+	//mavalue
+	
 	i = rows;
 	j = cols;
 
 	//Inserting cols - startCol rigth gaps in upSequence
 	while(startCol++ < cols){
+		island->points = g_slist_append(island->points, j);
+		island->points = g_slist_append(island->points, i);
 		alignmentLength++;
 		newLeftSeq[leftIndex--] = GAP;
 		newUpSeq[upIndex--] = upSequence[--j];
@@ -41,6 +47,8 @@ static gchar ** alignmentFromPoint(Cell*** matrix, gchar* upSequence, gchar* lef
 
 	//Inserting rows - startRow rigth gaps in left 
 	while(startRow++ < rows){
+		island->points = g_slist_append(island->points, j);
+		island->points = g_slist_append(island->points, i);
 		alignmentLength++;
 		newUpSeq[upIndex--] = GAP;
 		newLeftSeq[leftIndex--] = leftSequence[--i];		
@@ -50,6 +58,8 @@ static gchar ** alignmentFromPoint(Cell*** matrix, gchar* upSequence, gchar* lef
 		//While not int matrix[0][0]
 		while(i > 0 || j > 0){
 			alignmentLength++;
+			island->points = g_slist_append(island->points, j);
+			island->points = g_slist_append(island->points, i);
 			cell_setFlagA (matrix[i][j], IS_PAINTED);
 			if(cell_isFlagASet (matrix[i][j], COMES_FROM_DIAGONAL)){
 				newUpSeq[upIndex--] = upSequence[--j];
@@ -67,8 +77,13 @@ static gchar ** alignmentFromPoint(Cell*** matrix, gchar* upSequence, gchar* lef
 			}
 		}
 	}else{//block of gaps
+		island->islandPath = (g_malloc((rows + cols+1) * sizeof(gchar)));
 		while(i > 0 || j > 0){
 			alignmentLength++;
+			island->points = g_slist_append(island->points, j);
+			island->points = g_slist_append(island->points, i);
+			island->islandPath[startIndex++] = currentMatrix;
+			
 			cell_setFlag (matrix[i][j], IS_PAINTED, currentMatrix);
 			if(currentMatrix == 'A'){
 				if(!cell_isFlagASet (matrix[i][j], COMES_FROM_DIAGONAL)){
@@ -99,6 +114,11 @@ static gchar ** alignmentFromPoint(Cell*** matrix, gchar* upSequence, gchar* lef
 		}
 	}
 
+	//always add 0,0 at the end
+	island->points = g_slist_append(island->points, 0);
+	island->points = g_slist_append(island->points, 0);
+	
+	island->length = alignmentLength+1;
 	startIndex = (rows+cols) - alignmentLength;
 	for(i = 0; i < alignmentLength; i++){
 		newUpSeq[i] = newUpSeq[startIndex + i];
@@ -106,14 +126,18 @@ static gchar ** alignmentFromPoint(Cell*** matrix, gchar* upSequence, gchar* lef
 	}
 	newUpSeq[alignmentLength] = '\0';
 	newLeftSeq[alignmentLength] = '\0';
+	if(island->islandPath != NULL){
+		island->islandPath[alignmentLength++] = 'A';
+		island->islandPath[alignmentLength] = '\0';
+	}
 
-	sequences[0] = newUpSeq;
-	sequences[1] = newLeftSeq;
+	island->upSequence = newUpSeq;
+	island->leftSequence = newLeftSeq;
 
-	return sequences;
+	return island;
 }
 
-gchar** afterMatrixFilling_find_NW_Alignment(Cell*** matrix,
+Island* afterMatrixFilling_find_NW_Alignment(Cell*** matrix,
                                                   gchar* upSequence,
                                                   gchar* leftSequence,
                                                   gint rows,

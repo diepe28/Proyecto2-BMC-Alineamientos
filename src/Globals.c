@@ -312,31 +312,49 @@ gchar* APP_SEQUENCE_TYPE(gint stype) {
 }
 
 
-int createBirdWatchGraph(int* xs, int* ys, int alignmentLength, int rows, int cols){
-	char * commandsForGnuplot[] = {
+gint createBirdWatchGraph(Island* island, gint rows, gint cols, gboolean drawEachPoint){
+	gchar * commandsForGnuplot[] = {
 		"set terminal png large size 1920, 1080",
 		"set output \"birdWatch.png\"",
 		"set style line 1 lc rgb '#0060ad' lt 1 lw 2 pt 7 ps 1", //0060ad blue
 		"set style line 2 lc rgb '#33CC33' lt 1 lw 2 pt 7 ps 1.5", //green
 		"set title \"Vista de pajaro\"",
 		"unset key",
+		"set format y \"\"",
+		"set format x \"\"",
 		"set offset 1,1,1,1",
 		"plot 'birdWatchdata.temp' index 0 with linespoints ls 1"};
 	
-	char xRangeCommand[30], yRangeCommand[50];
-	int i = 0, numCommands = 8, minTimeIndex = 0, maxTimeIndex = 0;
-	long maxTime = 0, minTime = LONG_MAX, yMargin;
+	gchar xRangeCommand[30], yRangeCommand[50];
+	gint i = 0, j = 0, numCommands = 10, minTimeIndex = 0, maxTimeIndex = 0, x, y;
+	glong maxTime = 0, minTime = LONG_MAX, yMargin;
 	FILE * gnuplotPipe = popen ("gnuplot -persistent", "w");
 	FILE * tempFile = fopen("birdWatchdata.temp", "w");
-
+	char pointCommand[150];
+	
 	if(gnuplotPipe == NULL || tempFile == NULL)
 		return 1;
 		
-	sprintf (xRangeCommand, "set xrange [%d:%d]", -1, cols+1);
-	sprintf (yRangeCommand, "set yrange [%d:%d]", -1, rows+1);
-		
-	for(i=0; i < alignmentLength; i++){
-		fprintf(tempFile, "%d %d \n", xs[i] , rows-ys[i]); //Write the data to a temporary file
+	sprintf (xRangeCommand, "set xrange [%d:%d]", 0, cols);
+	sprintf (yRangeCommand, "set yrange [%d:%d]", 0, rows);
+
+	if(drawEachPoint){
+		for(i = 0; i < rows+1; i++){
+			for(j = 0; j < cols+1; j++){
+				sprintf (pointCommand,
+					     "set object circle at first %d,%d radius char 0.5 fillcolor rgb 'black' fillstyle solid noborder", 
+					     j, i);
+				fprintf(gnuplotPipe, "%s \n", pointCommand);
+			}
+		}
+	}
+	
+	GSList* iterator;
+	for(iterator = island->points; iterator; iterator = iterator->next){
+		x = (gint) (iterator->data);
+		iterator = iterator->next;
+		y = (gint) (iterator->data);
+		fprintf(tempFile, "%d %d \n", x , rows-y); //Write the data to a temporary file
 	}
 	
 	fprintf(gnuplotPipe, "%s \n", xRangeCommand);
