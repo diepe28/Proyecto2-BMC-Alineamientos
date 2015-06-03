@@ -150,7 +150,7 @@ void app_widget_show_nwpopup(
 		FALSE
 	);
 
-	gint result = createBirdWatchGraph(globalAl, lengthW,  lengthV, FALSE);
+	gint result = createBirdWatchGraphNW(globalAl, lengthW,  lengthV, FALSE);
 	
 	GtkWidget* popup = GTK_WIDGET(app_builder_get_popup());
 
