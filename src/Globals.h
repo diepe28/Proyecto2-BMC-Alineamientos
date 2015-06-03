@@ -9,5 +9,7 @@ gchar* sequenceFromFile(gchar *, gulong *);
 //Assumming both chars ar capital
 gint valueOfMatrix(gint matrix[26][26], gchar first, gchar second);
 gchar* APP_SEQUENCE_TYPE(gint stype);
+gint createBirdWatchGraphNW(Island* island, gint rows, gint cols, gboolean drawEachPoint);
+gint createBirdWatchGraphSW(Island** islands, gint rows, gint cols, gboolean drawEachPoint);
 
 #endif

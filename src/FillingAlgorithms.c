@@ -47,7 +47,7 @@ static void fill_matrix(Cell*** matrix, ScoringOptions* options, gint startX, gi
 	gint yLimit = startY + width;
 	for (i = startX; i < xLimit; i++)
 		for (j = startY; j < yLimit; j++) {
-			printf("Computing [%d][%d]\n", i, j);
+			//printf("Computing [%d][%d]\n", i, j);
 			fill (matrix, options, seq1, seq2, i, j, isLocalAlignment);
 		}
 }

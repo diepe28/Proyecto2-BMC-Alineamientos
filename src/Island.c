@@ -3,7 +3,7 @@
 Island* island_new(gint startRow, gint startCol, gint maxValue, gint length, gchar* islandPath,
                    gchar* upSequence, gchar* leftSequence){
 
-	Island * island = (Island*) (malloc(sizeof(Island)));
+	Island * island = (Island*) (g_malloc(sizeof(Island)));
 	island->length = length;
 	island->startCol = startCol;
 	island->startRow = startRow;
@@ -12,8 +12,7 @@ Island* island_new(gint startRow, gint startCol, gint maxValue, gint length, gch
 	
 	gint i = 0, row = startRow, col = startCol, upIndex = length-1, leftIndex = length-1;
 	island->upSequence = (gchar*) (g_malloc((length) * sizeof(gchar))); 
-	island->leftSequence = (gchar*) (g_malloc((length) * sizeof(gchar))); 
-
+	island->leftSequence = (gchar*) (g_malloc((length) * sizeof(gchar)));
 	
 	for(; i < length; i++){
 		switch(islandPath[i]){
@@ -50,6 +49,7 @@ void island_free(Island* this){
 	g_free(this->upSequence);
 	g_free(this->leftSequence);
 	g_free(this->islandPath);
+	g_free(this->points);
 }
 
 
