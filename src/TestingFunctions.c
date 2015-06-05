@@ -508,8 +508,8 @@ void testFillingMatrix()
 
 void testBenchmark()
 {
-	gchar* seq1 = "TTGCATCGGCTTGCATCGGCTTGCATCGGCTTGCATCGGC";
-	gchar* seq2 = "ATTGTGATCCTTGCATCGGCTTGCATCGGCTTGCATCGGCTTGCATCGGCTTGCATCGGCTTGCATCGGCTTGCATCGGCTTGCATCGGCTTGCATCGGCTTGCATCGGC";
+	// gchar* seq1 = "TTGCATCGGC";
+	// gchar* seq2 = "ATTGTGATCC";
 	gint size1 = strlen(seq1)+1;
 	gint size2 = strlen(seq2)+1;
 	gint i, j = 0;
@@ -531,10 +531,12 @@ void testBenchmark()
 	kbandOptions->kExtensionValue = 1;
 
 	// Call and printing
-	NWBenchmarkResult* result = execute_nw_benchmark (seq1, seq2, size1-1, size2-1, options, NULL, 1);
+	NWBenchmarkResult* result = execute_nw_benchmark (seq1, seq2, size1-1, size2-1, options, NULL, 6);
 	print (result->similarityMatrix, size1, size2, FALSE);
 
 	puts("Execution Times");
 	for (i = 0; i < result->numberOfRuns; i++)
 		printf("%lu \n", result->fullExecutionTimes[i]);
+
+	nw_benchmark_result_free(result);
 }

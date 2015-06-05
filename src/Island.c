@@ -49,7 +49,7 @@ void island_free(Island* this){
 	g_free(this->upSequence);
 	g_free(this->leftSequence);
 	g_free(this->islandPath);
-	g_free(this->points);
+	g_slist_free (this->points);
 }
 
 void island_destroyer(gpointer data) 
