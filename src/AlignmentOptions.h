@@ -11,6 +11,8 @@ typedef struct {
 	gint gapExtensionPenalty;
 	gboolean freeLeftGapsForX;
 	gboolean freeLeftGapsForY;
+	gboolean freeRightGapsForX;
+	gboolean freeRightGapsForY;
 	gint (*substitutionMatrix)[26];
 } ScoringOptions;
 
@@ -25,7 +27,10 @@ ScoringOptions* ScoringOptions_new(
 	gint gapOpeningPenalty,
 	gint gapExtensionPenalty,
 	gboolean freeLeftGapsForX,
-	gboolean freeLeftGapsForY
+	gboolean freeLeftGapsForY,
+    gboolean freeRightGapsForX,
+    gboolean freeRightGapsForY,
+    gint (*substitutionMatrix)[26]
 );
 
 KBandOptions* KBandOptions_new(

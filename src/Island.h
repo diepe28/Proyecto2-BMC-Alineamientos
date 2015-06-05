@@ -21,4 +21,6 @@ Island* island_new(gint startRow, gint startCol, gint maxValue, gint length, gch
 void island_print(Island*);
 
 void island_free(Island*);
+void island_destroyer(gpointer data);
+
 #endif

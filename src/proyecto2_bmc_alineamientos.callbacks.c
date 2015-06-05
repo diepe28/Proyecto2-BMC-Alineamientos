@@ -44,7 +44,10 @@ void on_btGlobalAlignNW_clicked(GtkButton* sender) {
 		gappenalty1,
 		gappenalty2,
 		freeleftgapsv,
-		freeleftgapsw
+		freeleftgapsw,
+	    freerightgapsv,
+	    freerightgapsw,
+	    NULL
 	);
 
 	app_widget_show_nwpopup(

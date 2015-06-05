@@ -52,6 +52,12 @@ void island_free(Island* this){
 	g_free(this->points);
 }
 
+void island_destroyer(gpointer data) 
+{
+	Island* island_data = (Island*) data;
+	island_free (island_data);
+}
+
 
 
 

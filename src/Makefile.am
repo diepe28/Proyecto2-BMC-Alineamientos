@@ -43,7 +43,9 @@ proyecto2_bmc_alineamientos_SOURCES = \
 	proyecto2_bmc_alineamientos.callbacks.c \
 	proyecto2_bmc_alineamientos.handlers.c \
 	proyecto2_bmc_alineamientos.handlers.h \
-	AlignmentOptions.c	
+	AlignmentOptions.c \
+	BenchmarkSupport.c \
+	BenchmarkSupport.h	
 
 
 proyecto2_bmc_alineamientos_LDFLAGS = \

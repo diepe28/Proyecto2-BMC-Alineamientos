@@ -7,7 +7,10 @@ ScoringOptions* ScoringOptions_new(
 	gint gapOpeningPenalty,
 	gint gapExtensionPenalty,
 	gboolean freeLeftGapsForX,
-	gboolean freeLeftGapsForY
+	gboolean freeLeftGapsForY,
+    gboolean freeRightGapsForX,
+    gboolean freeRightGapsForY,
+    gint (*substitutionMatrix)[26]
 ) {
 	ScoringOptions* options = (ScoringOptions*) g_malloc(sizeof(ScoringOptions));
 	options->matchBonus = matchBonus;
@@ -16,7 +19,9 @@ ScoringOptions* ScoringOptions_new(
 	options->gapExtensionPenalty = gapExtensionPenalty;
 	options->freeLeftGapsForX = freeLeftGapsForX;
 	options->freeLeftGapsForY = freeLeftGapsForY;
-	options->substitutionMatrix = NULL;
+	options->freeRightGapsForX = freeRightGapsForX;
+	options->freeRightGapsForY = freeRightGapsForY;
+	options->substitutionMatrix = substitutionMatrix;
 	return options;
 }
 /* ---------------------------------------------------------------- */
