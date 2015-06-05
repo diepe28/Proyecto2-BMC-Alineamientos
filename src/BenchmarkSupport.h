@@ -11,7 +11,7 @@ typedef struct {
 	Island* result;
 	gulong* fullExecutionTimes;
 	gulong* kbandExecutionTimes;
-	gint numberOfResults;
+	gint numberOfRuns;
 	gint seq1Length;
 	gint seq2Length;
 } NWBenchmarkResult;
@@ -20,7 +20,7 @@ typedef struct {
 	Cell*** similarityMatrix;
 	GSList* result;
 	gulong* fullExecutionTimes;
-	gint numberOfResults;
+	gint numberOfRuns;
 	gint seq1Length;
 	gint seq2Length;
 } SWBenchmarkResult;

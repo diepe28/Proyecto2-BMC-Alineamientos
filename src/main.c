@@ -28,6 +28,7 @@ main (int argc, char *argv[])
 {
 	Proyecto2bmcalineamientos *app;
 	int status;
+	//testBenchmark ();
 	
 #ifdef ENABLE_NLS
 	bindtextdomain (GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);

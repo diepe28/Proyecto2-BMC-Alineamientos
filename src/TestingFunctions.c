@@ -480,6 +480,8 @@ void testFillingMatrix()
 	options->gapExtensionPenalty = -2;
 	options->freeLeftGapsForX = FALSE;
 	options->freeLeftGapsForY = FALSE;
+	options->freeRightGapsForX = FALSE;
+	options->freeRightGapsForY = FALSE;
 	options->substitutionMatrix = NULL;
 
 	KBandOptions* kbandOptions = g_malloc(sizeof(KBandOptions));
@@ -502,4 +504,37 @@ void testFillingMatrix()
 	g_free(matrix);
 	g_free(options);
 	g_free(kbandOptions);
+}
+
+void testBenchmark()
+{
+	gchar* seq1 = "TTGCATCGGCTTGCATCGGCTTGCATCGGCTTGCATCGGC";
+	gchar* seq2 = "ATTGTGATCCTTGCATCGGCTTGCATCGGCTTGCATCGGCTTGCATCGGCTTGCATCGGCTTGCATCGGCTTGCATCGGCTTGCATCGGCTTGCATCGGCTTGCATCGGC";
+	gint size1 = strlen(seq1)+1;
+	gint size2 = strlen(seq2)+1;
+	gint i, j = 0;
+	// Initialization
+
+	ScoringOptions* options = g_malloc(sizeof(ScoringOptions));
+	options->matchBonus = 1;
+	options->missmatchPenalty = -1;
+	options->gapOpeningPenalty = 0;
+	options->gapExtensionPenalty = -2;
+	options->freeLeftGapsForX = FALSE;
+	options->freeLeftGapsForY = FALSE;
+	options->freeRightGapsForX = FALSE;
+	options->freeRightGapsForY = FALSE;
+	options->substitutionMatrix = NULL;
+
+	KBandOptions* kbandOptions = g_malloc(sizeof(KBandOptions));
+	kbandOptions->kInitValue = 1;
+	kbandOptions->kExtensionValue = 1;
+
+	// Call and printing
+	NWBenchmarkResult* result = execute_nw_benchmark (seq1, seq2, size1-1, size2-1, options, NULL, 1);
+	print (result->similarityMatrix, size1, size2, FALSE);
+
+	puts("Execution Times");
+	for (i = 0; i < result->numberOfRuns; i++)
+		printf("%lu \n", result->fullExecutionTimes[i]);
 }

@@ -1,3 +1,5 @@
+
+#include "BenchmarkSupport.h"
 #include "AfterMatrixFilling.h"
 #include "FillingAlgorithms.h"
 
@@ -9,5 +11,6 @@ void testSemiGlobalAlingment();
 void testLocalAlingment();
 void testGNUPLOT();
 void testFillingMatrix();
+void testBenchmark();
 
 #endif
