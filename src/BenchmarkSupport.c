@@ -15,49 +15,56 @@ static void free_matrix(Cell*** matrix, gint n, gint m)
 
 NWBenchmarkResult* execute_nw_benchmark(gchar* seq1, gchar* seq2, gint seq1Length, gint seq2Length, ScoringOptions* scoringOptions, KBandOptions* kbandOptions, gint numberOfThreads)
 {
-	gint i = 0, j = 0;
+	gint i = 0;
 	Cell*** similarityMatrix = NULL;
 	Island* result = NULL;
-	glong* fullExecutionTimes = NULL;
-	glong* kbandExecutionTimes = NULL;
+	gulong* fullExecutionTimes = NULL;
+	gulong* kbandExecutionTimes = NULL;
 
-	fullExecutionTimes = (glong*) g_malloc(sizeof(glong) * numberOfThreads);
+	fullExecutionTimes = (gulong*) g_malloc(sizeof(glong) * numberOfThreads);
 	for (i = 0; i < numberOfThreads; i++) {
 		if (similarityMatrix != NULL && result != NULL) {
 			island_free(result);
 			free_matrix(similarityMatrix, seq1Length + 1, seq2Length + 1);
 		}
-		// START TIMER
+		GTimer* timer = g_timer_new();
 		similarityMatrix = create_similarity_matrix_full(seq1, seq2, seq1Length, seq2Length, scoringOptions, FALSE, i + 1);
 		if (similarityMatrix == NULL) {
-			for (j = 0; j < i; j++) g_free(fullExecutionTimes[j]);
+			g_timer_stop(timer);
+			g_timer_destroy(timer);
 			g_free(fullExecutionTimes);
 			return NULL;
 		}
 		result = afterMatrixFilling_find_NW_Alignment(similarityMatrix, seq2, seq1, seq1Length + 1, seq2Length + 1, scoringOptions->freeRightGapsForX, scoringOptions->freeRightGapsForY, scoringOptions->gapOpeningPenalty != 0);
-		// END TIMER
-		// COLLECT TIME
+		g_timer_stop(timer);
+		gulong fractional_part = 0;
+		gdouble seconds_elapsed = g_timer_elapsed(timer, &fractional_part);
+		fullExecutionTimes[i] = ((gulong)(seconds_elapsed * 1000000)) + fractional_part;
+		g_timer_destroy(timer);
 	}
 
 	if (kbandOptions != NULL) {
-		kbandExecutionTimes = (glong*) g_malloc(sizeof(glong) * numberOfThreads);
+		kbandExecutionTimes = (gulong*) g_malloc(sizeof(glong) * numberOfThreads);
 		for (i = 0; i < numberOfThreads; i++) {
 			if (similarityMatrix != NULL && result != NULL) {
 				island_free(result);
 				free_matrix(similarityMatrix, seq1Length + 1, seq2Length + 1);
 			}
-			// START TIMER
+			GTimer* timer = g_timer_new();
 			similarityMatrix = create_similarity_matrix_kband(seq1, seq2, seq1Length, seq2Length, scoringOptions, kbandOptions, i + 1);
 			if (similarityMatrix == NULL) {
-				for (j = 0; j < numberOfThreads; j++) g_free(fullExecutionTimes[j]);
+				g_timer_stop(timer);
+				g_timer_destroy(timer);
 				g_free(fullExecutionTimes);
-				for (j = 0; j < i; j++) g_free(kbandExecutionTimes[j]);
 				g_free(kbandExecutionTimes);
 				return NULL;
 			}
 			result = afterMatrixFilling_find_NW_Alignment(similarityMatrix, seq2, seq1, seq1Length + 1, seq2Length + 1, scoringOptions->freeRightGapsForX, scoringOptions->freeRightGapsForY, scoringOptions->gapOpeningPenalty != 0);
-			// END TIMER
-			// COLLECT TIME
+			g_timer_stop(timer);
+			gulong fractional_part = 0;
+			gdouble seconds_elapsed = g_timer_elapsed(timer, &fractional_part);
+			kbandExecutionTimes[i] = ((gulong)(seconds_elapsed * 1000000)) + fractional_part;
+			g_timer_destroy(timer);
 		}
 	}
 
@@ -74,27 +81,31 @@ NWBenchmarkResult* execute_nw_benchmark(gchar* seq1, gchar* seq2, gint seq1Lengt
 
 SWBenchmarkResult* execute_sw_benchmark(gchar* seq1, gchar* seq2, gint seq1Length, gint seq2Length, ScoringOptions* scoringOptions, gint minimumScoreForIsland, gint numberOfThreads)
 {
-	gint i = 0, j = 0;
+	gint i = 0;
 	Cell*** similarityMatrix = NULL;
 	GSList* result = NULL;
-	glong* fullExecutionTimes = NULL;
+	gulong* fullExecutionTimes = NULL;
 
-	fullExecutionTimes = (glong*) g_malloc(sizeof(glong) * numberOfThreads);
+	fullExecutionTimes = (gulong*) g_malloc(sizeof(glong) * numberOfThreads);
 	for (i = 0; i < numberOfThreads; i++) {
 		if (similarityMatrix != NULL && result != NULL) {
 			g_slist_free_full(result, island_destroyer);
 			free_matrix(similarityMatrix, seq1Length + 1, seq2Length + 1);
 		}
-		// START TIMER
+		GTimer* timer = g_timer_new();
 		similarityMatrix = create_similarity_matrix_full(seq1, seq2, seq1Length, seq2Length, scoringOptions, TRUE, i + 1);
 		if (similarityMatrix == NULL) {
-			for (j = 0; j < i; j++) g_free(fullExecutionTimes[j]);
+			g_timer_stop(timer);
+			g_timer_destroy(timer);
 			g_free(fullExecutionTimes);
 			return NULL;
 		}
 		result = afterMatrixFilling_findLocalAlignments(similarityMatrix, seq2, seq1, seq1Length + 1, seq2Length + 1, minimumScoreForIsland);
-		// END TIMER
-		// COLLECT TIME
+		g_timer_stop(timer);
+		gulong fractional_part = 0;
+		gdouble seconds_elapsed = g_timer_elapsed(timer, &fractional_part);
+		fullExecutionTimes[i] = ((gulong)(seconds_elapsed * 1000000)) + fractional_part;
+		g_timer_destroy(timer);
 	}
 
 	SWBenchmarkResult* benchmarkResult = (SWBenchmarkResult*) g_malloc(sizeof(SWBenchmarkResult));
@@ -109,27 +120,18 @@ SWBenchmarkResult* execute_sw_benchmark(gchar* seq1, gchar* seq2, gint seq1Lengt
 
 void nw_benchmark_result_free(NWBenchmarkResult* data) 
 {
-	gint i = 0;
 	island_free(data->result);
 	free_matrix(data->similarityMatrix, data->seq1Length + 1, data->seq2Length + 1);
-	for (i = 0; i < data->numberOfResults; i++)
-		g_free(data->fullExecutionTimes[i]);
 	g_free(data->fullExecutionTimes);
-	if (data->kbandExecutionTimes != NULL) {
-		for (i = 0; i < data->numberOfResults; i++)
-			g_free(data->kbandExecutionTimes[i]);
+	if (data->kbandExecutionTimes != NULL)
 		g_free(data->kbandExecutionTimes);
-	}
 	g_free(data);
 }
 
 void sw_benchmark_result_free(SWBenchmarkResult* data)
 {
-	gint i = 0;
 	g_slist_free_full(data->result, island_destroyer);
 	free_matrix(data->similarityMatrix, data->seq1Length + 1, data->seq2Length + 1);
-	for (i = 0; i < data->numberOfResults; i++)
-		g_free(data->fullExecutionTimes[i]);
 	g_free(data->fullExecutionTimes);
 	g_free(data);
 }
