@@ -22,8 +22,8 @@ Island* afterMatrixFilling_find_NW_Alignment(Cell*** matrix,
 GSList* afterMatrixFilling_findLocalAlignments(Cell*** matrix, 
                                               gchar* upSequence,
                                               gchar* leftSequence,
-                                              gint n,
-                                              gint m,
+                                              gint rows,
+                                              gint cols,
                                               gint minScore);
 
 

@@ -30,8 +30,8 @@ Island* island_new(gint startRow, gint startCol, gint maxValue, gint length, gch
 				break;
 		}
 	}
-	island->upSequence[length+1] = '\0';
-	island->leftSequence[length+1] = '\0';
+	island->upSequence[length] = '\0';
+	island->leftSequence[length] = '\0';
 
 	return island;	
 }

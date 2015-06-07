@@ -43,14 +43,14 @@ NWBenchmarkResult* execute_nw_benchmark(gchar* seq1, gchar* seq2, gint seq1Lengt
 {
 	gint i = 0;
 	Cell*** similarityMatrix = NULL;
-	Island* result = NULL;
+	Island* alignment = NULL;
 	gulong* fullExecutionTimes = NULL;
 	gulong* kbandExecutionTimes = NULL;
 
 	fullExecutionTimes = (gulong*) g_malloc(sizeof(gulong) * numberOfThreads);
 	for (i = 0; i < numberOfThreads; i++) {
-		if (similarityMatrix != NULL && result != NULL) {
-			island_free(result);
+		if (similarityMatrix != NULL && alignment != NULL) {
+			island_free(alignment);
 			free_matrix(similarityMatrix, seq1Length + 1, seq2Length + 1);
 		}
 		if (i == 1)
@@ -62,7 +62,7 @@ NWBenchmarkResult* execute_nw_benchmark(gchar* seq1, gchar* seq2, gint seq1Lengt
 		}
 		GTimer* timer = g_timer_new();
 		fill_similarity_matrix_full(similarityMatrix, seq1, seq2, seq1Length, seq2Length, scoringOptions, FALSE, i + 1);
-		result = afterMatrixFilling_find_NW_Alignment(similarityMatrix, seq2, seq1, seq1Length, seq2Length, scoringOptions->freeRightGapsForX, scoringOptions->freeRightGapsForY, scoringOptions->gapOpeningPenalty != 0);
+		alignment = afterMatrixFilling_find_NW_Alignment(similarityMatrix, seq2, seq1, seq1Length, seq2Length, scoringOptions->freeRightGapsForX, scoringOptions->freeRightGapsForY, scoringOptions->gapOpeningPenalty != 0);
 		g_timer_stop(timer);
 		gulong fractional_part = 0;
 		gdouble seconds_elapsed = g_timer_elapsed(timer, &fractional_part);
@@ -75,8 +75,8 @@ NWBenchmarkResult* execute_nw_benchmark(gchar* seq1, gchar* seq2, gint seq1Lengt
 	if (kbandOptions != NULL) {
 		kbandExecutionTimes = (gulong*) g_malloc(sizeof(gulong) * numberOfThreads);
 		for (i = 0; i < numberOfThreads; i++) {
-			if (similarityMatrix != NULL && result != NULL) {
-				island_free(result);
+			if (similarityMatrix != NULL && alignment != NULL) {
+				island_free(alignment);
 				free_matrix(similarityMatrix, seq1Length + 1, seq2Length + 1);
 			}
 			similarityMatrix = create_matrix (seq1Length + 1, seq2Length + 1);
@@ -87,7 +87,7 @@ NWBenchmarkResult* execute_nw_benchmark(gchar* seq1, gchar* seq2, gint seq1Lengt
 			}
 			GTimer* timer = g_timer_new();
 			fill_similarity_matrix_kband(similarityMatrix, seq1, seq2, seq1Length, seq2Length, scoringOptions, kbandOptions, i + 1);
-			result = afterMatrixFilling_find_NW_Alignment(similarityMatrix, seq2, seq1, seq1Length, seq2Length, scoringOptions->freeRightGapsForX, scoringOptions->freeRightGapsForY, scoringOptions->gapOpeningPenalty != 0);
+			alignment = afterMatrixFilling_find_NW_Alignment(similarityMatrix, seq2, seq1, seq1Length, seq2Length, scoringOptions->freeRightGapsForX, scoringOptions->freeRightGapsForY, scoringOptions->gapOpeningPenalty != 0);
 			g_timer_stop(timer);
 			gulong fractional_part = 0;
 			gdouble seconds_elapsed = g_timer_elapsed(timer, &fractional_part);
@@ -100,7 +100,7 @@ NWBenchmarkResult* execute_nw_benchmark(gchar* seq1, gchar* seq2, gint seq1Lengt
 
 	NWBenchmarkResult* benchmarkResult = (NWBenchmarkResult*) g_malloc(sizeof(NWBenchmarkResult));
 	benchmarkResult->similarityMatrix = similarityMatrix;
-	benchmarkResult->result = result;
+	benchmarkResult->alignment = alignment;
 	benchmarkResult->fullExecutionTimes = fullExecutionTimes;
 	benchmarkResult->kbandExecutionTimes = kbandExecutionTimes;
 	benchmarkResult->numberOfRuns = numberOfThreads;
@@ -113,13 +113,13 @@ SWBenchmarkResult* execute_sw_benchmark(gchar* seq1, gchar* seq2, gint seq1Lengt
 {
 	gint i = 0;
 	Cell*** similarityMatrix = NULL;
-	GSList* result = NULL;
+	GSList* islands = NULL;
 	gulong* fullExecutionTimes = NULL;
 
 	fullExecutionTimes = (gulong*) g_malloc(sizeof(gulong) * numberOfThreads);
 	for (i = 0; i < numberOfThreads; i++) {
-		if (similarityMatrix != NULL && result != NULL) {
-			g_slist_free_full(result, island_destroyer);
+		if (similarityMatrix != NULL && islands != NULL) {
+			g_slist_free_full(islands, island_destroyer);
 			free_matrix(similarityMatrix, seq1Length + 1, seq2Length + 1);
 		}
 		if (i == 1)
@@ -131,7 +131,7 @@ SWBenchmarkResult* execute_sw_benchmark(gchar* seq1, gchar* seq2, gint seq1Lengt
 		}
 		GTimer* timer = g_timer_new();
 		fill_similarity_matrix_full(similarityMatrix, seq1, seq2, seq1Length, seq2Length, scoringOptions, TRUE, i + 1);
-		result = afterMatrixFilling_findLocalAlignments(similarityMatrix, seq2, seq1, seq1Length, seq2Length, minimumScoreForIsland);
+		islands = afterMatrixFilling_findLocalAlignments(similarityMatrix, seq2, seq1, seq1Length, seq2Length, minimumScoreForIsland);
 		g_timer_stop(timer);
 		gulong fractional_part = 0;
 		gdouble seconds_elapsed = g_timer_elapsed(timer, &fractional_part);
@@ -143,7 +143,7 @@ SWBenchmarkResult* execute_sw_benchmark(gchar* seq1, gchar* seq2, gint seq1Lengt
 
 	SWBenchmarkResult* benchmarkResult = (SWBenchmarkResult*) g_malloc(sizeof(SWBenchmarkResult));
 	benchmarkResult->similarityMatrix = similarityMatrix;
-	benchmarkResult->result = result;
+	benchmarkResult->islands = islands;
 	benchmarkResult->fullExecutionTimes = fullExecutionTimes;
 	benchmarkResult->numberOfRuns = numberOfThreads;
 	benchmarkResult->seq1Length = seq1Length;
@@ -153,7 +153,7 @@ SWBenchmarkResult* execute_sw_benchmark(gchar* seq1, gchar* seq2, gint seq1Lengt
 
 void nw_benchmark_result_free(NWBenchmarkResult* data) 
 {
-	island_free(data->result);
+	island_free(data->alignment);
 	free_matrix(data->similarityMatrix, data->seq1Length + 1, data->seq2Length + 1);
 	g_free(data->fullExecutionTimes);
 	if (data->kbandExecutionTimes != NULL)
@@ -163,7 +163,7 @@ void nw_benchmark_result_free(NWBenchmarkResult* data)
 
 void sw_benchmark_result_free(SWBenchmarkResult* data)
 {
-	g_slist_free_full(data->result, island_destroyer);
+	g_slist_free_full(data->islands, island_destroyer);
 	free_matrix(data->similarityMatrix, data->seq1Length + 1, data->seq2Length + 1);
 	g_free(data->fullExecutionTimes);
 	g_free(data);

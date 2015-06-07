@@ -8,7 +8,7 @@
 
 typedef struct {
 	Cell*** similarityMatrix;
-	Island* result;
+	Island* alignment;
 	gulong* fullExecutionTimes;
 	gulong* kbandExecutionTimes;
 	gint numberOfRuns;
@@ -18,7 +18,7 @@ typedef struct {
 
 typedef struct {
 	Cell*** similarityMatrix;
-	GSList* result;
+	GSList* islands;
 	gulong* fullExecutionTimes;
 	gint numberOfRuns;
 	gint seq1Length;

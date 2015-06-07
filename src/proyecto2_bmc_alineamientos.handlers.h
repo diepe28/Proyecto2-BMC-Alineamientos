@@ -32,16 +32,14 @@ GObject* app_builder_get_lWTypeValue();
 GObject* app_builder_get_lVNew();
 GObject* app_builder_get_lWNew();
 void app_widget_show_nwpopup(
-	gchar* seq1,
-	gchar* seq2,
-	gint seq1Length,
-	gint seq2Length,
-	gint seq1Type,
-	gint seq2Type,
+	gchar* v, // v is up sequence
+	gchar* w,
+	gint lengthV,
+	gint lengthW,
+	gint vType,
+	gint wType,
 	ScoringOptions* scoringOptions,
-  gboolean freeRightGapsUp,
-  gboolean freeRightGapsLeft,
-	gboolean isLocalAlignment,
+	KBandOptions* kBandOptions,
 	gint numberOfThreads
 );
 gint app_entry_set_source(GtkEntry* entry, gchar* source);

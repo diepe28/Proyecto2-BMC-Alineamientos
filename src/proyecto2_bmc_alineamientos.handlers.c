@@ -2,6 +2,7 @@
 #include "Globals.h"
 #include "proyecto2-bmc-alineamientos.h"
 #include "proyecto2_bmc_alineamientos.handlers.h"
+#include "BenchmarkSupport.h"
 
 /* Globals -------------------------------------------------------- */
 
@@ -116,6 +117,10 @@ GObject* app_builder_get_lWTypeValue() {
 	return gtk_builder_get_object(builder, "lWTypeValue");
 }
 /* ---------------------------------------------------------------- */
+GObject* app_builder_get_spMinIslands() {
+	return gtk_builder_get_object(builder, "spMinIslands");
+}
+/* ---------------------------------------------------------------- */
 void app_widget_show_nwpopup(
 	gchar* v, // v is up sequence
 	gchar* w,
@@ -124,33 +129,16 @@ void app_widget_show_nwpopup(
 	gint vType,
 	gint wType,
 	ScoringOptions* scoringOptions,
-  gboolean freeRightGapsUp,
-  gboolean freeRightGapsLeft,
-	gboolean isLocalAlignment,
+	KBandOptions* kBandOptions,
 	gint numberOfThreads
 ) {
-	Cell*** matrix = NULL; /*create_similarity_matrix_full(
-		w,
-		v,
-		lengthW,
-		lengthV,
-		scoringOptions,
-		isLocalAlignment,
-		numberOfThreads
-	);*/
 
-	Island* globalAl = afterMatrixFilling_find_NW_Alignment(
-		matrix,
-		v,
-		w,
-		lengthW,
-		lengthV,
-		freeRightGapsUp,
-		freeRightGapsLeft,
-		FALSE
-	);
+	NWBenchmarkResult* result =
+		execute_nw_benchmark(w, v, lengthW, lengthV, scoringOptions,kBandOptions,numberOfThreads);
 
-	gint result = createBirdWatchGraphNW(globalAl, lengthW,  lengthV, FALSE);
+	Island* alignment = result->alignment;
+	createBirdWatchGraphNW(alignment, lengthW,  lengthV);
+	
 	
 	GtkWidget* popup = GTK_WIDGET(app_builder_get_popup());
 
@@ -168,11 +156,50 @@ void app_widget_show_nwpopup(
 	gtk_label_set_text(GTK_LABEL(app_builder_get_lVTypeValue()), APP_SEQUENCE_TYPE(vType));
 	gtk_label_set_text(GTK_LABEL(app_builder_get_lWTypeValue()), APP_SEQUENCE_TYPE(wType));
 	
-	gtk_label_set_text(GTK_LABEL(app_builder_get_lVNew()), globalAl->upSequence);
-	gtk_label_set_text(GTK_LABEL(app_builder_get_lWNew()), globalAl->leftSequence);
+	gtk_label_set_text(GTK_LABEL(app_builder_get_lVNew()), alignment->upSequence);
+	gtk_label_set_text(GTK_LABEL(app_builder_get_lWNew()), alignment->leftSequence);
 
 	gtk_widget_show_all(popup);
 }
+/* ---------------------------------------------------------------- */
+void app_widget_show_swpopup(
+	gchar* v, // v is up sequence
+	gchar* w,
+	gint lengthV,
+	gint lengthW,
+	gint vType,
+	gint wType,
+	ScoringOptions* scoringOptions,
+    gint minValueIslands,
+	gint numberOfThreads
+) {
+	SWBenchmarkResult* benchmarkResult = execute_sw_benchmark(w, v, lengthW, lengthV, scoringOptions, minValueIslands, numberOfThreads);
+	GSList* islands = benchmarkResult->islands;
+	createBirdWatchGraphSW (islands, lengthW, lengthV);
+	
+	GtkWidget* popup = GTK_WIDGET(app_builder_get_popup());
+
+	gtk_label_set_text(GTK_LABEL(app_builder_get_lAlgorithmValue()), "Smith-Waterman");
+	
+	gchar* sSeq1Length = (gchar*) g_malloc(sizeof(gchar) * (log10(lengthV) + 1));
+	gchar* sSeq2Length = (gchar*) g_malloc(sizeof(gchar) * (log10(lengthW) + 1));
+
+	sprintf(sSeq1Length, "%d", lengthV);
+	sprintf(sSeq2Length, "%d", lengthW);
+
+	gtk_label_set_text(GTK_LABEL(app_builder_get_lVLengthValue()), sSeq1Length);
+	gtk_label_set_text(GTK_LABEL(app_builder_get_lWLengthValue()), sSeq2Length);
+	
+	gtk_label_set_text(GTK_LABEL(app_builder_get_lVTypeValue()), APP_SEQUENCE_TYPE(vType));
+	gtk_label_set_text(GTK_LABEL(app_builder_get_lWTypeValue()), APP_SEQUENCE_TYPE(wType));
+	
+	//gtk_label_set_text(GTK_LABEL(app_builder_get_lVNew()), benchmarkResult->result->upSequence);
+	//gtk_label_set_text(GTK_LABEL(app_builder_get_lWNew()), benchmarkResult->result->leftSequence);
+
+	gtk_widget_show_all(popup);
+
+}
+
 /* ---------------------------------------------------------------- */
 gint app_entry_set_source(GtkEntry* entry, gchar* source) {
 	FILE* file;
