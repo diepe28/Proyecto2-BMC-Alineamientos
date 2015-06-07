@@ -508,12 +508,25 @@ void testFillingMatrix()
 
 void testBenchmark()
 {
-	// gchar* seq1 = "TTGCATCGGC";
-	// gchar* seq2 = "ATTGTGATCC";
-	gint size1 = strlen(seq1)+1;
-	gint size2 = strlen(seq2)+1;
-	gint i, j = 0;
-	// Initialization
+	//gchar* seq1 = "TTGCATCGGC";
+	//gchar* seq2 = "ATTGTGATCC";
+	//gint size1 = strlen(seq1)+1;
+	//gint size2 = strlen(seq2)+1;
+
+	//GError* error1 = NULL;
+	//GError* error2 = NULL;
+	GIOChannel* channel1 = g_io_channel_new_file ("seq1", "r", NULL);
+	GIOChannel* channel2 = g_io_channel_new_file ("seq2", "r", NULL);
+	gchar* seq1 = NULL;
+	gchar* seq2 = NULL;
+	gsize gsize1 = 0;
+	gsize gsize2 = 0;
+	g_io_channel_read_to_end (channel1, &seq1, &gsize1, NULL);
+	g_io_channel_read_to_end (channel2, &seq2, &gsize2, NULL);
+	gint size1 = gsize1;
+	gint size2 = gsize2;
+	
+	gint i = 0;
 
 	ScoringOptions* options = g_malloc(sizeof(ScoringOptions));
 	options->matchBonus = 1;
@@ -527,16 +540,37 @@ void testBenchmark()
 	options->substitutionMatrix = NULL;
 
 	KBandOptions* kbandOptions = g_malloc(sizeof(KBandOptions));
-	kbandOptions->kInitValue = 1;
-	kbandOptions->kExtensionValue = 1;
+	kbandOptions->kInitValue = 500;
+	kbandOptions->kExtensionValue = 100;
 
 	// Call and printing
-	NWBenchmarkResult* result = execute_nw_benchmark (seq1, seq2, size1-1, size2-1, options, NULL, 6);
-	print (result->similarityMatrix, size1, size2, FALSE);
+	//NWBenchmarkResult* result = execute_nw_benchmark (seq1, seq2, size1-1, size2-1, options, kbandOptions, 5);
+	SWBenchmarkResult* result = execute_sw_benchmark (seq1, seq2, size1-1, size2-1, options, 2, 5);
+	//print (result->similarityMatrix, size1, size2, FALSE);
 
-	puts("Execution Times");
+	/*puts("Normal Execution Times");
 	for (i = 0; i < result->numberOfRuns; i++)
 		printf("%lu \n", result->fullExecutionTimes[i]);
 
-	nw_benchmark_result_free(result);
+	if (result->kbandExecutionTimes != NULL) {
+		puts("Kband Execution Times");
+		for (i = 0; i < result->numberOfRuns; i++)
+			printf("%lu \n", result->kbandExecutionTimes[i]);
+	}
+	*/
+	puts("Result");
+	/*puts(result->result->upSequence);
+	puts(result->result->leftSequence);
+*/
+	//nw_benchmark_result_free(result);
+	sw_benchmark_result_free (result);
+	g_free(options);
+	g_free(kbandOptions);
+	
+	g_free(seq1);
+	g_free(seq2);
+	g_io_channel_shutdown (channel1, TRUE, NULL);
+	g_io_channel_shutdown (channel2, TRUE, NULL);
+	g_io_channel_unref (channel1);
+	g_io_channel_unref (channel2);
 }

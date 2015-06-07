@@ -41,6 +41,8 @@ NWBenchmarkResult* execute_nw_benchmark(gchar* seq1, gchar* seq2, gint seq1Lengt
 		gdouble seconds_elapsed = g_timer_elapsed(timer, &fractional_part);
 		fullExecutionTimes[i] = ((gulong)(seconds_elapsed * 1000000)) + fractional_part;
 		g_timer_destroy(timer);
+
+		printf("Full Run #%d result=%d \n", i, similarityMatrix[seq1Length][seq2Length]->value_a);
 	}
 
 	if (kbandOptions != NULL) {
@@ -65,6 +67,8 @@ NWBenchmarkResult* execute_nw_benchmark(gchar* seq1, gchar* seq2, gint seq1Lengt
 			gdouble seconds_elapsed = g_timer_elapsed(timer, &fractional_part);
 			kbandExecutionTimes[i] = ((gulong)(seconds_elapsed * 1000000)) + fractional_part;
 			g_timer_destroy(timer);
+
+			printf("KBand Full Run #%d result=%d \n", i, similarityMatrix[seq1Length][seq2Length]->value_a);
 		}
 	}
 
@@ -106,6 +110,8 @@ SWBenchmarkResult* execute_sw_benchmark(gchar* seq1, gchar* seq2, gint seq1Lengt
 		gdouble seconds_elapsed = g_timer_elapsed(timer, &fractional_part);
 		fullExecutionTimes[i] = ((gulong)(seconds_elapsed * 1000000)) + fractional_part;
 		g_timer_destroy(timer);
+
+		printf("Local Run #%d result=%d \n", i, similarityMatrix[seq1Length][seq2Length]->value_a);
 	}
 
 	SWBenchmarkResult* benchmarkResult = (SWBenchmarkResult*) g_malloc(sizeof(SWBenchmarkResult));

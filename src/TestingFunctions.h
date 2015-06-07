@@ -1,4 +1,5 @@
 
+#include <glib.h>
 #include "BenchmarkSupport.h"
 #include "AfterMatrixFilling.h"
 #include "FillingAlgorithms.h"

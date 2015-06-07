@@ -46,10 +46,8 @@ static void fill_matrix(Cell*** matrix, ScoringOptions* options, gint startX, gi
 	gint xLimit = startX + height;
 	gint yLimit = startY + width;
 	for (i = startX; i < xLimit; i++)
-		for (j = startY; j < yLimit; j++) {
-			//printf("Computing [%d][%d]\n", i, j);
+		for (j = startY; j < yLimit; j++)
 			fill (matrix, options, seq1, seq2, i, j, isLocalAlignment);
-		}
 }
 
 static void fill_kband_boundaries(Cell*** matrix, gint seq1Length, gint seq2Length, gint k) 
@@ -99,7 +97,6 @@ static void fill_antidiagonal(Cell*** matrix, gint n, gchar* seq1, gchar* seq2, 
 			g_free (matrix[i][j]);
 		if (waitingSemaphore != NULL && i != 0 && (i-1)-j >= lowerBound && sem_wait(waitingSemaphore))
 			puts("ERROR from sem_wait()");
-		printf("Computing [%d][%d]\n", i, j);
 		fill (matrix, scoringOptions, seq1, seq2, i, j, FALSE);
 		if (signalSemaphore != NULL && i != seq1Length && (i+1)-j <= upperBound && sem_post(signalSemaphore))
 			puts("ERROR from sem_post()");
@@ -122,7 +119,7 @@ static void fill_strip(FullFillParameters* params, gboolean firstStrip)
 				puts("ERROR from sem_wait()");
 		blockWidth = (n > 0) ? (params->basicBlockWidth + 1) : params->basicBlockWidth;
 		fill_matrix (params->matrix, params->options, startX, startY, blockHeight, blockWidth, params->seq1, params->seq2, params->isLocalAlignment);
-		printf("Block finished from thread %d \n", params->threadID);
+		// printf("Block finished from thread %d \n", params->threadID);
 		startY += blockWidth;
 		n--;
 		if (sem_post(params->signalSemaphore))
@@ -168,12 +165,12 @@ static void fill_matrix_parallel(Cell*** matrix, ScoringOptions* options, gint h
 	}
 
 	// Debug
-	printf("Width=%d \n", width);
+	/*printf("Width=%d \n", width);
 	printf("Height=%d \n", height);
 	printf("BasicBlockWidth=%d \n", basicBlockWidth);
 	printf("BasicBlockHeight=%d \n", basicBlockHeight);
 	printf("WidthExcess=%d \n", widthExcess);
-	printf("HeightExcess=%d \n", heightExcess);
+	printf("HeightExcess=%d \n", heightExcess);*/
 	// Debug
 	
 	for (i = 0; i < numberOfThreads; i++) {
@@ -195,11 +192,11 @@ static void fill_matrix_parallel(Cell*** matrix, ScoringOptions* options, gint h
 		parameters[i]->waitingSemaphore = (i == 0) ? semaphores[numberOfThreads-1] : semaphores[i-1];
 
 		// Debug
-		printf("Thread %d strip1Start=%d \n", i, parameters[i]->strip1Start);
+		/*printf("Thread %d strip1Start=%d \n", i, parameters[i]->strip1Start);
 		printf("Thread %d strip1Height=%d \n",  i, parameters[i]->strip1Height);
 		printf("Thread %d strip2Start=%d \n", i, parameters[i]->strip2Start);
 		printf("Thread %d strip2Height=%d \n",  i, parameters[i]->strip2Height);
-		puts("");
+		puts("");*/
 		// Debug
 
 		threads[i] = (pthread_t*) g_malloc(sizeof(pthread_t));
@@ -236,7 +233,7 @@ static void* kband_worker(void* parameters)
 	if (params->k != 0) {
 		while (i < number_of_antidiagonals (params->seq1Length, params->seq2Length)) {
 			fill_antidiagonal (params->matrix, i, params->seq1, params->seq2, params->seq1Length, params->seq2Length, params->k, params->options, params->waitingSemaphore, params->signalSemaphore);
-			printf("Kband Thread %d computed antidiagonal %d... \n", params->threadID, i);
+			// printf("Kband Thread %d computed antidiagonal %d... \n", params->threadID, i);
 			i += params->numberOfThreads;
 		}
 	} else if (params->threadID == 0) {
