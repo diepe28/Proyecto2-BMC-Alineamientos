@@ -129,7 +129,7 @@ void app_widget_show_nwpopup(
 	gboolean isLocalAlignment,
 	gint numberOfThreads
 ) {
-	Cell*** matrix = create_similarity_matrix_full(
+	Cell*** matrix = NULL; /*create_similarity_matrix_full(
 		w,
 		v,
 		lengthW,
@@ -137,7 +137,7 @@ void app_widget_show_nwpopup(
 		scoringOptions,
 		isLocalAlignment,
 		numberOfThreads
-	);
+	);*/
 
 	Island* globalAl = afterMatrixFilling_find_NW_Alignment(
 		matrix,

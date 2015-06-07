@@ -23,23 +23,6 @@ static void print_matrix(Cell*** matrix, gint m, gint n)
 	}
 }
 
-static Cell*** create_matrix(gint height, gint width) 
-{
-	gint i, j = 0;
-
-	Cell*** matrix = (Cell***) g_try_malloc0 (sizeof(Cell**) * height);
-	for (i = 0; i < height; i++) {
-		matrix[i] = (Cell**) g_try_malloc0 (sizeof(Cell*) * width);
-		if (matrix[i] == NULL) {
-			for (j = 0; j < i; j++)
-				g_free (matrix[j]);
-			g_free (matrix);
-			return NULL;
-		}
-	}
-	return matrix;
-}
-
 static void fill_matrix(Cell*** matrix, ScoringOptions* options, gint startX, gint startY, gint height, gint width, gchar* seq1, gchar* seq2, gboolean isLocalAlignment) 
 {
 	gint i, j = 0;
@@ -119,7 +102,6 @@ static void fill_strip(FullFillParameters* params, gboolean firstStrip)
 				puts("ERROR from sem_wait()");
 		blockWidth = (n > 0) ? (params->basicBlockWidth + 1) : params->basicBlockWidth;
 		fill_matrix (params->matrix, params->options, startX, startY, blockHeight, blockWidth, params->seq1, params->seq2, params->isLocalAlignment);
-		// printf("Block finished from thread %d \n", params->threadID);
 		startY += blockWidth;
 		n--;
 		if (sem_post(params->signalSemaphore))
@@ -130,7 +112,6 @@ static void fill_strip(FullFillParameters* params, gboolean firstStrip)
 static void* fill_strips(void* parameters) 
 {
 	FullFillParameters* params = (FullFillParameters*) parameters;
-	printf("Thread %d started processing... \n", params->threadID);
 
 	if (params->strip1Height != 0)
 		fill_strip (params, TRUE);
@@ -138,7 +119,6 @@ static void* fill_strips(void* parameters)
 	if (params->strip2Height != 0)
 		fill_strip (params, FALSE);
 	
-	printf("Thread %d finished processing... \n", params->threadID);
 	pthread_exit((void *) 0);
 }
 
@@ -163,15 +143,6 @@ static void fill_matrix_parallel(Cell*** matrix, ScoringOptions* options, gint h
 		if (sem_init(semaphores[i], FALSE, 0))
 			puts("ERROR from sem_init()");
 	}
-
-	// Debug
-	/*printf("Width=%d \n", width);
-	printf("Height=%d \n", height);
-	printf("BasicBlockWidth=%d \n", basicBlockWidth);
-	printf("BasicBlockHeight=%d \n", basicBlockHeight);
-	printf("WidthExcess=%d \n", widthExcess);
-	printf("HeightExcess=%d \n", heightExcess);*/
-	// Debug
 	
 	for (i = 0; i < numberOfThreads; i++) {
 		parameters[i] = (FullFillParameters*) g_malloc(sizeof(FullFillParameters));
@@ -190,14 +161,6 @@ static void fill_matrix_parallel(Cell*** matrix, ScoringOptions* options, gint h
 		parameters[i]->strip2Height = ((i + numberOfThreads) < heightExcess) ? (basicBlockHeight + 1) : (basicBlockHeight);
 		parameters[i]->signalSemaphore = semaphores[i];
 		parameters[i]->waitingSemaphore = (i == 0) ? semaphores[numberOfThreads-1] : semaphores[i-1];
-
-		// Debug
-		/*printf("Thread %d strip1Start=%d \n", i, parameters[i]->strip1Start);
-		printf("Thread %d strip1Height=%d \n",  i, parameters[i]->strip1Height);
-		printf("Thread %d strip2Start=%d \n", i, parameters[i]->strip2Start);
-		printf("Thread %d strip2Height=%d \n",  i, parameters[i]->strip2Height);
-		puts("");*/
-		// Debug
 
 		threads[i] = (pthread_t*) g_malloc(sizeof(pthread_t));
 		if (pthread_create(threads[i], &attr, fill_strips, (void*)parameters[i]))
@@ -227,13 +190,11 @@ static void fill_matrix_parallel(Cell*** matrix, ScoringOptions* options, gint h
 static void* kband_worker(void* parameters) 
 {
 	KBandFillParameters* params = (KBandFillParameters*) parameters;
-	printf("Kband Thread %d started processing... \n", params->threadID);
 
 	gint i = params->threadID;
 	if (params->k != 0) {
 		while (i < number_of_antidiagonals (params->seq1Length, params->seq2Length)) {
 			fill_antidiagonal (params->matrix, i, params->seq1, params->seq2, params->seq1Length, params->seq2Length, params->k, params->options, params->waitingSemaphore, params->signalSemaphore);
-			// printf("Kband Thread %d computed antidiagonal %d... \n", params->threadID, i);
 			i += params->numberOfThreads;
 		}
 	} else if (params->threadID == 0) {
@@ -241,7 +202,6 @@ static void* kband_worker(void* parameters)
 				fill_antidiagonal (params->matrix, i, params->seq1, params->seq2, params->seq1Length, params->seq2Length, params->k, params->options, NULL, NULL);
 	}
 	
-	printf("Kband Thread %d finished processing... \n", params->threadID);
 	pthread_exit((void *) 0);
 }
 
@@ -303,28 +263,16 @@ static void fill_kband_parallel(Cell*** matrix, gchar* seq1, gchar* seq2, gint s
 
 // Exposed functions
 
-Cell*** create_similarity_matrix_full(gchar* seq1, gchar* seq2, gint seq1Length, gint seq2Length, ScoringOptions* scoringOptions, gboolean isLocalAlignment, gint numberOfThreads) 
+void fill_similarity_matrix_full(Cell*** matrix, gchar* seq1, gchar* seq2, gint seq1Length, gint seq2Length, ScoringOptions* scoringOptions, gboolean isLocalAlignment, gint numberOfThreads) 
 {
-	Cell*** matrix = create_matrix (seq1Length + 1, seq2Length + 1);
-	
-	if (matrix == NULL) 
-		return NULL;
-		
 	if (numberOfThreads == 1)
 		fill_matrix (matrix, scoringOptions, 0, 0, seq1Length + 1, seq2Length + 1, seq1, seq2, isLocalAlignment);
 	else
 		fill_matrix_parallel (matrix, scoringOptions, seq1Length + 1, seq2Length + 1, seq1, seq2, isLocalAlignment, numberOfThreads);
-	
-	return matrix;
 }
 
-Cell*** create_similarity_matrix_kband(gchar* seq1, gchar* seq2, gint seq1Length, gint seq2Length, ScoringOptions* scoringOptions, KBandOptions* kbandOptions, gint numberOfThreads) 
+void fill_similarity_matrix_kband(Cell*** matrix, gchar* seq1, gchar* seq2, gint seq1Length, gint seq2Length, ScoringOptions* scoringOptions, KBandOptions* kbandOptions, gint numberOfThreads) 
 {
-	Cell*** matrix = create_matrix (seq1Length + 1, seq2Length + 1);
-	
-	if (matrix == NULL) 
-		return NULL;
-
 	gint i = 0;
 	gint k = kbandOptions->kInitValue;
 	gint minLength = MIN(seq1Length, seq2Length);
@@ -341,15 +289,12 @@ Cell*** create_similarity_matrix_kband(gchar* seq1, gchar* seq2, gint seq1Length
 		gint bestScore = matrix[seq1Length][seq2Length]->value_a;
 		gint nextKBound = (2*(k + 1) + maxLength - minLength)*scoringOptions->gapExtensionPenalty + (minLength - (k + 1))*scoringOptions->matchBonus;
 		if (bestScore >= nextKBound)
-			return matrix;
+			return;
 		k += kbandOptions->kExtensionValue;
-		print_matrix (matrix, seq1Length+1, seq2Length+1);
 	}
 
 	if (numberOfThreads == 1)
 		fill_matrix (matrix, scoringOptions, 0, 0, seq1Length + 1, seq2Length + 1, seq1, seq2, FALSE);
 	else
 		fill_matrix_parallel (matrix, scoringOptions, seq1Length + 1, seq2Length + 1, seq1, seq2, FALSE, numberOfThreads);
-	
-	return matrix;
 }

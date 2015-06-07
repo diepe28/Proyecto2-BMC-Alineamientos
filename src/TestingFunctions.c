@@ -41,7 +41,7 @@ void testGlobalAlingment(){
 	options->freeLeftGapsForY = FALSE;
 	options->substitutionMatrix = NULL;
 
-	Cell*** matrix = create_similarity_matrix_full(w, v, wLength, vLength, options, FALSE, 1);
+	Cell*** matrix = NULL; /*create_similarity_matrix_full(w, v, wLength, vLength, options, FALSE, 1);*/
 	printMatrix(wLength, vLength, matrix);
 	char** sequences = afterMatrixFilling_find_NW_Alignment (matrix, v, w, wLength, vLength,
 	                                                         FALSE, FALSE, TRUE);
@@ -490,7 +490,7 @@ void testFillingMatrix()
 
 	// Call and printing
 	//Cell*** matrix = create_similarity_matrix_full (seq1, seq2, size1-1, size2-1, options, FALSE, 1);
-	Cell*** matrix = create_similarity_matrix_kband (seq1, seq2, size1-1, size2-1, options, kbandOptions, 100);
+	Cell*** matrix = NULL; /*create_similarity_matrix_kband (seq1, seq2, size1-1, size2-1, options, kbandOptions, 100);*/
 	print (matrix, size1, size2, FALSE);
 	
 	// Cleaning
@@ -544,11 +544,11 @@ void testBenchmark()
 	kbandOptions->kExtensionValue = 100;
 
 	// Call and printing
-	//NWBenchmarkResult* result = execute_nw_benchmark (seq1, seq2, size1-1, size2-1, options, kbandOptions, 5);
-	SWBenchmarkResult* result = execute_sw_benchmark (seq1, seq2, size1-1, size2-1, options, 2, 5);
+	NWBenchmarkResult* result = execute_nw_benchmark (seq1, seq2, size1-1, size2-1, options, NULL, 10);
+	//SWBenchmarkResult* result = execute_sw_benchmark (seq1, seq2, size1-1, size2-1, options, 2, 5);
 	//print (result->similarityMatrix, size1, size2, FALSE);
 
-	/*puts("Normal Execution Times");
+	puts("Normal Execution Times");
 	for (i = 0; i < result->numberOfRuns; i++)
 		printf("%lu \n", result->fullExecutionTimes[i]);
 
@@ -557,13 +557,13 @@ void testBenchmark()
 		for (i = 0; i < result->numberOfRuns; i++)
 			printf("%lu \n", result->kbandExecutionTimes[i]);
 	}
-	*/
+	
 	puts("Result");
-	/*puts(result->result->upSequence);
+	puts(result->result->upSequence);
 	puts(result->result->leftSequence);
-*/
-	//nw_benchmark_result_free(result);
-	sw_benchmark_result_free (result);
+
+	nw_benchmark_result_free(result);
+	//sw_benchmark_result_free (result);
 	g_free(options);
 	g_free(kbandOptions);
 	

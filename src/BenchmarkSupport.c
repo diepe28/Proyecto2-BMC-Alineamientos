@@ -1,6 +1,23 @@
 
 #include "BenchmarkSupport.h"
 
+static Cell*** create_matrix(gint height, gint width) 
+{
+	gint i, j = 0;
+
+	Cell*** matrix = (Cell***) g_try_malloc0 (sizeof(Cell**) * height);
+	for (i = 0; i < height; i++) {
+		matrix[i] = (Cell**) g_try_malloc0 (sizeof(Cell*) * width);
+		if (matrix[i] == NULL) {
+			for (j = 0; j < i; j++)
+				g_free (matrix[j]);
+			g_free (matrix);
+			return NULL;
+		}
+	}
+	return matrix;
+}
+
 static void free_matrix(Cell*** matrix, gint n, gint m)
 {
 	gint i, j = 0;
@@ -11,6 +28,15 @@ static void free_matrix(Cell*** matrix, gint n, gint m)
 		g_free(matrix[i]);
 	}
 	g_free(matrix);
+}
+
+static void warm_up(gchar* seq1, gchar* seq2, gint seq1Length, gint seq2Length, ScoringOptions* scoringOptions, gboolean local) 
+{
+	Cell*** similarityMatrix = create_matrix (seq1Length + 1, seq2Length + 1);
+	if (similarityMatrix != NULL) {
+		fill_similarity_matrix_full(similarityMatrix, seq1, seq2, seq1Length, seq2Length, scoringOptions, local, 2);
+		free_matrix(similarityMatrix, seq1Length + 1, seq2Length + 1);
+	}
 }
 
 NWBenchmarkResult* execute_nw_benchmark(gchar* seq1, gchar* seq2, gint seq1Length, gint seq2Length, ScoringOptions* scoringOptions, KBandOptions* kbandOptions, gint numberOfThreads)
@@ -27,14 +53,15 @@ NWBenchmarkResult* execute_nw_benchmark(gchar* seq1, gchar* seq2, gint seq1Lengt
 			island_free(result);
 			free_matrix(similarityMatrix, seq1Length + 1, seq2Length + 1);
 		}
-		GTimer* timer = g_timer_new();
-		similarityMatrix = create_similarity_matrix_full(seq1, seq2, seq1Length, seq2Length, scoringOptions, FALSE, i + 1);
+		if (i == 1)
+			warm_up (seq1, seq2, seq1Length, seq2Length, scoringOptions, FALSE);
+		similarityMatrix = create_matrix (seq1Length + 1, seq2Length + 1);
 		if (similarityMatrix == NULL) {
-			g_timer_stop(timer);
-			g_timer_destroy(timer);
 			g_free(fullExecutionTimes);
 			return NULL;
 		}
+		GTimer* timer = g_timer_new();
+		fill_similarity_matrix_full(similarityMatrix, seq1, seq2, seq1Length, seq2Length, scoringOptions, FALSE, i + 1);
 		result = afterMatrixFilling_find_NW_Alignment(similarityMatrix, seq2, seq1, seq1Length, seq2Length, scoringOptions->freeRightGapsForX, scoringOptions->freeRightGapsForY, scoringOptions->gapOpeningPenalty != 0);
 		g_timer_stop(timer);
 		gulong fractional_part = 0;
@@ -52,15 +79,14 @@ NWBenchmarkResult* execute_nw_benchmark(gchar* seq1, gchar* seq2, gint seq1Lengt
 				island_free(result);
 				free_matrix(similarityMatrix, seq1Length + 1, seq2Length + 1);
 			}
-			GTimer* timer = g_timer_new();
-			similarityMatrix = create_similarity_matrix_kband(seq1, seq2, seq1Length, seq2Length, scoringOptions, kbandOptions, i + 1);
+			similarityMatrix = create_matrix (seq1Length + 1, seq2Length + 1);
 			if (similarityMatrix == NULL) {
-				g_timer_stop(timer);
-				g_timer_destroy(timer);
 				g_free(fullExecutionTimes);
 				g_free(kbandExecutionTimes);
 				return NULL;
 			}
+			GTimer* timer = g_timer_new();
+			fill_similarity_matrix_kband(similarityMatrix, seq1, seq2, seq1Length, seq2Length, scoringOptions, kbandOptions, i + 1);
 			result = afterMatrixFilling_find_NW_Alignment(similarityMatrix, seq2, seq1, seq1Length, seq2Length, scoringOptions->freeRightGapsForX, scoringOptions->freeRightGapsForY, scoringOptions->gapOpeningPenalty != 0);
 			g_timer_stop(timer);
 			gulong fractional_part = 0;
@@ -96,14 +122,15 @@ SWBenchmarkResult* execute_sw_benchmark(gchar* seq1, gchar* seq2, gint seq1Lengt
 			g_slist_free_full(result, island_destroyer);
 			free_matrix(similarityMatrix, seq1Length + 1, seq2Length + 1);
 		}
-		GTimer* timer = g_timer_new();
-		similarityMatrix = create_similarity_matrix_full(seq1, seq2, seq1Length, seq2Length, scoringOptions, TRUE, i + 1);
+		if (i == 1)
+			warm_up (seq1, seq2, seq1Length, seq2Length, scoringOptions, TRUE);
+		similarityMatrix = create_matrix (seq1Length + 1, seq2Length + 1);
 		if (similarityMatrix == NULL) {
-			g_timer_stop(timer);
-			g_timer_destroy(timer);
 			g_free(fullExecutionTimes);
 			return NULL;
 		}
+		GTimer* timer = g_timer_new();
+		fill_similarity_matrix_full(similarityMatrix, seq1, seq2, seq1Length, seq2Length, scoringOptions, TRUE, i + 1);
 		result = afterMatrixFilling_findLocalAlignments(similarityMatrix, seq2, seq1, seq1Length, seq2Length, minimumScoreForIsland);
 		g_timer_stop(timer);
 		gulong fractional_part = 0;
