@@ -136,6 +136,10 @@ GObject* app_builder_get_lPage(){
 	return gtk_builder_get_object(builder, "lPage");
 }
 /* ---------------------------------------------------------------- */
+GObject* app_builder_get_imgBirdWatch(){
+	return gtk_builder_get_object(builder, "imgBirdWatch");
+}
+/* ---------------------------------------------------------------- */
 void app_widget_show_nwpopup(
 	gchar* v, // v is up sequence
 	gchar* w,
@@ -183,6 +187,7 @@ void app_widget_show_nwpopup(
 	gtk_label_set_text(GTK_LABEL(app_builder_get_lStartValue()), startPoint);
 	gtk_label_set_text(GTK_LABEL(app_builder_get_lScoreValue ()), scoreValue);
 
+	loadBirdWatchImage();
 	gtk_widget_show_all(popup);
 }
 /* ---------------------------------------------------------------- */
@@ -221,9 +226,9 @@ void app_widget_show_swpopup(
 	gtk_label_set_text(GTK_LABEL(app_builder_get_lWTypeValue()), APP_SEQUENCE_TYPE(wType));
 	
 	showIsland(currentIslandIndex);
-
+	loadBirdWatchImage();
+	
 	gtk_widget_show_all(popup);
-
 }
 
 /* ---------------------------------------------------------------- */
@@ -263,15 +268,31 @@ void showIsland (int index){
 		gtk_label_set_text(GTK_LABEL(app_builder_get_lScoreValue()), scoreValue);
 	}
 }
-
+/* ---------------------------------------------------------------- */
 void showNextIsland(){
 	if(currentIslandIndex+1 < islandCount){
 		showIsland(++currentIslandIndex);
 	}
 }
+/* ---------------------------------------------------------------- */
 void showPrevIsland(){
 	if((currentIslandIndex-1) >= 0){
 		showIsland(--currentIslandIndex);
 	}
+}
+/* ---------------------------------------------------------------- */
+void loadBirdWatchImage(){
+	GError *gerror = 0;
+	GtkImage* image = app_builder_get_imgBirdWatch();
+	gtk_image_clear (image);
+	
+	int width = gtk_widget_get_allocated_width (image);
+	int heigth = gtk_widget_get_allocated_height (image);
+	if(width < 100) width = 400;
+	if(heigth < 100) heigth = 350;
+	
+	GdkPixbuf* pixbuf = gdk_pixbuf_new_from_file ("BIRD_WATCH.png", &gerror); 
+	GdkPixbuf* resized = gdk_pixbuf_scale_simple (pixbuf,width ,heigth, GDK_INTERP_BILINEAR);
+	gtk_image_set_from_pixbuf(image, resized);
 }
 /* ---------------------------------------------------------------- */

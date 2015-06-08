@@ -68,6 +68,7 @@ void on_btGlobalAlignNW_clicked(GtkButton* sender) {
 		numberOfThreads
 	);
 
+	loadBirdWatchImage();
 	g_critical("btGlobalAlignNW clicked");
 }
 /* ---------------------------------------------------------------- */
@@ -170,9 +171,15 @@ gboolean on_popup_delete_event(GtkWidget* sender, GdkEvent* event) {
 	return TRUE;
 }
 /* ---------------------------------------------------------------- */
+void on_btnResize_clicked(GtkButton* sender) {
+	loadBirdWatchImage();
+}
+/* ---------------------------------------------------------------- */
+
 void on_tbNext_clicked(GtkButton* sender) { 
 	showNextIsland();
 }
+/* ---------------------------------------------------------------- */
 void on_tbPrev_clicked(GtkButton* sender) { 
 	showPrevIsland();
 }

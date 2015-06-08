@@ -128,7 +128,7 @@ gint valueOfMatrix(gint matrix[26][26], gchar first, gchar second){
 int createBenchmarkGraph(long* times, int n){
 	char * commandsForGnuplot[] = {
 		"set terminal png large size 1920, 1080",
-		"set output \"printme.png\"",
+		"set output \"BENCHMARK.png\"",
 		"set style line 1 lc rgb 'black' lt 1 lw 2 pt 7 ps 1", //0060ad blue
 		"set style line 2 lc rgb '#33CC33' lt 1 lw 2 pt 7 ps 1.5", //green
 		"set title \"Curva de aceleracion\"",
@@ -189,7 +189,7 @@ int createBenchmarkGraph(long* times, int n){
 int createBenchmarkGraphKBand(long* times, long* timesKBand, int n){
 	char * commandsForGnuplot[] = {
 		"set terminal png large size 1920, 1080",
-		"set output \"printme.png\"",
+		"set output \"BENCHMARK.png\"",
 		"set style line 1 lc rgb '#0060ad' lt 1 lw 2 pt 7 ps 1", //black
 		"set style line 2 lc rgb '#33CC33' lt 1 lw 2 pt 7 ps 1.5", //green
 		"set title \"Curva de aceleracion\"",
@@ -315,7 +315,7 @@ gchar* APP_SEQUENCE_TYPE(gint stype) {
 gint createBirdWatchGraphNW(Island* island, gint rows, gint cols){
 	gchar * commandsForGnuplot[] = {
 		"set terminal png large size 1920, 1080",
-		"set output \"birdWatch.png\"",
+		"set output \"BIRD_WATCH.png\"",
 		"set style line 1 lc rgb '#0060ad' lt 1 lw 2 pt 7 ps 1", //0060ad blue
 		"set style line 2 lc rgb '#33CC33' lt 1 lw 2 pt 7 ps 1.5", //green
 		"set title \"Vista de pajaro alineamiento global\"",
@@ -362,7 +362,7 @@ gint createBirdWatchGraphNW(Island* island, gint rows, gint cols){
 gint createBirdWatchGraphSW(GSList* islands, gint rows, gint cols){
 	gchar * commandsForGnuplot[] = {
 		"set terminal png large size 1920, 1080",
-		"set output \"birdWatchSW.png\"",
+		"set output \"BIRD_WATCH.png\"",
 		"set style line 1 lc rgb '#0060ad' lt 1 lw 2 pt 7 ps 1", //0060ad blue
 		"set style line 2 lc rgb '#33CC33' lt 1 lw 2 pt 7 ps 1.5", //green
 		"set title \"Vista de pajaro alineamiento local\"",
