@@ -31,7 +31,7 @@ static Island* alignmentFromPoint(Cell*** matrix, gchar* upSequence, gchar* left
 	island->points = NULL; island->islandPath = NULL;
 	island->startCol = startCol;
 	island->startRow = startRow;
-	//mavalue
+	island->maxValue = getMaxValue(matrix, blockOfGaps, startRow, startCol, &currentMatrix);
 	
 	i = rows;
 	j = cols;

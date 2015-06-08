@@ -24,13 +24,16 @@ GObject* app_builder_get_sbNThreads();
 GObject* app_builder_get_cbSubstitutionMatrix();
 GObject* app_builder_get_cbVInputType();
 GObject* app_builder_get_cbWInputType();
-GObject* app_builder_get_lAlgorithmValue();
+GObject* app_builder_get_lAlgTypeValue();
 GObject* app_builder_get_lVLengthValue();
 GObject* app_builder_get_lWLengthValue();
 GObject* app_builder_get_lVTypeValue();
 GObject* app_builder_get_lWTypeValue();
+GObject* app_builder_get_lStartValue();
+GObject* app_builder_get_lScoreValue();
 GObject* app_builder_get_lVNew();
 GObject* app_builder_get_lWNew();
+GObject* app_builder_get_lPage();
 void app_widget_show_nwpopup(
 	gchar* v, // v is up sequence
 	gchar* w,
@@ -43,5 +46,6 @@ void app_widget_show_nwpopup(
 	gint numberOfThreads
 );
 gint app_entry_set_source(GtkEntry* entry, gchar* source);
-
+void showNextIsland();
+void showPrevIsland();
 #endif

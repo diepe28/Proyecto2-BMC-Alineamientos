@@ -5,6 +5,7 @@
 
 #ifndef CALLBACKS
 #define CALLBACKS
+
 /* ---------------------------------------------------------------- */
 void on_window_init(GtkBuilder* sender) {
 	app_set_builder(sender);
@@ -169,4 +170,10 @@ gboolean on_popup_delete_event(GtkWidget* sender, GdkEvent* event) {
 	return TRUE;
 }
 /* ---------------------------------------------------------------- */
+void on_tbNext_clicked(GtkButton* sender) { 
+	showNextIsland();
+}
+void on_tbPrev_clicked(GtkButton* sender) { 
+	showPrevIsland();
+}
 #endif

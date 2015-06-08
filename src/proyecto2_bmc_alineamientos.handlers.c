@@ -7,6 +7,9 @@
 /* Globals -------------------------------------------------------- */
 
 GtkBuilder* builder = NULL;
+int currentIslandIndex;
+int islandCount = -1;
+SWBenchmarkResult* swBenchmarkResult = NULL;
 
 /* ---------------------------------------------------------------- */
 void app_set_builder(GtkBuilder* value) {
@@ -89,10 +92,18 @@ GObject* app_builder_get_popup() {
 	return gtk_builder_get_object(builder, "popup");
 }
 /* ---------------------------------------------------------------- */
-GObject* app_builder_get_lAlgorithmValue() {
-	return gtk_builder_get_object(builder, "lAlgorithmValue");
+GObject* app_builder_get_lAlgTypeValue() {
+	return gtk_builder_get_object(builder, "lAlgTypeValue");
 }
 /* ---------------------------------------------------------------- */
+GObject* app_builder_get_lStartValue(){
+	return gtk_builder_get_object(builder, "lStartValue");
+}
+/* ---------------------------------------------------------------- */
+GObject* app_builder_get_lScoreValue(){
+	return gtk_builder_get_object(builder, "lScoreValue");
+}
+	/* ---------------------------------------------------------------- */
 GObject* app_builder_get_lVNew() {
 	return gtk_builder_get_object(builder, "lVNew");
 }
@@ -121,6 +132,10 @@ GObject* app_builder_get_spMinIslands() {
 	return gtk_builder_get_object(builder, "spMinIslands");
 }
 /* ---------------------------------------------------------------- */
+GObject* app_builder_get_lPage(){
+	return gtk_builder_get_object(builder, "lPage");
+}
+/* ---------------------------------------------------------------- */
 void app_widget_show_nwpopup(
 	gchar* v, // v is up sequence
 	gchar* w,
@@ -135,21 +150,21 @@ void app_widget_show_nwpopup(
 
 	NWBenchmarkResult* result =
 		execute_nw_benchmark(w, v, lengthW, lengthV, scoringOptions,kBandOptions,numberOfThreads);
-
+	
 	Island* alignment = result->alignment;
 	createBirdWatchGraphNW(alignment, lengthW,  lengthV);
 	
-	
 	GtkWidget* popup = GTK_WIDGET(app_builder_get_popup());
 
-	gtk_label_set_text(GTK_LABEL(app_builder_get_lAlgorithmValue()), "Needleman-Wunsch");
-	
 	gchar* sSeq1Length = (gchar*) g_malloc(sizeof(gchar) * (log10(lengthV) + 1));
 	gchar* sSeq2Length = (gchar*) g_malloc(sizeof(gchar) * (log10(lengthW) + 1));
 
 	sprintf(sSeq1Length, "%d", lengthV);
 	sprintf(sSeq2Length, "%d", lengthW);
 
+	//TODO, check if is semi blobal alignment to set label 
+	gtk_label_set_text(GTK_LABEL(app_builder_get_lAlgTypeValue()), "Global");
+	
 	gtk_label_set_text(GTK_LABEL(app_builder_get_lVLengthValue()), sSeq1Length);
 	gtk_label_set_text(GTK_LABEL(app_builder_get_lWLengthValue()), sSeq2Length);
 	
@@ -158,6 +173,15 @@ void app_widget_show_nwpopup(
 	
 	gtk_label_set_text(GTK_LABEL(app_builder_get_lVNew()), alignment->upSequence);
 	gtk_label_set_text(GTK_LABEL(app_builder_get_lWNew()), alignment->leftSequence);
+
+	char startPoint[15], scoreValue[15];
+
+	sprintf(startPoint, "(%d,%d)",alignment->startRow, alignment->startCol);
+	sprintf(scoreValue, "%d",alignment->maxValue);
+
+	gtk_label_set_text(GTK_LABEL(app_builder_get_lPage()), "1/1");
+	gtk_label_set_text(GTK_LABEL(app_builder_get_lStartValue()), startPoint);
+	gtk_label_set_text(GTK_LABEL(app_builder_get_lScoreValue ()), scoreValue);
 
 	gtk_widget_show_all(popup);
 }
@@ -173,13 +197,16 @@ void app_widget_show_swpopup(
     gint minValueIslands,
 	gint numberOfThreads
 ) {
-	SWBenchmarkResult* benchmarkResult = execute_sw_benchmark(w, v, lengthW, lengthV, scoringOptions, minValueIslands, numberOfThreads);
-	GSList* islands = benchmarkResult->islands;
+	swBenchmarkResult = execute_sw_benchmark(w, v, lengthW, lengthV, scoringOptions, minValueIslands, numberOfThreads);
+	islandCount = g_slist_length (swBenchmarkResult->islands);
+	currentIslandIndex = 0;
+	
+	GSList* islands = swBenchmarkResult->islands;
 	createBirdWatchGraphSW (islands, lengthW, lengthV);
 	
 	GtkWidget* popup = GTK_WIDGET(app_builder_get_popup());
 
-	gtk_label_set_text(GTK_LABEL(app_builder_get_lAlgorithmValue()), "Smith-Waterman");
+	gtk_label_set_text(GTK_LABEL(app_builder_get_lAlgTypeValue()), "Local");
 	
 	gchar* sSeq1Length = (gchar*) g_malloc(sizeof(gchar) * (log10(lengthV) + 1));
 	gchar* sSeq2Length = (gchar*) g_malloc(sizeof(gchar) * (log10(lengthW) + 1));
@@ -193,8 +220,7 @@ void app_widget_show_swpopup(
 	gtk_label_set_text(GTK_LABEL(app_builder_get_lVTypeValue()), APP_SEQUENCE_TYPE(vType));
 	gtk_label_set_text(GTK_LABEL(app_builder_get_lWTypeValue()), APP_SEQUENCE_TYPE(wType));
 	
-	//gtk_label_set_text(GTK_LABEL(app_builder_get_lVNew()), benchmarkResult->result->upSequence);
-	//gtk_label_set_text(GTK_LABEL(app_builder_get_lWNew()), benchmarkResult->result->leftSequence);
+	showIsland(currentIslandIndex);
 
 	gtk_widget_show_all(popup);
 
@@ -217,5 +243,35 @@ gint app_entry_set_source(GtkEntry* entry, gchar* source) {
 	gtk_entry_set_text(entry, value);
 
 	return result;
+}
+/* ---------------------------------------------------------------- */
+
+void showIsland (int index){
+	char* tipoAli = (char*) gtk_label_get_text(GTK_LABEL(app_builder_get_lAlgTypeValue()));
+	if(index < islandCount && strcmp(tipoAli, "Local") == 0){
+		Island* island = (Island*) g_slist_nth_data (swBenchmarkResult->islands,index);
+		char currentIsland[10], startPoint[15], scoreValue[15];
+
+		sprintf(currentIsland, "%d/%d",index+1, islandCount);
+		sprintf(startPoint, "(%d,%d)",island->startRow, island->startCol);
+		sprintf(scoreValue, "%d",island->maxValue);
+		
+		gtk_label_set_text(GTK_LABEL(app_builder_get_lVNew()), island->upSequence);
+		gtk_label_set_text(GTK_LABEL(app_builder_get_lWNew()), island->leftSequence);
+		gtk_label_set_text(GTK_LABEL(app_builder_get_lStartValue()), startPoint);
+		gtk_label_set_text(GTK_LABEL(app_builder_get_lPage()), currentIsland);
+		gtk_label_set_text(GTK_LABEL(app_builder_get_lScoreValue()), scoreValue);
+	}
+}
+
+void showNextIsland(){
+	if(currentIslandIndex+1 < islandCount){
+		showIsland(++currentIslandIndex);
+	}
+}
+void showPrevIsland(){
+	if((currentIslandIndex-1) >= 0){
+		showIsland(--currentIslandIndex);
+	}
 }
 /* ---------------------------------------------------------------- */
