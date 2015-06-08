@@ -1,10 +1,11 @@
 #include <gtk/gtk.h>
 #include "proyecto2-bmc-alineamientos.h"
 #include "proyecto2_bmc_alineamientos.handlers.h"
-#include "FillingAlgorithms.h"
+#include "BenchmarkSupport.h"
 
 #ifndef CALLBACKS
 #define CALLBACKS
+
 /* ---------------------------------------------------------------- */
 void on_window_init(GtkBuilder* sender) {
 	app_set_builder(sender);
@@ -38,7 +39,7 @@ void on_btGlobalAlignNW_clicked(GtkButton* sender) {
 	gboolean freerightgapsw = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(app_builder_get_cbWRightFG()));
 	gint numberOfThreads = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbNThreads()));
 	
-	ScoringOptions* options = ScoringOptions_new(
+	ScoringOptions* scoringOptions = ScoringOptions_new(
 		matchbonus,
 		missmatchbonus,
 		gappenalty1,
@@ -50,6 +51,11 @@ void on_btGlobalAlignNW_clicked(GtkButton* sender) {
 	    NULL
 	);
 
+	KBandOptions* kBandOptions = KBandOptions_new(
+		0,
+		0
+	);
+	
 	app_widget_show_nwpopup(
 		v,
 		w,
@@ -57,13 +63,12 @@ void on_btGlobalAlignNW_clicked(GtkButton* sender) {
 		strlen(w),
 		vtype,
 		wtype,
-		options,
-		freerightgapsv,
-		freerightgapsw,
-		FALSE,
+		scoringOptions,
+		NULL,
 		numberOfThreads
 	);
 
+	loadBirdWatchImage();
 	g_critical("btGlobalAlignNW clicked");
 }
 /* ---------------------------------------------------------------- */
@@ -116,10 +121,39 @@ void on_btWLoad_clicked(GtkButton* sender) {
 void on_btLocalAlignSW_clicked(GtkButton* sender) {
 	gchar* v = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txV()));
 	gchar* w = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txW()));
+	gint vtype = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbVInputType()));
+	gint wtype = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbWInputType()));
 	
-	GtkWidget* popup = GTK_WIDGET(app_builder_get_popup());
+	gint matchbonus = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbMatch()));
+	gint missmatchbonus = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbMissmatch()));
+	gint gappenalty1 = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbF()));
+	gint gappenalty2 = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbK()));
+	gint numberOfThreads = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbNThreads()));
+	gint minValueIslands = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_spMinIslands()));
+	
+	ScoringOptions* options = ScoringOptions_new(
+		matchbonus,
+		missmatchbonus,
+		gappenalty1,
+		gappenalty2,
+		FALSE,
+		FALSE,
+	    FALSE,
+	    FALSE,
+	    NULL
+	);
 
-	gtk_widget_show_all(popup);
+	app_widget_show_swpopup(
+		v,
+		w,
+		strlen(v),
+		strlen(w),
+		vtype,
+		wtype,
+		options,
+		minValueIslands,
+		numberOfThreads
+	);
 }
 /* ---------------------------------------------------------------- */
 void on_rbCustomValues_toggled(GtkRadioButton* sender) {
@@ -137,4 +171,16 @@ gboolean on_popup_delete_event(GtkWidget* sender, GdkEvent* event) {
 	return TRUE;
 }
 /* ---------------------------------------------------------------- */
+void on_btnResize_clicked(GtkButton* sender) {
+	loadBirdWatchImage();
+}
+/* ---------------------------------------------------------------- */
+
+void on_tbNext_clicked(GtkButton* sender) { 
+	showNextIsland();
+}
+/* ---------------------------------------------------------------- */
+void on_tbPrev_clicked(GtkButton* sender) { 
+	showPrevIsland();
+}
 #endif

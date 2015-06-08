@@ -31,7 +31,7 @@ static Island* alignmentFromPoint(Cell*** matrix, gchar* upSequence, gchar* left
 	island->points = NULL; island->islandPath = NULL;
 	island->startCol = startCol;
 	island->startRow = startRow;
-	//mavalue
+	island->maxValue = getMaxValue(matrix, blockOfGaps, startRow, startCol, &currentMatrix);
 	
 	i = rows;
 	j = cols;
@@ -205,27 +205,25 @@ Island* afterMatrixFilling_find_NW_Alignment(Cell*** matrix,
 
 
 static Island* findAndMarkFromPoint(gint startRow, gint startCol, gint n,
-                                        gint m,Cell*** matrix, gchar* islandPath,
+                                        gint m,Cell*** matrix,
                                  gchar* upSequence, gchar* leftSequence){
-	gint i, j, islandIndex = 0, startvalue_a = matrix[startRow][startCol]->value_a;
+	gint i, j, islandIndex = 0, startvalue = matrix[startRow][startCol]->value_a;
 	Island* island = NULL;
+	gchar* islandPath = (gchar*) (g_malloc((n+m) * sizeof(gchar)));
 
 	//i > 0 n && j > 0 because first row and col are always 0 (zero)
 	for(i = startRow, j = startCol; i > 0 && j > 0;){
-		if(cell_isFlagASet (matrix[i][j], IS_PROCESSED)){
-			
-		}
 		cell_setFlagA (matrix[i][j], IS_PROCESSED);
 
 		if(matrix[i][j]->value_a == 0)
 			break;
 		
 		//if finds greater value_a than the one we started with, then the island starts from there
-		if(matrix[i][j]->value_a > startvalue_a){
+		if(matrix[i][j]->value_a > startvalue){
 			islandIndex = 0;
 			startRow = i;
 			startCol = j;
-			startvalue_a = matrix[i][j]->value_a;
+			startvalue = matrix[i][j]->value_a;
 		}
 		
 		if(cell_isFlagASet(matrix[i][j], COMES_FROM_DIAGONAL) &&
@@ -251,7 +249,8 @@ static Island* findAndMarkFromPoint(gint startRow, gint startCol, gint n,
 		return NULL;
 	}
 
-	island = island_new(startRow, startCol, startvalue_a, islandIndex,
+	islandPath[islandIndex] = '\0';
+	island = island_new(startRow, startCol, startvalue, islandIndex,
 	                            islandPath, upSequence, leftSequence);
 	return island;
 }
@@ -262,19 +261,17 @@ static Island* findAndMarkFromPoint(gint startRow, gint startCol, gint n,
 GSList* afterMatrixFilling_findLocalAlignments(Cell*** matrix, 
                                               gchar* upSequence,
                                               gchar* leftSequence,
-                                              gint n,
-                                              gint m,
+                                              gint rows,
+                                              gint cols,
                                               gint minScore){
-	gchar* islandPath  = (gchar*)  (g_malloc((n + m) * sizeof(Cell*)));
 	gint i, j;
 	GSList *list = NULL;
 	
-	for(i = n; i > 0; i--){
-		for(j = m; j > 0; j--){
+	for(i = rows; i > 0; i--){
+		for(j = cols; j > 0; j--){
 			if(matrix[i][j]->value_a >= minScore && 
 			   !cell_isFlagASet (matrix[i][j], IS_PROCESSED)){
-				Island* newIsland = findAndMarkFromPoint(i,j,n,m,matrix,
-				                                                 islandPath, 
+				Island* newIsland = findAndMarkFromPoint(i,j,rows,cols,matrix, 
 				                                                 upSequence, 
 				                                                 leftSequence);
 				if(newIsland != NULL)

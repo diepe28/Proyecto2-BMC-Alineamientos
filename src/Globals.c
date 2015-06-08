@@ -128,7 +128,7 @@ gint valueOfMatrix(gint matrix[26][26], gchar first, gchar second){
 int createBenchmarkGraph(long* times, int n){
 	char * commandsForGnuplot[] = {
 		"set terminal png large size 1920, 1080",
-		"set output \"printme.png\"",
+		"set output \"BENCHMARK.png\"",
 		"set style line 1 lc rgb 'black' lt 1 lw 2 pt 7 ps 1", //0060ad blue
 		"set style line 2 lc rgb '#33CC33' lt 1 lw 2 pt 7 ps 1.5", //green
 		"set title \"Curva de aceleracion\"",
@@ -189,7 +189,7 @@ int createBenchmarkGraph(long* times, int n){
 int createBenchmarkGraphKBand(long* times, long* timesKBand, int n){
 	char * commandsForGnuplot[] = {
 		"set terminal png large size 1920, 1080",
-		"set output \"printme.png\"",
+		"set output \"BENCHMARK.png\"",
 		"set style line 1 lc rgb '#0060ad' lt 1 lw 2 pt 7 ps 1", //black
 		"set style line 2 lc rgb '#33CC33' lt 1 lw 2 pt 7 ps 1.5", //green
 		"set title \"Curva de aceleracion\"",
@@ -312,10 +312,10 @@ gchar* APP_SEQUENCE_TYPE(gint stype) {
 }
 
 
-gint createBirdWatchGraphNW(Island* island, gint rows, gint cols, gboolean drawEachPoint){
+gint createBirdWatchGraphNW(Island* island, gint rows, gint cols){
 	gchar * commandsForGnuplot[] = {
 		"set terminal png large size 1920, 1080",
-		"set output \"birdWatch.png\"",
+		"set output \"BIRD_WATCH.png\"",
 		"set style line 1 lc rgb '#0060ad' lt 1 lw 2 pt 7 ps 1", //0060ad blue
 		"set style line 2 lc rgb '#33CC33' lt 1 lw 2 pt 7 ps 1.5", //green
 		"set title \"Vista de pajaro alineamiento global\"",
@@ -337,17 +337,6 @@ gint createBirdWatchGraphNW(Island* island, gint rows, gint cols, gboolean drawE
 		
 	sprintf (xRangeCommand, "set xrange [%d:%d]", 0, cols);
 	sprintf (yRangeCommand, "set yrange [%d:%d]", 0, rows);
-
-	if(drawEachPoint){
-		for(i = 0; i < rows+1; i++){
-			for(j = 0; j < cols+1; j++){
-				sprintf (pointCommand,
-					     "set object circle at first %d,%d radius char 0.5 fillcolor rgb 'black' fillstyle solid noborder", 
-					     j, i);
-				fprintf(gnuplotPipe, "%s \n", pointCommand);
-			}
-		}
-	}
 	
 	GSList* iterator;
 	for(iterator = island->points; iterator; iterator = iterator->next){
@@ -370,10 +359,10 @@ gint createBirdWatchGraphNW(Island* island, gint rows, gint cols, gboolean drawE
 	return 0;
 }
 
-gint createBirdWatchGraphSW(Island** islands, gint rows, gint cols, gboolean drawEachPoint){
-gchar * commandsForGnuplot[] = {
+gint createBirdWatchGraphSW(GSList* islands, gint rows, gint cols){
+	gchar * commandsForGnuplot[] = {
 		"set terminal png large size 1920, 1080",
-		"set output \"birdWatch.png\"",
+		"set output \"BIRD_WATCH.png\"",
 		"set style line 1 lc rgb '#0060ad' lt 1 lw 2 pt 7 ps 1", //0060ad blue
 		"set style line 2 lc rgb '#33CC33' lt 1 lw 2 pt 7 ps 1.5", //green
 		"set title \"Vista de pajaro alineamiento local\"",
@@ -381,14 +370,16 @@ gchar * commandsForGnuplot[] = {
 		"set format y \"\"",
 		"set format x \"\"",
 		"set offset 1,1,1,1",
-		"plot 'birdWatchdata.temp' index 0 with linespoints ls 1"};
+		"plot 'birdWatchdata.temp' with linespoints ls 1"};
 	
 	gchar xRangeCommand[30], yRangeCommand[50];
 	gint i = 0, j = 0, numCommands = 10, minTimeIndex = 0, maxTimeIndex = 0, x, y;
 	glong maxTime = 0, minTime = LONG_MAX, yMargin;
 	FILE * gnuplotPipe = popen ("gnuplot -persistent", "w");
 	FILE * tempFile = fopen("birdWatchdata.temp", "w");
-	char pointCommand[150];
+	char pointCommand[150], direction;
+	GSList* islandIterator;
+	Island* currentIsland;
 	
 	if(gnuplotPipe == NULL || tempFile == NULL)
 		return 1;
@@ -396,28 +387,27 @@ gchar * commandsForGnuplot[] = {
 	sprintf (xRangeCommand, "set xrange [%d:%d]", 0, cols);
 	sprintf (yRangeCommand, "set yrange [%d:%d]", 0, rows);
 
-	if(drawEachPoint){
-		for(i = 0; i < rows+1; i++){
-			for(j = 0; j < cols+1; j++){
-				sprintf (pointCommand,
-					     "set object circle at first %d,%d radius char 0.5 fillcolor rgb 'black' fillstyle solid noborder", 
-					     j, i);
-				fprintf(gnuplotPipe, "%s \n", pointCommand);
-			}
-		}
-	}
-
-	GSList* islandIterator, * pointIterator;
 	for(islandIterator = islands; islandIterator; islandIterator = islandIterator->next){
-		for(pointIterator = ((Island*)(islandIterator->data))->points; pointIterator; pointIterator = pointIterator->next){
-			x = (gint) (pointIterator->data);
-			pointIterator = pointIterator->next;
-			y = (gint) (pointIterator->data);
+		currentIsland = (Island*) (islandIterator->data);
+		x = currentIsland->startCol;
+		y = currentIsland->startRow;
+		fprintf(tempFile, "%d %d \n", x , rows-y); //Write the data to a temporary file
+		for(j = 0; (direction = currentIsland->islandPath[j]) != '\0'; j++){
+			switch(direction){
+				case 'D':
+					x--; y--;
+					break;
+				case 'L':
+					x--;
+					break;
+				case 'U':
+					y--;
+					break;
+			}
 			fprintf(tempFile, "%d %d \n", x , rows-y); //Write the data to a temporary file
-		}
+		}			
 		fprintf(tempFile, "\n\n");
-	}
-	
+	}	
 	
 	fprintf(gnuplotPipe, "%s \n", xRangeCommand);
 	fprintf(gnuplotPipe, "%s \n", yRangeCommand);

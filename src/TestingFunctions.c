@@ -560,8 +560,8 @@ void testBenchmark()
 		}
 
 		puts("Result");
-		puts(result->result->upSequence);
-		puts(result->result->leftSequence);
+		puts(result->alignment->upSequence);
+		puts(result->alignment->leftSequence);
 
 		nw_benchmark_result_free(result);
 		//sw_benchmark_result_free (result);
