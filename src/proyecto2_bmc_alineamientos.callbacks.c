@@ -2,6 +2,7 @@
 #include "proyecto2-bmc-alineamientos.h"
 #include "proyecto2_bmc_alineamientos.handlers.h"
 #include "BenchmarkSupport.h"
+#include "Gridview.h"
 
 #ifndef CALLBACKS
 #define CALLBACKS
@@ -14,6 +15,9 @@ void on_window_init(GtkBuilder* sender) {
 	gtk_widget_set_sensitive(GTK_WIDGET(app_builder_get_sbKValue()), FALSE);
 
 	gtk_widget_set_sensitive(GTK_WIDGET(app_builder_get_cbSubstitutionMatrix()), FALSE);
+
+	GtkWidget* gridview = GTK_WIDGET(app_builder_get_gridview());
+	gridview_init(gridview);
 }
 /* ---------------------------------------------------------------- */
 void on_cbKBand_toggled(GtkCheckButton* sender) {
@@ -46,9 +50,9 @@ void on_btGlobalAlignNW_clicked(GtkButton* sender) {
 		gappenalty2,
 		freeleftgapsv,
 		freeleftgapsw,
-	    freerightgapsv,
-	    freerightgapsw,
-	    NULL
+		freerightgapsv,
+		freerightgapsw,
+		NULL
 	);
 
 	KBandOptions* kBandOptions = KBandOptions_new(
@@ -69,7 +73,6 @@ void on_btGlobalAlignNW_clicked(GtkButton* sender) {
 	);
 
 	loadBirdWatchImage();
-	g_critical("btGlobalAlignNW clicked");
 }
 /* ---------------------------------------------------------------- */
 void on_btVLoad_clicked(GtkButton* sender) {
@@ -138,9 +141,9 @@ void on_btLocalAlignSW_clicked(GtkButton* sender) {
 		gappenalty2,
 		FALSE,
 		FALSE,
-	    FALSE,
-	    FALSE,
-	    NULL
+		FALSE,
+		FALSE,
+		NULL
 	);
 
 	app_widget_show_swpopup(

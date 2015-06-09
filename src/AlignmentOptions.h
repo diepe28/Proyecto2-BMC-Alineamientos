@@ -1,4 +1,3 @@
-
 #include <glib.h>
 
 #ifndef ALIGNMENT_OPTIONS_H
@@ -28,9 +27,9 @@ ScoringOptions* ScoringOptions_new(
 	gint gapExtensionPenalty,
 	gboolean freeLeftGapsForX,
 	gboolean freeLeftGapsForY,
-    gboolean freeRightGapsForX,
-    gboolean freeRightGapsForY,
-    gint (*substitutionMatrix)[26]
+	gboolean freeRightGapsForX,
+	gboolean freeRightGapsForY,
+	gint (*substitutionMatrix)[26]
 );
 
 KBandOptions* KBandOptions_new(

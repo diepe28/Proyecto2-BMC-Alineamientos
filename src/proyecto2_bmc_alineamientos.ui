@@ -731,7 +731,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="adjustment">aF</property>
-                        <property name="value">2</property>
+                        <property name="value">-2</property>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -757,7 +757,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="adjustment">aK</property>
-                        <property name="value">1</property>
+                        <property name="value">-1</property>
                       </object>
                       <packing>
                         <property name="expand">False</property>

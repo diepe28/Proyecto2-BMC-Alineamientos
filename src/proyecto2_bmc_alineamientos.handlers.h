@@ -29,6 +29,8 @@ GObject* app_builder_get_lVLengthValue();
 GObject* app_builder_get_lWLengthValue();
 GObject* app_builder_get_lVTypeValue();
 GObject* app_builder_get_lWTypeValue();
+GObject* app_builder_get_gridview();
+GObject* app_builder_get_spMinIslands();
 GObject* app_builder_get_lStartValue();
 GObject* app_builder_get_lScoreValue();
 GObject* app_builder_get_lVNew();
@@ -47,7 +49,19 @@ void app_widget_show_nwpopup(
 	KBandOptions* kBandOptions,
 	gint numberOfThreads
 );
+void app_widget_show_swpopup(
+	gchar* v, // v is up sequence
+	gchar* w,
+	gint lengthV,
+	gint lengthW,
+	gint vType,
+	gint wType,
+	ScoringOptions* scoringOptions,
+	gint minValueIslands,
+	gint numberOfThreads
+);
 gint app_entry_set_source(GtkEntry* entry, gchar* source);
+void showIsland(int index);
 void showNextIsland();
 void showPrevIsland();
 #endif

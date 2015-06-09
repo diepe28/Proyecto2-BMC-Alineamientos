@@ -3,6 +3,7 @@
 #include "proyecto2-bmc-alineamientos.h"
 #include "proyecto2_bmc_alineamientos.handlers.h"
 #include "BenchmarkSupport.h"
+#include "Gridview.h"
 
 /* Globals -------------------------------------------------------- */
 
@@ -128,6 +129,10 @@ GObject* app_builder_get_lWTypeValue() {
 	return gtk_builder_get_object(builder, "lWTypeValue");
 }
 /* ---------------------------------------------------------------- */
+GObject* app_builder_get_gridview() {
+	return gtk_builder_get_object(builder, "gridview");
+}
+/* ---------------------------------------------------------------- */
 GObject* app_builder_get_spMinIslands() {
 	return gtk_builder_get_object(builder, "spMinIslands");
 }
@@ -151,9 +156,18 @@ void app_widget_show_nwpopup(
 	KBandOptions* kBandOptions,
 	gint numberOfThreads
 ) {
+	NWBenchmarkResult* result = execute_nw_benchmark(
+		w,
+		v,
+		lengthW,
+		lengthV,
+		scoringOptions,
+		kBandOptions,
+		numberOfThreads
+	);
 
-	NWBenchmarkResult* result =
-		execute_nw_benchmark(w, v, lengthW, lengthV, scoringOptions,kBandOptions,numberOfThreads);
+	GtkWidget* gridview = GTK_WIDGET(app_builder_get_gridview());
+	gridview_databind(gridview, result->similarityMatrix, w, v, lengthW, lengthV);
 	
 	Island* alignment = result->alignment;
 	createBirdWatchGraphNW(alignment, lengthW,  lengthV);
@@ -178,10 +192,11 @@ void app_widget_show_nwpopup(
 	gtk_label_set_text(GTK_LABEL(app_builder_get_lVNew()), alignment->upSequence);
 	gtk_label_set_text(GTK_LABEL(app_builder_get_lWNew()), alignment->leftSequence);
 
-	char startPoint[15], scoreValue[15];
+	char startPoint[15];
+	char scoreValue[15];
 
-	sprintf(startPoint, "(%d,%d)",alignment->startRow, alignment->startCol);
-	sprintf(scoreValue, "%d",alignment->maxValue);
+	sprintf(startPoint, "(%d,%d)", alignment->startRow, alignment->startCol);
+	sprintf(scoreValue, "%d", alignment->maxValue);
 
 	gtk_label_set_text(GTK_LABEL(app_builder_get_lPage()), "1/1");
 	gtk_label_set_text(GTK_LABEL(app_builder_get_lStartValue()), startPoint);
@@ -199,15 +214,23 @@ void app_widget_show_swpopup(
 	gint vType,
 	gint wType,
 	ScoringOptions* scoringOptions,
-    gint minValueIslands,
+	gint minValueIslands,
 	gint numberOfThreads
 ) {
-	swBenchmarkResult = execute_sw_benchmark(w, v, lengthW, lengthV, scoringOptions, minValueIslands, numberOfThreads);
+	swBenchmarkResult = execute_sw_benchmark(
+		w,
+		v,
+		lengthW,
+		lengthV,
+		scoringOptions,
+		minValueIslands,
+		numberOfThreads
+	);
 	islandCount = g_slist_length (swBenchmarkResult->islands);
 	currentIslandIndex = 0;
 	
 	GSList* islands = swBenchmarkResult->islands;
-	createBirdWatchGraphSW (islands, lengthW, lengthV);
+	createBirdWatchGraphSW(islands, lengthW, lengthV);
 	
 	GtkWidget* popup = GTK_WIDGET(app_builder_get_popup());
 
@@ -250,16 +273,19 @@ gint app_entry_set_source(GtkEntry* entry, gchar* source) {
 	return result;
 }
 /* ---------------------------------------------------------------- */
-
-void showIsland (int index){
+void showIsland(int index) {
 	char* tipoAli = (char*) gtk_label_get_text(GTK_LABEL(app_builder_get_lAlgTypeValue()));
-	if(index < islandCount && strcmp(tipoAli, "Local") == 0){
-		Island* island = (Island*) g_slist_nth_data (swBenchmarkResult->islands,index);
-		char currentIsland[10], startPoint[15], scoreValue[15];
+	
+	if (index < islandCount && strcmp(tipoAli, "Local") == 0) {
+		Island* island = (Island*) g_slist_nth_data(swBenchmarkResult->islands, index);
+		
+		char currentIsland[10];
+		char startPoint[15];
+		char scoreValue[15];
 
-		sprintf(currentIsland, "%d/%d",index+1, islandCount);
-		sprintf(startPoint, "(%d,%d)",island->startRow, island->startCol);
-		sprintf(scoreValue, "%d",island->maxValue);
+		sprintf(currentIsland, "%d/%d", index+1, islandCount);
+		sprintf(startPoint, "(%d,%d)", island->startRow, island->startCol);
+		sprintf(scoreValue, "%d", island->maxValue);
 		
 		gtk_label_set_text(GTK_LABEL(app_builder_get_lVNew()), island->upSequence);
 		gtk_label_set_text(GTK_LABEL(app_builder_get_lWNew()), island->leftSequence);
@@ -269,30 +295,36 @@ void showIsland (int index){
 	}
 }
 /* ---------------------------------------------------------------- */
-void showNextIsland(){
-	if(currentIslandIndex+1 < islandCount){
+void showNextIsland() {
+	if (currentIslandIndex+1 < islandCount) {
 		showIsland(++currentIslandIndex);
 	}
 }
 /* ---------------------------------------------------------------- */
-void showPrevIsland(){
-	if((currentIslandIndex-1) >= 0){
+void showPrevIsland() {
+	if ((currentIslandIndex-1) >= 0) {
 		showIsland(--currentIslandIndex);
 	}
 }
 /* ---------------------------------------------------------------- */
-void loadBirdWatchImage(){
-	GError *gerror = 0;
-	GtkImage* image = app_builder_get_imgBirdWatch();
-	gtk_image_clear (image);
+void loadBirdWatchImage() {
+	GtkWidget* wimage = GTK_WIDGET(app_builder_get_imgBirdWatch());
+	GtkImage* iimage = GTK_IMAGE(app_builder_get_imgBirdWatch());
 	
-	int width = gtk_widget_get_allocated_width (image);
-	int heigth = gtk_widget_get_allocated_height (image);
-	if(width < 100) width = 400;
-	if(heigth < 100) heigth = 350;
+	GError* gerror = 0;
+	gtk_image_clear(iimage);
 	
-	GdkPixbuf* pixbuf = gdk_pixbuf_new_from_file ("BIRD_WATCH.png", &gerror); 
-	GdkPixbuf* resized = gdk_pixbuf_scale_simple (pixbuf,width ,heigth, GDK_INTERP_BILINEAR);
-	gtk_image_set_from_pixbuf(image, resized);
+	int width = gtk_widget_get_allocated_width(wimage);
+	int heigth = gtk_widget_get_allocated_height(wimage);
+	if (width < 100) {
+		width = 400;
+	}
+	if (heigth < 100) {
+		heigth = 350;
+	}
+	
+	GdkPixbuf* pixbuf = gdk_pixbuf_new_from_file("BIRD_WATCH.png", &gerror); 
+	GdkPixbuf* resized = gdk_pixbuf_scale_simple(pixbuf, width, heigth, GDK_INTERP_BILINEAR);
+	gtk_image_set_from_pixbuf(iimage, resized);
 }
 /* ---------------------------------------------------------------- */
