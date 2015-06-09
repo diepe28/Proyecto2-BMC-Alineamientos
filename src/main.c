@@ -28,7 +28,11 @@ main (int argc, char *argv[])
 {
 	Proyecto2bmcalineamientos *app;
 	int status;
-	//testBenchmark ();
+	gchar* dna = "ACUGAAAAGGGUUUCGAACUGGUAUGGUAG";
+	gchar* protein = dnaToProtein (dna);
+	printf("PROTEIN: %s\n", protein);
+
+	printf("value of: %d\n",valueOfMatrix(BLOSUM_45, '*', '*'));
 	
 #ifdef ENABLE_NLS
 	bindtextdomain (GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);

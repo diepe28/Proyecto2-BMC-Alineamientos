@@ -94,7 +94,23 @@ gint valueOfBase(gchar base){
 
 //*16 + *4 + *1 = INDEX
 gchar codonToOneLetter(gchar codon[3]){
-	return AMINO_ACIDS[(16 * valueOfBase(codon[0])) + (4 * valueOfBase(codon[1])) + valueOfBase(codon[0]) ];
+	return AMINO_ACIDS[(16 * valueOfBase(codon[0])) + (4 * valueOfBase(codon[1])) + valueOfBase(codon[2]) ];
+}
+
+gchar* dnaToProtein(gchar* dna){
+	int dnaLength = strlen(dna), currentCodon = 0, i = 0, codonCount = (int) (dnaLength / 3);
+	gchar* protein = (gchar*) g_malloc(codonCount * sizeof(gchar));
+	gchar codon[3];
+
+	for(; currentCodon < codonCount; i+=3, currentCodon++){
+		codon[0] = dna[i];
+		codon[1] = dna[i+1];
+		codon[2] = dna[i+2];
+		protein[currentCodon] = codonToOneLetter(codon);
+	}
+	protein[currentCodon] = '\0';
+
+	return protein;
 }
 
 gchar* sequenceFromFile(gchar * filePath, gulong *length){
@@ -121,8 +137,10 @@ gchar* sequenceFromFile(gchar * filePath, gulong *length){
 	return sequence;
 }
 
-gint valueOfMatrix(gint matrix[26][26], gchar first, gchar second){
-	return matrix[(int) first - 'A'][(int) second - 'A'];
+gint valueOfMatrix(gint matrix[27][27], gchar first, gchar second){
+	int firstIndex  = first  == '*'? 26 : (int) first  - 'A';
+	int secondIndex = second == '*'? 26 : (int) second - 'A';
+	return matrix[firstIndex][secondIndex];
 }
 
 int createBenchmarkGraph(long* times, int n){
