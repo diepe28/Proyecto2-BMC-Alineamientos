@@ -37,6 +37,7 @@ GObject* app_builder_get_lVNew();
 GObject* app_builder_get_lWNew();
 GObject* app_builder_get_lPage();
 GObject* app_builder_get_imgBirdWatch();
+GObject* app_builder_get_BenchmarkImage();
 void loadBirdWatchImage();
 void app_widget_show_nwpopup(
 	gchar* v, // v is up sequence

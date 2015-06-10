@@ -306,7 +306,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkSpinButton" id="sbKValue">
+                      <object class="GtkSpinButton" id="sbGrowthInterval">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="adjustment">aKValue</property>
@@ -320,7 +320,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkSpinButton" id="sbGrowthInterval">
+                      <object class="GtkSpinButton" id="sbKValue">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="adjustment">aGrowthInterval</property>
@@ -1489,7 +1489,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
-                  <object class="GtkImage" id="image">
+                  <object class="GtkImage" id="BenchmarkImage">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="stock">gtk-missing-image</property>

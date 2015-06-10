@@ -41,8 +41,13 @@ void on_btGlobalAlignNW_clicked(GtkButton* sender) {
 	gboolean freeleftgapsw = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(app_builder_get_cbWLeftFG()));
 	gboolean freerightgapsv = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(app_builder_get_cbVRightFG()));
 	gboolean freerightgapsw = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(app_builder_get_cbWRightFG()));
+	gboolean usingKBand = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(app_builder_get_cbKBand()));
+	gint kbandValue = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbKValue()));
+	gint kbandGrowth = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbGrowthInterval()));
 	gint numberOfThreads = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbNThreads()));
-	
+
+
+	//TODO GET SUBSTITUTION_MATRIXES
 	ScoringOptions* scoringOptions = ScoringOptions_new(
 		matchbonus,
 		missmatchbonus,
@@ -55,10 +60,13 @@ void on_btGlobalAlignNW_clicked(GtkButton* sender) {
 		NULL
 	);
 
-	KBandOptions* kBandOptions = KBandOptions_new(
-		0,
-		0
-	);
+	KBandOptions* kBandOptions = NULL;
+	if(usingKBand){
+		kBandOptions = KBandOptions_new(
+			kbandValue,
+			kbandGrowth
+		);
+	}
 	
 	app_widget_show_nwpopup(
 		v,
@@ -68,7 +76,7 @@ void on_btGlobalAlignNW_clicked(GtkButton* sender) {
 		vtype,
 		wtype,
 		scoringOptions,
-		NULL,
+		kBandOptions,
 		numberOfThreads
 	);
 

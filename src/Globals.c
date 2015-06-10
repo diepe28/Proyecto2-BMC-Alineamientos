@@ -145,13 +145,13 @@ gint valueOfMatrix(gint matrix[27][27], gchar first, gchar second){
 
 int createBenchmarkGraph(long* times, int n){
 	char * commandsForGnuplot[] = {
-		"set terminal png large size 1920, 1080",
+		"set terminal png large size 1080, 720",
 		"set output \"BENCHMARK.png\"",
 		"set style line 1 lc rgb 'black' lt 1 lw 2 pt 7 ps 1", //0060ad blue
 		"set style line 2 lc rgb '#33CC33' lt 1 lw 2 pt 7 ps 1.5", //green
 		"set title \"Curva de aceleracion\"",
 		"set xlabel \"Cantidad de hilos\"",
-		"set ylabel \"Tiempo en milisegundos\"",
+		"set ylabel \"Tiempo en microsegundos\"",
 		"unset key",
 		"set offset 1,1,1,1",
 		"plot 'data.temp' index 0 with linespoints ls 1, 'data.temp' using 1:2:(sprintf(\"(%d, %d)\", $1, $2)) with labels offset char 2,2 notitle"};
@@ -206,13 +206,13 @@ int createBenchmarkGraph(long* times, int n){
 
 int createBenchmarkGraphKBand(long* times, long* timesKBand, int n){
 	char * commandsForGnuplot[] = {
-		"set terminal png large size 1920, 1080",
+		"set terminal png large size 1080, 720",
 		"set output \"BENCHMARK.png\"",
 		"set style line 1 lc rgb '#0060ad' lt 1 lw 2 pt 7 ps 1", //black
 		"set style line 2 lc rgb '#33CC33' lt 1 lw 2 pt 7 ps 1.5", //green
 		"set title \"Curva de aceleracion\"",
 		"set xlabel \"Cantidad de hilos\"",
-		"set ylabel \"Tiempo en milisegundos\"",
+		"set ylabel \"Tiempo en microsegundos\"",
 		"set key box height 3",
 		"set offset 1,1,1,1",
 		//"plot 'data.temp' index 0 with linespoints ls 1, '' index 1 with linespoints ls 2, 'data.temp' using 1:2:(sprintf(\"(%d, %d)\", $1, $2)) with labels offset char 2,2 notitle "};
