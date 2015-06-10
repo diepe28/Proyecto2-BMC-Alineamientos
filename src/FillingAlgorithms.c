@@ -11,7 +11,6 @@ static void fill_matrix(Cell*** matrix, ScoringOptions* options, gint startX, gi
 	for (i = startX; i < xLimit; i++) {
 		for (j = startY; j < yLimit; j++)
 			fill (matrix, options, seq1, seq2, i, j, isLocalAlignment);
-		// printf("Row %d completed... \n", i);
 	}
 }
 
