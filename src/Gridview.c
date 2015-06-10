@@ -16,7 +16,7 @@ void gridview_model_set_value(GtkTreeModel* model, gint row, gint column, gchar*
 void gridview_resize(GtkWidget* gridview, gint rowslen, gint colslen) {
 	gint oldcolslen = (gtk_tree_view_get_n_columns(GTK_TREE_VIEW(gridview)) - 2)/2;
 	gint i;
-	gchar data[CELL_MAX_SIZE];
+	gchar value[CELL_MAX_SIZE];
 	GType types[2 + colslen*2];
 	GtkTreeViewColumn* column;
 	GtkCellRenderer* cellrenderer;
@@ -27,18 +27,11 @@ void gridview_resize(GtkWidget* gridview, gint rowslen, gint colslen) {
 
 	if (oldcolslen <= colslen) {
 		for (i=oldcolslen*2+2; i<colslen*2+2; i++) {
-			sprintf(data, "%s", "");
-			/*
-			if (i%2 == 0) {
-				cellrenderer = gtk_cell_renderer_pixbuf_new();
-
-				column = gtk_tree_view_column_new_with_attributes(data, cellrenderer, NULL);
-			} else {
-				*/
-				cellrenderer = gtk_cell_renderer_text_new();
+			sprintf(value, "%s", "");
+			
+			cellrenderer = gtk_cell_renderer_text_new();
 				
-				column = gtk_tree_view_column_new_with_attributes(data, cellrenderer, "text", i, NULL);
-			//}
+			column = gtk_tree_view_column_new_with_attributes(value, cellrenderer, "text", i, NULL);
 			
 			g_object_set_data(G_OBJECT(cellrenderer), "column", GINT_TO_POINTER(i));
 			
@@ -63,10 +56,9 @@ void gridview_resize(GtkWidget* gridview, gint rowslen, gint colslen) {
 		gtk_list_store_append(row, &iter);
 
 		for (j=0; j<2+colslen*2; j++) {
-			sprintf(data, "%s", "");
-			
+			sprintf(value, "%s", "");
 			g_value_init(&values[j], G_TYPE_STRING);
-			g_value_set_string(&values[j], data);
+			g_value_set_string(&values[j], value);
 
 			colids[j] = j;
 		}
@@ -82,7 +74,7 @@ void gridview_resize(GtkWidget* gridview, gint rowslen, gint colslen) {
 /* ---------------------------------------------------------------- */
 void gridview_init(GtkWidget* gridview) {
 	gint i;
-	gchar data[CELL_MAX_SIZE];
+	gchar value[CELL_MAX_SIZE];
 	GtkTreeViewColumn* column;
 	GtkCellRenderer* cellrenderer;
 	
@@ -90,9 +82,9 @@ void gridview_init(GtkWidget* gridview) {
 		cellrenderer = gtk_cell_renderer_text_new();
 		g_object_set_data(G_OBJECT(cellrenderer), "column", GINT_TO_POINTER(i));
 
-		sprintf(data, "%s", "");
+		sprintf(value, "%s", "");
 		
-		column = gtk_tree_view_column_new_with_attributes(data, cellrenderer, "text", i, NULL);
+		column = gtk_tree_view_column_new_with_attributes(value, cellrenderer, "text", i, NULL);
 		
 		gtk_tree_view_append_column(GTK_TREE_VIEW(gridview), column);
 	}
@@ -105,32 +97,83 @@ void gridview_databind(GtkWidget* gridview, Cell*** datasource, gchar* col0, gch
 
 	gint i = 0;
 	gint j;
-	gchar data[CELL_MAX_SIZE];
+	gchar value[CELL_MAX_SIZE];
+	gchar arrou[CELL_MAX_SIZE];
+	gchar arron[CELL_MAX_SIZE];
+	gchar arrol[CELL_MAX_SIZE];
 
 	for (i=0; i<colslen; i++) {
 		column = gtk_tree_view_get_column(GTK_TREE_VIEW(gridview), i*2 + 3);
-		sprintf(data, "%c", head[i]);
-		gtk_tree_view_column_set_title(column, data);
+		sprintf(value, "%c", head[i]);
+		gtk_tree_view_column_set_title(column, value);
 	}
 
 	for (i=0; i<rowslen + 1; i++) {
 		for (j=0; j<colslen + 2; j++) {
 			if (j == 0) {
 				if (i == 0) {
-					sprintf(data, "%s", "");
+					sprintf(value, "%s", "");
 				} else {
-					sprintf(data, "%c", col0[i - 1]);
+					sprintf(value, "%c", col0[i - 1]);
 				}
+				
+				sprintf(arrou, "%s", CELL_A_ARROW_NULL);
+				sprintf(arron, "%s", CELL_A_ARROW_NULL);
+				sprintf(arrol, "%s", CELL_A_ARROW_NULL);
 			} else {
 				if (datasource[i][j - 1]->value_a == -1000000) {
-					sprintf(data, "%s", "-INF");
+					sprintf(value, "%s", "-INF");
 				} else {
-					sprintf(data, "%d", datasource[i][j - 1]->value_a);
+					sprintf(value, "%d", datasource[i][j - 1]->value_a);
+				}
+				
+				if (datasource[i][j - 1]->flags_a == COMES_FROM_UP) {
+					sprintf(arrou, "%s", CELL_A_ARROW_UPWARDS);
+					sprintf(arron, "%s", CELL_A_ARROW_NULL);
+					sprintf(arrol, "%s", CELL_A_ARROW_NULL);
+				}
+				if (datasource[i][j - 1]->flags_a == COMES_FROM_DIAGONAL) {
+					sprintf(arrou, "%s", CELL_A_ARROW_NULL);
+					sprintf(arron, "%s", CELL_A_ARROW_NORTHWEST);
+					sprintf(arrol, "%s", CELL_A_ARROW_NULL);
+				}
+				if (datasource[i][j - 1]->flags_a == COMES_FROM_LEFT) {
+					sprintf(arrou, "%s", CELL_A_ARROW_NULL);
+					sprintf(arron, "%s", CELL_A_ARROW_NULL);
+					sprintf(arrol, "%s", CELL_A_ARROW_LEFTWARDS);
+				}
+				
+				if (datasource[i][j - 1]->flags_b == COMES_FROM_UP) {
+					sprintf(arrou, "%s", CELL_B_ARROW_UPWARDS);
+				}
+				if (datasource[i][j - 1]->flags_b == COMES_FROM_DIAGONAL) {
+					sprintf(arron, "%s", CELL_B_ARROW_NORTHWEST);
+				}
+				if (datasource[i][j - 1]->flags_b == COMES_FROM_LEFT) {
+					sprintf(arrol, "%s", CELL_B_ARROW_LEFTWARDS);
+				}
+
+				if (datasource[i][j - 1]->flags_c == COMES_FROM_UP) {
+					sprintf(arrou, "%s", CELL_C_ARROW_UPWARDS);
+				}
+				if (datasource[i][j - 1]->flags_c == COMES_FROM_DIAGONAL) {
+					sprintf(arron, "%s", CELL_C_ARROW_NORTHWEST);
+				}
+				if (datasource[i][j - 1]->flags_c == COMES_FROM_LEFT) {
+					sprintf(arrol, "%s", CELL_C_ARROW_LEFTWARDS);
 				}
 			}
 
 			//                              row, col
-			gridview_model_set_value(model, i*2, j == 0? 0: j*2 - 1, data);
+			gridview_model_set_value(model, i*2, j==0? 0: j*2-1, value);
+
+			if (i > 0) {
+				gridview_model_set_value(model, i*2-1, j*2-1, arrou);
+			}
+			if (j > 1) {
+				gridview_model_set_value(model, i*2-1, j*2-2, arron);
+				gridview_model_set_value(model, i*2, j*2-2, arrol);
+			}
 		}
 	}
 	
