@@ -246,6 +246,7 @@ static Island* findAndMarkFromPoint(gint startRow, gint startCol, gint n,
 		}
 		//if got here means, it comes from only already processed cells
 		//or it does not comes from anywhere (error), anyway return NULL
+		g_free(islandPath);
 		return NULL;
 	}
 

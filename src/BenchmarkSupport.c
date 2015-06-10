@@ -1,6 +1,26 @@
 
 #include "BenchmarkSupport.h"
 
+static void print_matrix(Cell*** matrix, gint m, gint n)
+{
+	gint i, j = 0;
+	for (i = 0; i < m; i++) 
+	{
+		printf("Row %d:\n", i);
+		for (j = 0; j < n; j++) {
+			if (matrix[i][j] != NULL && matrix[i][j]->value_a > MIN_VALUE + 100) {
+				printf("[%d][%d] = %d   ", i, j, matrix[i][j]->value_a);
+				if (cell_isFlagASet (matrix[i][j], COMES_FROM_DIAGONAL)) printf("D "); else printf("  ");
+				if (cell_isFlagASet (matrix[i][j], COMES_FROM_UP)) printf("U "); else printf("  ");
+				if (cell_isFlagASet (matrix[i][j], COMES_FROM_LEFT)) printf("L "); else printf("  ");
+			}
+			else
+				printf("[%d][%d] = -Inf   ", i, j);
+			puts("");
+		}
+	}
+}
+
 static Cell*** create_matrix(gint height, gint width) 
 {
 	gint i, j = 0;
@@ -8,12 +28,14 @@ static Cell*** create_matrix(gint height, gint width)
 	Cell*** matrix = (Cell***) g_try_malloc0 (sizeof(Cell**) * height);
 	for (i = 0; i < height; i++) {
 		matrix[i] = (Cell**) g_try_malloc0 (sizeof(Cell*) * width);
-		if (matrix[i] == NULL) {
+		/* if (matrix[i] == NULL) {
 			for (j = 0; j < i; j++)
 				g_free (matrix[j]);
 			g_free (matrix);
 			return NULL;
-		}
+		} */
+		for (j = 0; j < width; j++)
+			matrix[i][j] = cell_new (0, NONE);
 	}
 	return matrix;
 }
@@ -30,13 +52,9 @@ static void free_matrix(Cell*** matrix, gint n, gint m)
 	g_free(matrix);
 }
 
-static void warm_up(gchar* seq1, gchar* seq2, gint seq1Length, gint seq2Length, ScoringOptions* scoringOptions, gboolean local) 
+static void warm_up(Cell*** similarityMatrix, gchar* seq1, gchar* seq2, gint seq1Length, gint seq2Length, ScoringOptions* scoringOptions, gboolean local) 
 {
-	Cell*** similarityMatrix = create_matrix (seq1Length + 1, seq2Length + 1);
-	if (similarityMatrix != NULL) {
-		fill_similarity_matrix_full(similarityMatrix, seq1, seq2, seq1Length, seq2Length, scoringOptions, local, 2);
-		free_matrix(similarityMatrix, seq1Length + 1, seq2Length + 1);
-	}
+	fill_similarity_matrix_full(similarityMatrix, seq1, seq2, seq1Length, seq2Length, scoringOptions, local, 2);
 }
 
 NWBenchmarkResult* execute_nw_benchmark(gchar* seq1, gchar* seq2, gint seq1Length, gint seq2Length, ScoringOptions* scoringOptions, KBandOptions* kbandOptions, gint numberOfThreads)
@@ -47,19 +65,18 @@ NWBenchmarkResult* execute_nw_benchmark(gchar* seq1, gchar* seq2, gint seq1Lengt
 	gulong* fullExecutionTimes = NULL;
 	gulong* kbandExecutionTimes = NULL;
 
+	similarityMatrix = create_matrix (seq1Length + 1, seq2Length + 1);
+	if (similarityMatrix == NULL)
+		return NULL;
 	fullExecutionTimes = (gulong*) g_malloc(sizeof(gulong) * numberOfThreads);
+	
 	for (i = 0; i < numberOfThreads; i++) {
-		if (similarityMatrix != NULL && alignment != NULL) {
+		if (alignment != NULL)
 			island_free(alignment);
-			free_matrix(similarityMatrix, seq1Length + 1, seq2Length + 1);
-		}
+
 		if (i == 1)
-			warm_up (seq1, seq2, seq1Length, seq2Length, scoringOptions, FALSE);
-		similarityMatrix = create_matrix (seq1Length + 1, seq2Length + 1);
-		if (similarityMatrix == NULL) {
-			g_free(fullExecutionTimes);
-			return NULL;
-		}
+			warm_up (similarityMatrix, seq1, seq2, seq1Length, seq2Length, scoringOptions, FALSE);
+		
 		GTimer* timer = g_timer_new();
 		fill_similarity_matrix_full(similarityMatrix, seq1, seq2, seq1Length, seq2Length, scoringOptions, FALSE, i + 1);
 		alignment = afterMatrixFilling_find_NW_Alignment(similarityMatrix, seq2, seq1, seq1Length, seq2Length, scoringOptions->freeRightGapsForX, scoringOptions->freeRightGapsForY, scoringOptions->gapOpeningPenalty != 0);
@@ -75,16 +92,9 @@ NWBenchmarkResult* execute_nw_benchmark(gchar* seq1, gchar* seq2, gint seq1Lengt
 	if (kbandOptions != NULL) {
 		kbandExecutionTimes = (gulong*) g_malloc(sizeof(gulong) * numberOfThreads);
 		for (i = 0; i < numberOfThreads; i++) {
-			if (similarityMatrix != NULL && alignment != NULL) {
+			if (alignment != NULL)
 				island_free(alignment);
-				free_matrix(similarityMatrix, seq1Length + 1, seq2Length + 1);
-			}
-			similarityMatrix = create_matrix (seq1Length + 1, seq2Length + 1);
-			if (similarityMatrix == NULL) {
-				g_free(fullExecutionTimes);
-				g_free(kbandExecutionTimes);
-				return NULL;
-			}
+			
 			GTimer* timer = g_timer_new();
 			fill_similarity_matrix_kband(similarityMatrix, seq1, seq2, seq1Length, seq2Length, scoringOptions, kbandOptions, i + 1);
 			alignment = afterMatrixFilling_find_NW_Alignment(similarityMatrix, seq2, seq1, seq1Length, seq2Length, scoringOptions->freeRightGapsForX, scoringOptions->freeRightGapsForY, scoringOptions->gapOpeningPenalty != 0);
@@ -116,19 +126,18 @@ SWBenchmarkResult* execute_sw_benchmark(gchar* seq1, gchar* seq2, gint seq1Lengt
 	GSList* islands = NULL;
 	gulong* fullExecutionTimes = NULL;
 
+	similarityMatrix = create_matrix (seq1Length + 1, seq2Length + 1);
+	if (similarityMatrix == NULL)
+		return NULL;
 	fullExecutionTimes = (gulong*) g_malloc(sizeof(gulong) * numberOfThreads);
+	
 	for (i = 0; i < numberOfThreads; i++) {
-		if (similarityMatrix != NULL && islands != NULL) {
+		if (islands != NULL)
 			g_slist_free_full(islands, island_destroyer);
-			free_matrix(similarityMatrix, seq1Length + 1, seq2Length + 1);
-		}
+
 		if (i == 1)
-			warm_up (seq1, seq2, seq1Length, seq2Length, scoringOptions, TRUE);
-		similarityMatrix = create_matrix (seq1Length + 1, seq2Length + 1);
-		if (similarityMatrix == NULL) {
-			g_free(fullExecutionTimes);
-			return NULL;
-		}
+			warm_up (similarityMatrix, seq1, seq2, seq1Length, seq2Length, scoringOptions, TRUE);
+		
 		GTimer* timer = g_timer_new();
 		fill_similarity_matrix_full(similarityMatrix, seq1, seq2, seq1Length, seq2Length, scoringOptions, TRUE, i + 1);
 		islands = afterMatrixFilling_findLocalAlignments(similarityMatrix, seq2, seq1, seq1Length, seq2Length, minimumScoreForIsland);
@@ -138,7 +147,7 @@ SWBenchmarkResult* execute_sw_benchmark(gchar* seq1, gchar* seq2, gint seq1Lengt
 		fullExecutionTimes[i] = ((gulong)(seconds_elapsed * 1000000)) + fractional_part;
 		g_timer_destroy(timer);
 
-		printf("Local Run #%d result=%d \n", i, similarityMatrix[seq1Length][seq2Length]->value_a);
+		printf("Local Run #%d \n", i);
 	}
 
 	SWBenchmarkResult* benchmarkResult = (SWBenchmarkResult*) g_malloc(sizeof(SWBenchmarkResult));

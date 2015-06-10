@@ -10,36 +10,36 @@ static void fill_corner(Cell*** matrix, ScoringOptions* options, gint x, gint y,
 {
 	if (options->gapOpeningPenalty == 0) {
 		if (isLocalAlignment || (x == 0 && y == 0))
-			matrix[x][y] = cell_new (0, NONE);
+			cell_setValues (matrix[x][y], 0, NONE);
 		else if (x == 0)
-			matrix[x][y] = cell_new (options->freeLeftGapsForY ? 0 : (y * options->gapExtensionPenalty), COMES_FROM_LEFT);
+			cell_setValues (matrix[x][y], options->freeLeftGapsForY ? 0 : (y * options->gapExtensionPenalty), COMES_FROM_LEFT);
 		else if (y == 0)
-			matrix[x][y] = cell_new (options->freeLeftGapsForX ? 0 : (x * options->gapExtensionPenalty), COMES_FROM_UP);
+			cell_setValues (matrix[x][y], options->freeLeftGapsForX ? 0 : (x * options->gapExtensionPenalty), COMES_FROM_UP);
 	} else {
 		if (x == 0 && y == 0)
-			matrix[x][y] = triple_cell_new (0, MIN_VALUE, MIN_VALUE, NONE, NONE, NONE);
+			cell_setTripleValues (matrix[x][y], 0, MIN_VALUE, MIN_VALUE, NONE, NONE, NONE);
 	    else if (x == 0)
-			matrix[x][y] = triple_cell_new (isLocalAlignment ? 0 : MIN_VALUE,
-			                                (options->freeLeftGapsForY) ? 0 : (options->gapOpeningPenalty + options->gapExtensionPenalty * y),
-			                                MIN_VALUE,
-			                                (!isLocalAlignment && y == 1) ? COMES_FROM_LEFT : NONE,
-			                                (!isLocalAlignment && y != 1) ? COMES_FROM_LEFT : NONE,
-			                                NONE
-			                                );
+			cell_setTripleValues (matrix[x][y], isLocalAlignment ? 0 : MIN_VALUE,
+					                            (options->freeLeftGapsForY) ? 0 : (options->gapOpeningPenalty + options->gapExtensionPenalty * y),
+					                            MIN_VALUE,
+					                            (!isLocalAlignment && y == 1) ? COMES_FROM_LEFT : NONE,
+					                            (!isLocalAlignment && y != 1) ? COMES_FROM_LEFT : NONE,
+					                            NONE
+					                            );
 		else if (y == 0)
-			matrix[x][y] = triple_cell_new (isLocalAlignment ? 0 : MIN_VALUE,
-			                                MIN_VALUE,
-			                                (options->freeLeftGapsForX) ? 0 : (options->gapOpeningPenalty + options->gapExtensionPenalty * x),
-			                                (!isLocalAlignment && x == 1) ? COMES_FROM_UP : NONE,
-			                                NONE,
-			                                (!isLocalAlignment && x != 1) ? COMES_FROM_UP : NONE
-			                                );
+			cell_setTripleValues (matrix[x][y], isLocalAlignment ? 0 : MIN_VALUE,
+					                            MIN_VALUE,
+					                            (options->freeLeftGapsForX) ? 0 : (options->gapOpeningPenalty + options->gapExtensionPenalty * x),
+					                            (!isLocalAlignment && x == 1) ? COMES_FROM_UP : NONE,
+					                            NONE,
+					                            (!isLocalAlignment && x != 1) ? COMES_FROM_UP : NONE
+					                            );
 	}
 }
 
 static void fill_interior(Cell*** matrix, ScoringOptions* options, gint x, gint y, gchar* seq1, gchar* seq2, gboolean isLocalAlignment) 
 {
-	Cell* newCell = NULL;
+	Cell* newCell = matrix[x][y];
 	gint fValue = ((options->substitutionMatrix != NULL) ? value_from_matrix(options->substitutionMatrix, seq1[x-1], seq2[y-1]) :
 				  ((seq1[x-1] == seq2[y-1]) ? options->matchBonus : options->missmatchPenalty));
 	if (options->gapOpeningPenalty == 0) {
@@ -48,9 +48,9 @@ static void fill_interior(Cell*** matrix, ScoringOptions* options, gint x, gint 
 		gint upValue = options->gapExtensionPenalty + matrix[x-1][y]->value_a;
 		gint bestScore = MAX(diagonalValue, MAX(leftValue, upValue));
 		if (isLocalAlignment && bestScore <= 0)
-			newCell = cell_new (0, NONE);
+			cell_setValues (newCell, 0, NONE);
 		else {
-			newCell = cell_new (bestScore, NONE);
+			cell_setValues (newCell, bestScore, NONE);
 			if (bestScore == diagonalValue) cell_setFlagA (newCell, COMES_FROM_DIAGONAL);
 			if (bestScore == leftValue) cell_setFlagA (newCell, COMES_FROM_LEFT);
 			if (bestScore == upValue) cell_setFlagA (newCell, COMES_FROM_UP);
@@ -88,9 +88,8 @@ static void fill_interior(Cell*** matrix, ScoringOptions* options, gint x, gint 
 		if (bestCValue == upValueB) flagsB |= COMES_FROM_UP;
 		if (bestCValue == upValueC) flagsC |= COMES_FROM_UP;
 		
-		newCell = triple_cell_new (bestAValue, bestBValue, bestCValue, flagsA, flagsB, flagsC);
+		cell_setTripleValues (newCell, bestAValue, bestBValue, bestCValue, flagsA, flagsB, flagsC);
 	}
-	matrix[x][y] = newCell;
 }
 
 void fill(Cell*** matrix, ScoringOptions* options, gchar* seq1, gchar* seq2, gint x, gint y, gboolean isLocalAlignment) 

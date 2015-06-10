@@ -23,6 +23,24 @@ Cell* triple_cell_new(gint value_a, gint value_b, gint value_c, guint flags_a, g
 	return cell;
 }
 
+void cell_setValues(Cell* cell, gint value_a, guint flags_a) {
+	cell->value_a = value_a;
+	cell->flags_a = flags_a;
+	cell->value_b = 0;
+	cell->value_c = 0;
+	cell->flags_b = NONE;
+	cell->flags_c = NONE;
+}
+
+void cell_setTripleValues(Cell* cell, gint value_a, gint value_b, gint value_c, guint flags_a, guint flags_b, guint flags_c) {
+	cell->value_a = value_a;
+	cell->value_b = value_b;
+	cell->value_c = value_c;
+	cell->flags_a = flags_a;
+	cell->flags_b = flags_b;
+	cell->flags_c = flags_c;
+}
+
 void cell_setFlagA(Cell *this, guint option){
 	this->flags_a |= option;
 }

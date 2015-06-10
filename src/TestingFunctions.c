@@ -544,8 +544,8 @@ void testBenchmark()
 	kbandOptions->kExtensionValue = 100;
 
 	// Call and printing
-	NWBenchmarkResult* result = execute_nw_benchmark (seq1, seq2, size1-1, size2-1, options, NULL, 20);
-	//SWBenchmarkResult* result = execute_sw_benchmark (seq1, seq2, size1-1, size2-1, options, 2, 5);
+	//NWBenchmarkResult* result = execute_nw_benchmark (seq1, seq2, size1-1, size2-1, options, NULL, 5);
+	SWBenchmarkResult* result = execute_sw_benchmark (seq1, seq2, size1-1, size2-1, options, 8, 5);
 	//print (result->similarityMatrix, size1, size2, FALSE);
 
 	if (result != NULL) {
@@ -553,7 +553,7 @@ void testBenchmark()
 		for (i = 0; i < result->numberOfRuns; i++)
 			printf("%lu \n", result->fullExecutionTimes[i]);
 
-		if (result->kbandExecutionTimes != NULL) {
+		/*if (result->kbandExecutionTimes != NULL) {
 			puts("Kband Execution Times");
 			for (i = 0; i < result->numberOfRuns; i++)
 				printf("%lu \n", result->kbandExecutionTimes[i]);
@@ -563,11 +563,13 @@ void testBenchmark()
 		puts(result->alignment->upSequence);
 		puts(result->alignment->leftSequence);
 
-		nw_benchmark_result_free(result);
-		//sw_benchmark_result_free (result);
+		nw_benchmark_result_free(result);*/
+		
 	} else {
 		puts("Too much memory...");
 	}
+
+	sw_benchmark_result_free (result);
 	g_free(options);
 	g_free(kbandOptions);
 	

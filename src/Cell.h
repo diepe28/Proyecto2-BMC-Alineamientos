@@ -28,6 +28,9 @@ typedef struct{
 Cell* cell_new(gint value_a, guint flags_a);
 Cell* triple_cell_new(gint value_a, gint value_b, gint value_c, guint flags_a, guint flags_b, guint flags_c);
 
+void cell_setValues(Cell* cell, gint value_a, guint flags_a);
+void cell_setTripleValues(Cell* cell, gint value_a, gint value_b, gint value_c, guint flags_a, guint flags_b, guint flags_c);
+
 void cell_setFlagA(Cell*, guint flag);
 void cell_setFlagB(Cell*, guint flag);
 void cell_setFlagC(Cell*, guint flag);

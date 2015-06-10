@@ -3,34 +3,16 @@
 
 // Helper functions
 
-static void print_matrix(Cell*** matrix, gint m, gint n)
-{
-	gint i, j = 0;
-	for (i = 0; i < m; i++) 
-	{
-		printf("Row %d:\n", i);
-		for (j = 0; j < n; j++) {
-			if (matrix[i][j] != NULL && matrix[i][j]->value_a > MIN_VALUE + 100) {
-				printf("[%d][%d] = %d   ", i, j, matrix[i][j]->value_a);
-				if (cell_isFlagASet (matrix[i][j], COMES_FROM_DIAGONAL)) printf("D "); else printf("  ");
-				if (cell_isFlagASet (matrix[i][j], COMES_FROM_UP)) printf("U "); else printf("  ");
-				if (cell_isFlagASet (matrix[i][j], COMES_FROM_LEFT)) printf("L "); else printf("  ");
-			}
-			else
-				printf("[%d][%d] = -Inf   ", i, j);
-			puts("");
-		}
-	}
-}
-
 static void fill_matrix(Cell*** matrix, ScoringOptions* options, gint startX, gint startY, gint height, gint width, gchar* seq1, gchar* seq2, gboolean isLocalAlignment) 
 {
 	gint i, j = 0;
 	gint xLimit = startX + height;
 	gint yLimit = startY + width;
-	for (i = startX; i < xLimit; i++)
+	for (i = startX; i < xLimit; i++) {
 		for (j = startY; j < yLimit; j++)
 			fill (matrix, options, seq1, seq2, i, j, isLocalAlignment);
+		// printf("Row %d completed... \n", i);
+	}
 }
 
 static void fill_kband_boundaries(Cell*** matrix, gint seq1Length, gint seq2Length, gint k) 
@@ -39,13 +21,13 @@ static void fill_kband_boundaries(Cell*** matrix, gint seq1Length, gint seq2Leng
 	gint diff = ABS(seq1Length - seq2Length);
 	if (seq1Length < seq2Length) {
 		for (i = 0, j = 0; i < (seq1Length - k); i++, j++) {
-			matrix[i + k + 1][j] = cell_new (MIN_VALUE, NONE);
-			matrix[i][j + diff + k + 1] = cell_new (MIN_VALUE, NONE);
+			cell_setValues (matrix[i + k + 1][j], MIN_VALUE, NONE);
+			cell_setValues (matrix[i][j + diff + k + 1], MIN_VALUE, NONE);
 		}	
 	} else {
 		for (i = 0, j = 0; i < (seq2Length - k); i++, j++) {
-			matrix[i + diff + k + 1][j] = cell_new (MIN_VALUE, NONE);
-			matrix[i][j + k + 1] = cell_new (MIN_VALUE, NONE);
+			cell_setValues (matrix[i + diff + k + 1][j], MIN_VALUE, NONE);
+			cell_setValues (matrix[i][j + k + 1], MIN_VALUE, NONE);
 		}
 	}		
 }
@@ -76,8 +58,6 @@ static void fill_antidiagonal(Cell*** matrix, gint n, gchar* seq1, gchar* seq2, 
 		j_init = ceilf((n - upperBound) / 2.0);
 	}
 	for (i = i_init, j = j_init; i >= 0 && j <= seq2Length && (i - j) >= lowerBound; i--, j++) {
-		if (matrix[i][j] != NULL)
-			g_free (matrix[i][j]);
 		if (waitingSemaphore != NULL && i != 0 && (i-1)-j >= lowerBound && sem_wait(waitingSemaphore))
 			puts("ERROR from sem_wait()");
 		fill (matrix, scoringOptions, seq1, seq2, i, j, FALSE);

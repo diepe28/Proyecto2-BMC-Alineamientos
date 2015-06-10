@@ -9,10 +9,11 @@ Island* island_new(gint startRow, gint startCol, gint maxValue, gint length, gch
 	island->startRow = startRow;
 	island->maxValue = maxValue;
 	island->islandPath = islandPath;
+	island->points = NULL;
 	
 	gint i = 0, row = startRow, col = startCol, upIndex = length-1, leftIndex = length-1;
-	island->upSequence = (gchar*) (g_malloc((length) * sizeof(gchar))); 
-	island->leftSequence = (gchar*) (g_malloc((length) * sizeof(gchar)));
+	island->upSequence = (gchar*) (g_malloc((length + 1) * sizeof(gchar))); 
+	island->leftSequence = (gchar*) (g_malloc((length + 1) * sizeof(gchar)));
 	
 	for(; i < length; i++){
 		switch(islandPath[i]){
