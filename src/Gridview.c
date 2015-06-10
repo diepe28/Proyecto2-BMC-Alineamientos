@@ -13,6 +13,79 @@ void gridview_model_set_value(GtkTreeModel* model, gint row, gint column, gchar*
 	gtk_tree_path_free(path);
 }
 /* ---------------------------------------------------------------- */
+void gridview_cell_colorize(GtkTreeViewColumn* column, GtkCellRenderer* cellrenderer, GtkTreeModel* model, GtkTreeIter* iter, gpointer colid) {
+	GValue* value = g_slice_alloc0(sizeof(GValue));
+	gtk_tree_model_get_value(model, iter, GPOINTER_TO_INT(colid), value);
+	const gchar* text = g_value_get_string(value);
+
+	g_object_set(cellrenderer, "foreground-set", FALSE, NULL);
+	
+	if (g_strcmp0(text, CELL_A_LEFTWARDS) == 0) {
+		g_object_set(cellrenderer, "text", CELL_ARROW_LEFTWARDS, NULL);
+		
+		g_object_set(cellrenderer, "foreground-set", TRUE, NULL);
+		g_object_set(cellrenderer, "foreground", "orange", NULL);
+	}
+
+	if (g_strcmp0(text, CELL_A_UPWARDS) == 0) {
+		g_object_set(cellrenderer, "text", CELL_ARROW_UPWARDS, NULL);
+		
+		g_object_set(cellrenderer, "foreground-set", TRUE, NULL);
+		g_object_set(cellrenderer, "foreground", "orange", NULL);
+	}
+
+	if (g_strcmp0(text, CELL_A_NORTHWEST) == 0) {
+		g_object_set(cellrenderer, "text", CELL_ARROW_NORTHWEST, NULL);
+		
+		g_object_set(cellrenderer, "foreground-set", TRUE, NULL);
+		g_object_set(cellrenderer, "foreground", "orange", NULL);
+	}
+
+	if (g_strcmp0(text, CELL_B_LEFTWARDS) == 0) {
+		g_object_set(cellrenderer, "text", CELL_ARROW_LEFTWARDS, NULL);
+		
+		g_object_set(cellrenderer, "foreground-set", TRUE, NULL);
+		g_object_set(cellrenderer, "foreground", "green", NULL);
+	}
+
+	if (g_strcmp0(text, CELL_B_UPWARDS) == 0) {
+		g_object_set(cellrenderer, "text", CELL_ARROW_UPWARDS, NULL);
+		
+		g_object_set(cellrenderer, "foreground-set", TRUE, NULL);
+		g_object_set(cellrenderer, "foreground", "green", NULL);
+	}
+
+	if (g_strcmp0(text, CELL_B_NORTHWEST) == 0) {
+		g_object_set(cellrenderer, "text", CELL_ARROW_NORTHWEST, NULL);
+		
+		g_object_set(cellrenderer, "foreground-set", TRUE, NULL);
+		g_object_set(cellrenderer, "foreground", "green", NULL);
+	}
+
+	if (g_strcmp0(text, CELL_C_LEFTWARDS) == 0) {
+		g_object_set(cellrenderer, "text", CELL_ARROW_LEFTWARDS, NULL);
+		
+		g_object_set(cellrenderer, "foreground-set", TRUE, NULL);
+		g_object_set(cellrenderer, "foreground", "red", NULL);
+	}
+
+	if (g_strcmp0(text, CELL_C_UPWARDS) == 0) {
+		g_object_set(cellrenderer, "text", CELL_ARROW_UPWARDS, NULL);
+		
+		g_object_set(cellrenderer, "foreground-set", TRUE, NULL);
+		g_object_set(cellrenderer, "foreground", "red", NULL);
+	}
+
+	if (g_strcmp0(text, CELL_C_NORTHWEST) == 0) {
+		g_object_set(cellrenderer, "text", CELL_ARROW_NORTHWEST, NULL);
+		
+		g_object_set(cellrenderer, "foreground-set", TRUE, NULL);
+		g_object_set(cellrenderer, "foreground", "red", NULL);
+	}
+	
+	g_value_unset(value);
+}
+/* ---------------------------------------------------------------- */
 void gridview_resize(GtkWidget* gridview, gint rowslen, gint colslen) {
 	gint oldcolslen = (gtk_tree_view_get_n_columns(GTK_TREE_VIEW(gridview)) - 2)/2;
 	gint i;
@@ -36,6 +109,8 @@ void gridview_resize(GtkWidget* gridview, gint rowslen, gint colslen) {
 			g_object_set_data(G_OBJECT(cellrenderer), "column", GINT_TO_POINTER(i));
 			
 			gtk_tree_view_append_column(GTK_TREE_VIEW(gridview), column);
+
+			gtk_tree_view_column_set_cell_data_func(column, cellrenderer, gridview_cell_colorize, GINT_TO_POINTER(i), NULL);
 		}
 	} else {
 		for (i=oldcolslen*2+1; i>=colslen*2+2; i--) {
@@ -87,20 +162,26 @@ void gridview_init(GtkWidget* gridview) {
 		column = gtk_tree_view_column_new_with_attributes(value, cellrenderer, "text", i, NULL);
 		
 		gtk_tree_view_append_column(GTK_TREE_VIEW(gridview), column);
+
+		gtk_tree_view_column_set_cell_data_func(column, cellrenderer, gridview_cell_colorize, GINT_TO_POINTER(i), NULL);
 	}
 }
 /* ---------------------------------------------------------------- */
-void gridview_databind(GtkWidget* gridview, Cell*** datasource, gchar* col0, gchar* head, gint rowslen, gint colslen) {
+void gridview_databind(GtkWidget* gridview, Cell*** datasource, gchar* col0, gchar* head, gint rowslen, gint colslen, gint index) {
 	gridview_resize(gridview, rowslen, colslen);
 	GtkTreeModel* model = gtk_tree_view_get_model(GTK_TREE_VIEW(gridview));
 	GtkTreeViewColumn* column;
 
 	gint i = 0;
 	gint j;
+	gint ivalue;
+	guint iflags;
 	gchar value[CELL_MAX_SIZE];
 	gchar arrou[CELL_MAX_SIZE];
 	gchar arron[CELL_MAX_SIZE];
 	gchar arrol[CELL_MAX_SIZE];
+
+	gchar bodies[3] = {'A', 'B', 'C'};
 
 	for (i=0; i<colslen; i++) {
 		column = gtk_tree_view_get_column(GTK_TREE_VIEW(gridview), i*2 + 3);
@@ -117,51 +198,73 @@ void gridview_databind(GtkWidget* gridview, Cell*** datasource, gchar* col0, gch
 					sprintf(value, "%c", col0[i - 1]);
 				}
 				
-				sprintf(arrou, "%s", CELL_A_ARROW_NULL);
-				sprintf(arron, "%s", CELL_A_ARROW_NULL);
-				sprintf(arrol, "%s", CELL_A_ARROW_NULL);
+				sprintf(arrou, "%s", CELL_A_NULL);
+				sprintf(arron, "%s", CELL_A_NULL);
+				sprintf(arrol, "%s", CELL_A_NULL);
 			} else {
-				if (datasource[i][j - 1]->value_a == -1000000) {
+				switch (index) {
+					case BODY_A:
+						ivalue = datasource[i][j - 1]->value_a;
+						iflags = datasource[i][j - 1]->flags_a;
+					break;
+					case BODY_B:
+						ivalue = datasource[i][j - 1]->value_b;
+						iflags = datasource[i][j - 1]->flags_b;
+					break;
+					case BODY_C:
+						ivalue = datasource[i][j - 1]->value_c;
+						iflags = datasource[i][j - 1]->flags_c;
+					break;
+				}
+				
+				if (ivalue == -1000000) {
 					sprintf(value, "%s", "-INF");
 				} else {
-					sprintf(value, "%d", datasource[i][j - 1]->value_a);
+					sprintf(value, "%d", ivalue);
 				}
 				
-				if (datasource[i][j - 1]->flags_c == COMES_FROM_UP) {
-					sprintf(arrou, "%s", CELL_C_ARROW_UPWARDS);
-					sprintf(arron, "%s", CELL_C_ARROW_NULL);
-					sprintf(arrol, "%s", CELL_C_ARROW_NULL);
+				switch (iflags) {
+					case COMES_FROM_UP:
+						sprintf(arrou, "1%c", bodies[index]);
+						sprintf(arron, "%s", CELL_A_NULL);
+						sprintf(arrol, "%s", CELL_A_NULL);
+					break;
+					case COMES_FROM_DIAGONAL:
+						sprintf(arrou, "%s", CELL_A_NULL);
+						sprintf(arron, "6%c", bodies[index]);
+						sprintf(arrol, "%s", CELL_A_NULL);
+					break;
+					case COMES_FROM_LEFT:
+						sprintf(arrou, "%s", CELL_A_NULL);
+						sprintf(arron, "%s", CELL_A_NULL);
+						sprintf(arrol, "0%c", bodies[index]);
+					break;
 				}
-				if (datasource[i][j - 1]->flags_c == COMES_FROM_DIAGONAL) {
-					sprintf(arrou, "%s", CELL_C_ARROW_NULL);
-					sprintf(arron, "%s", CELL_C_ARROW_NORTHWEST);
-					sprintf(arrol, "%s", CELL_C_ARROW_NULL);
-				}
-				if (datasource[i][j - 1]->flags_c == COMES_FROM_LEFT) {
-					sprintf(arrou, "%s", CELL_C_ARROW_NULL);
-					sprintf(arron, "%s", CELL_C_ARROW_NULL);
-					sprintf(arrol, "%s", CELL_C_ARROW_LEFTWARDS);
-				}
-				
-				if (datasource[i][j - 1]->flags_b == COMES_FROM_UP) {
-					sprintf(arrou, "%s", CELL_B_ARROW_UPWARDS);
-				}
-				if (datasource[i][j - 1]->flags_b == COMES_FROM_DIAGONAL) {
-					sprintf(arron, "%s", CELL_B_ARROW_NORTHWEST);
-				}
-				if (datasource[i][j - 1]->flags_b == COMES_FROM_LEFT) {
-					sprintf(arrol, "%s", CELL_B_ARROW_LEFTWARDS);
+				/*
+				switch (datasource[i][j - 1]->flags_b) {
+					case COMES_FROM_UP:
+						sprintf(arrou, "%s", CELL_B_UPWARDS);
+					break;
+					case COMES_FROM_DIAGONAL:
+						sprintf(arron, "%s", CELL_B_NORTHWEST);
+					break;
+					case COMES_FROM_LEFT:
+						sprintf(arrol, "%s", CELL_B_LEFTWARDS);
+					break;
 				}
 
-				if (datasource[i][j - 1]->flags_a == COMES_FROM_UP) {
-					sprintf(arrou, "%s", CELL_A_ARROW_UPWARDS);
+				switch (datasource[i][j - 1]->flags_a) {
+					case COMES_FROM_UP:
+						sprintf(arrou, "%s", CELL_A_UPWARDS);
+					break;
+					case COMES_FROM_DIAGONAL:
+						sprintf(arron, "%s", CELL_A_NORTHWEST);
+					break;
+					case COMES_FROM_LEFT:
+						sprintf(arrol, "%s", CELL_A_LEFTWARDS);
+					break;
 				}
-				if (datasource[i][j - 1]->flags_a == COMES_FROM_DIAGONAL) {
-					sprintf(arron, "%s", CELL_A_ARROW_NORTHWEST);
-				}
-				if (datasource[i][j - 1]->flags_a == COMES_FROM_LEFT) {
-					sprintf(arrol, "%s", CELL_A_ARROW_LEFTWARDS);
-				}
+				*/
 			}
 
 			//                              row, col

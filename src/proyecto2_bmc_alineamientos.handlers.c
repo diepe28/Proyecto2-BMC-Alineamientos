@@ -10,6 +10,7 @@
 GtkBuilder* builder = NULL;
 int currentIslandIndex;
 int islandCount = -1;
+NWBenchmarkResult* nwBenchmarkResult = NULL;
 SWBenchmarkResult* swBenchmarkResult = NULL;
 
 /* ---------------------------------------------------------------- */
@@ -133,6 +134,10 @@ GObject* app_builder_get_gridview() {
 	return gtk_builder_get_object(builder, "gridview");
 }
 /* ---------------------------------------------------------------- */
+GObject* app_builder_get_cbGotoValue() {
+	return gtk_builder_get_object(builder, "cbGotoValue");
+}
+/* ---------------------------------------------------------------- */
 GObject* app_builder_get_spMinIslands() {
 	return gtk_builder_get_object(builder, "spMinIslands");
 }
@@ -154,13 +159,14 @@ void app_widget_show_nwpopup(
 	gchar* w,
 	gint lengthV,
 	gint lengthW,
+	gint index,
 	gint vType,
 	gint wType,
 	ScoringOptions* scoringOptions,
 	KBandOptions* kBandOptions,
 	gint numberOfThreads
 ) {
-	NWBenchmarkResult* result = execute_nw_benchmark(
+	nwBenchmarkResult = execute_nw_benchmark(
 		w,
 		v,
 		lengthW,
@@ -171,17 +177,19 @@ void app_widget_show_nwpopup(
 	);
 
 	GtkWidget* gridview = GTK_WIDGET(app_builder_get_gridview());
-	gridview_databind(gridview, result->similarityMatrix, w, v, lengthW, lengthV);
 	
-	Island* alignment = result->alignment;
-	gulong* executionTimes = result->fullExecutionTimes;
-	gulong* executionTimesKband = result->kbandExecutionTimes;
-	createBirdWatchGraphNW(alignment, lengthW,  lengthV);
-	if(executionTimesKband == NULL)
+	gridview_databind(gridview, nwBenchmarkResult->similarityMatrix, w, v, lengthW, lengthV, index);
+	
+	Island* alignment = nwBenchmarkResult->alignment;
+	gulong* executionTimes = nwBenchmarkResult->fullExecutionTimes;
+	gulong* executionTimesKband = nwBenchmarkResult->kbandExecutionTimes;
+	createBirdWatchGraphNW(alignment, lengthW, lengthV);
+	if (executionTimesKband == NULL) {
 		createBenchmarkGraph(executionTimes, numberOfThreads);
-	else
+	} else {
 		createBenchmarkGraphKBand(executionTimes, executionTimesKband, numberOfThreads);
-		
+	}
+	
 	GtkWidget* popup = GTK_WIDGET(app_builder_get_popup());
 
 	gchar* sSeq1Length = (gchar*) g_malloc(sizeof(gchar) * (log10(lengthV) + 1));
@@ -217,6 +225,26 @@ void app_widget_show_nwpopup(
 	gtk_widget_show_all(popup);
 }
 /* ---------------------------------------------------------------- */
+void app_widget_refresh_nwpopup(
+	gchar* v, // v is up sequence
+	gchar* w,
+	gint lengthV,
+	gint lengthW,
+	gint index
+) {
+	GtkWidget* gridview = GTK_WIDGET(app_builder_get_gridview());
+	
+	gridview_databind(
+		gridview,
+		nwBenchmarkResult->similarityMatrix,
+		w,
+		v,
+		lengthV,
+		lengthW,
+		index
+	);
+}
+/* ---------------------------------------------------------------- */
 void app_widget_show_swpopup(
 	gchar* v, // v is up sequence
 	gchar* w,
@@ -237,12 +265,12 @@ void app_widget_show_swpopup(
 		minValueIslands,
 		numberOfThreads
 	);
-	islandCount = g_slist_length (swBenchmarkResult->islands);
+	islandCount = g_slist_length(swBenchmarkResult->islands);
 	currentIslandIndex = 0;
 	
 	GSList* islands = swBenchmarkResult->islands;
 	createBirdWatchGraphSW(islands, lengthW, lengthV);
-	createBenchmarkGraph (swBenchmarkResult->fullExecutionTimes, numberOfThreads);
+	createBenchmarkGraph(swBenchmarkResult->fullExecutionTimes, numberOfThreads);
 	
 	GtkWidget* popup = GTK_WIDGET(app_builder_get_popup());
 
@@ -278,7 +306,7 @@ gint app_entry_set_source(GtkEntry* entry, gchar* source) {
 	gint size = ftell(file);
 	fseek(file, 0L, SEEK_SET);
 	
-	gchar* value = g_malloc(sizeof(gchar*) * size);
+	gchar* value = g_malloc(sizeof(gchar) * size);
 	gint result = fscanf(file, "%s", value);
 
 	gtk_entry_set_text(entry, value);
@@ -341,9 +369,11 @@ void loadBirdWatchImage() {
 	gtk_image_set_from_pixbuf(iimage, resized);
 }
 /* ---------------------------------------------------------------- */
-void loadBenchmarkImage(){
+void loadBenchmarkImage() {
 	GtkWidget* wimage = GTK_WIDGET(app_builder_get_BenchmarkImage());
-	gtk_image_set_from_file (GTK_IMAGE(app_builder_get_BenchmarkImage()),
-	                         "BENCHMARK.png");
+	gtk_image_set_from_file(
+		GTK_IMAGE(app_builder_get_BenchmarkImage()),
+	  "BENCHMARK.png"
+	);
 }
 /* ---------------------------------------------------------------- */
