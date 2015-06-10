@@ -127,20 +127,20 @@ void gridview_databind(GtkWidget* gridview, Cell*** datasource, gchar* col0, gch
 					sprintf(value, "%d", datasource[i][j - 1]->value_a);
 				}
 				
-				if (datasource[i][j - 1]->flags_a == COMES_FROM_UP) {
-					sprintf(arrou, "%s", CELL_A_ARROW_UPWARDS);
-					sprintf(arron, "%s", CELL_A_ARROW_NULL);
-					sprintf(arrol, "%s", CELL_A_ARROW_NULL);
+				if (datasource[i][j - 1]->flags_c == COMES_FROM_UP) {
+					sprintf(arrou, "%s", CELL_C_ARROW_UPWARDS);
+					sprintf(arron, "%s", CELL_C_ARROW_NULL);
+					sprintf(arrol, "%s", CELL_C_ARROW_NULL);
 				}
-				if (datasource[i][j - 1]->flags_a == COMES_FROM_DIAGONAL) {
-					sprintf(arrou, "%s", CELL_A_ARROW_NULL);
-					sprintf(arron, "%s", CELL_A_ARROW_NORTHWEST);
-					sprintf(arrol, "%s", CELL_A_ARROW_NULL);
+				if (datasource[i][j - 1]->flags_c == COMES_FROM_DIAGONAL) {
+					sprintf(arrou, "%s", CELL_C_ARROW_NULL);
+					sprintf(arron, "%s", CELL_C_ARROW_NORTHWEST);
+					sprintf(arrol, "%s", CELL_C_ARROW_NULL);
 				}
-				if (datasource[i][j - 1]->flags_a == COMES_FROM_LEFT) {
-					sprintf(arrou, "%s", CELL_A_ARROW_NULL);
-					sprintf(arron, "%s", CELL_A_ARROW_NULL);
-					sprintf(arrol, "%s", CELL_A_ARROW_LEFTWARDS);
+				if (datasource[i][j - 1]->flags_c == COMES_FROM_LEFT) {
+					sprintf(arrou, "%s", CELL_C_ARROW_NULL);
+					sprintf(arron, "%s", CELL_C_ARROW_NULL);
+					sprintf(arrol, "%s", CELL_C_ARROW_LEFTWARDS);
 				}
 				
 				if (datasource[i][j - 1]->flags_b == COMES_FROM_UP) {
@@ -153,14 +153,14 @@ void gridview_databind(GtkWidget* gridview, Cell*** datasource, gchar* col0, gch
 					sprintf(arrol, "%s", CELL_B_ARROW_LEFTWARDS);
 				}
 
-				if (datasource[i][j - 1]->flags_c == COMES_FROM_UP) {
-					sprintf(arrou, "%s", CELL_C_ARROW_UPWARDS);
+				if (datasource[i][j - 1]->flags_a == COMES_FROM_UP) {
+					sprintf(arrou, "%s", CELL_A_ARROW_UPWARDS);
 				}
-				if (datasource[i][j - 1]->flags_c == COMES_FROM_DIAGONAL) {
-					sprintf(arron, "%s", CELL_C_ARROW_NORTHWEST);
+				if (datasource[i][j - 1]->flags_a == COMES_FROM_DIAGONAL) {
+					sprintf(arron, "%s", CELL_A_ARROW_NORTHWEST);
 				}
-				if (datasource[i][j - 1]->flags_c == COMES_FROM_LEFT) {
-					sprintf(arrol, "%s", CELL_C_ARROW_LEFTWARDS);
+				if (datasource[i][j - 1]->flags_a == COMES_FROM_LEFT) {
+					sprintf(arrol, "%s", CELL_A_ARROW_LEFTWARDS);
 				}
 			}
 
