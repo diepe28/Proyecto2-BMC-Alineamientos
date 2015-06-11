@@ -84,7 +84,7 @@
   </object>
   <object class="GtkWindow" id="popup">
     <property name="can_focus">False</property>
-    <property name="title" translatable="yes">Alineamientos</property>
+    <property name="title" translatable="yes">Resultados del Alineamiento</property>
     <property name="modal">True</property>
     <property name="window_position">center</property>
     <property name="default_width">800</property>
@@ -725,6 +725,7 @@
                         <property name="label">gtk-quit</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="tooltip_text" translatable="yes">Salir de la aplicación</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
                         <signal name="activate" handler="on_menuitem_exit" swapped="no"/>
@@ -749,6 +750,7 @@
                         <property name="label">gtk-about</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="tooltip_text" translatable="yes">Acerca de los autores de esta aplicación</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
                         <signal name="activate" handler="on_helpmenuitem_activate" swapped="no"/>
@@ -809,6 +811,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
+                        <property name="tooltip_text" translatable="yes">Permitir gaps gratis a la derecha de "v"</property>
                         <property name="margin_left">10</property>
                         <property name="xalign">0</property>
                         <property name="draw_indicator">True</property>
@@ -825,6 +828,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
+                        <property name="tooltip_text" translatable="yes">Permitir gaps gratis a la izquierda de "v"</property>
                         <property name="margin_left">10</property>
                         <property name="xalign">0</property>
                         <property name="draw_indicator">True</property>
@@ -841,6 +845,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
+                        <property name="tooltip_text" translatable="yes">Permitir gaps gratis a la derecha de "w"</property>
                         <property name="margin_left">10</property>
                         <property name="xalign">0</property>
                         <property name="draw_indicator">True</property>
@@ -857,6 +862,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
+                        <property name="tooltip_text" translatable="yes">Permitir gaps gratis a la izquierda de "w"</property>
                         <property name="margin_left">10</property>
                         <property name="margin_bottom">5</property>
                         <property name="xalign">0</property>
@@ -911,6 +917,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
+                    <property name="tooltip_text" translatable="yes">Marcar esta opción para utilizar la variante de K-Band. Ciertas configuraciones no son compatibles con esta opción (tales como el uso de funciones afines, gaps gratis y matrices de sustitución de aminoácidos)</property>
                     <property name="margin_left">5</property>
                     <property name="xalign">0</property>
                     <property name="draw_indicator">True</property>
@@ -961,6 +968,7 @@
                       <object class="GtkSpinButton" id="sbGrowthInterval">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
+                        <property name="tooltip_text" translatable="yes">El valor que indica por cuánto ampliar la banda en caso de que no se encuentre una solución óptima</property>
                         <property name="margin_left">5</property>
                         <property name="adjustment">aGrowthInterval</property>
                         <property name="value">500</property>
@@ -976,6 +984,7 @@
                       <object class="GtkSpinButton" id="sbKValue">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
+                        <property name="tooltip_text" translatable="yes">El valor inicial para el ancho de la banda</property>
                         <property name="margin_left">5</property>
                         <property name="adjustment">aKValue</property>
                         <property name="value">100</property>
@@ -1000,6 +1009,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
+                    <property name="tooltip_text" translatable="yes">Presione este botón para alinear las hileras introducidas usando el algoritmo de Needleman-Wunsch para alineamiento global/semiglobal</property>
                     <property name="halign">end</property>
                     <property name="margin_right">10</property>
                     <property name="margin_bottom">10</property>
@@ -1078,6 +1088,7 @@
                       <object class="GtkSpinButton" id="spMinIslands">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
+                        <property name="tooltip_text" translatable="yes">El puntaje mínimo que debe tener una isla para ser mostrada en la pantalla de resultados</property>
                         <property name="adjustment">aMinIslands</property>
                         <property name="value">1</property>
                       </object>
@@ -1101,6 +1112,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
+                    <property name="tooltip_text" translatable="yes">Presione este botón para alinear las hileras introducidas usando el algoritmo de Smith-Waterman para alineamiento local</property>
                     <property name="halign">end</property>
                     <property name="margin_right">10</property>
                     <property name="margin_bottom">10</property>
@@ -1182,6 +1194,7 @@
                       <object class="GtkSpinButton" id="sbNThreads">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
+                        <property name="tooltip_text" translatable="yes">Número máximo de hilos a utilizar en el llenado de la matriz de similitud. Se hará una corrida independiente para cada cantidad de hilos</property>
                         <property name="margin_bottom">5</property>
                         <property name="adjustment">aNThreads</property>
                         <property name="value">1</property>
@@ -1235,6 +1248,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
+                    <property name="tooltip_text" translatable="yes">Utilizar valores personalizados para los aciertos y desaciertos de símbolos</property>
                     <property name="margin_left">10</property>
                     <property name="xalign">0</property>
                     <property name="active">True</property>
@@ -1285,6 +1299,7 @@
                       <object class="GtkSpinButton" id="sbMatch">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
+                        <property name="tooltip_text" translatable="yes">Valor de un acierto de símbolos</property>
                         <property name="margin_left">5</property>
                         <property name="adjustment">aMatch</property>
                         <property name="value">1</property>
@@ -1300,6 +1315,7 @@
                       <object class="GtkSpinButton" id="sbMissmatch">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
+                        <property name="tooltip_text" translatable="yes">Valor de un desacierto de símbolos</property>
                         <property name="margin_left">5</property>
                         <property name="adjustment">aMissmatch</property>
                         <property name="value">-1</property>
@@ -1324,6 +1340,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
+                    <property name="tooltip_text" translatable="yes">Utilizar una tabla estándar para alineamiento de aminoácidos</property>
                     <property name="margin_left">10</property>
                     <property name="xalign">0</property>
                     <property name="active">True</property>
@@ -1340,6 +1357,7 @@
                   <object class="GtkComboBox" id="cbSubstitutionMatrix">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="tooltip_text" translatable="yes">Matriz de sustitución para alineamiento de aminoácidos</property>
                     <property name="halign">start</property>
                     <property name="margin_left">110</property>
                     <property name="margin_bottom">5</property>
@@ -1413,6 +1431,7 @@
                       <object class="GtkSpinButton" id="sbF">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
+                        <property name="tooltip_text" translatable="yes">Penalización de abrir un bloque de gaps</property>
                         <property name="margin_bottom">8</property>
                         <property name="adjustment">aF</property>
                       </object>
@@ -1440,6 +1459,7 @@
                       <object class="GtkSpinButton" id="sbK">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
+                        <property name="tooltip_text" translatable="yes">Penalización de extender un bloque de gaps</property>
                         <property name="margin_bottom">8</property>
                         <property name="adjustment">aK</property>
                         <property name="value">-2</property>
@@ -1542,6 +1562,7 @@
                   <object class="GtkEntry" id="txV">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="tooltip_text" translatable="yes">Primer hilera que participará en el proceso de alineamiento</property>
                     <property name="hexpand">True</property>
                   </object>
                   <packing>
@@ -1555,6 +1576,7 @@
                   <object class="GtkEntry" id="txW">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="tooltip_text" translatable="yes">Segunda hilera que participará en el proceso de alineamiento</property>
                     <property name="hexpand">True</property>
                   </object>
                   <packing>
@@ -1570,6 +1592,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
+                    <property name="tooltip_text" translatable="yes">Subir la secuencia "v" desde un archivo</property>
                     <signal name="clicked" handler="on_btVLoad_clicked" swapped="no"/>
                   </object>
                   <packing>
@@ -1585,6 +1608,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
+                    <property name="tooltip_text" translatable="yes">Subir la secuencia "w" desde un archivo</property>
                     <signal name="clicked" handler="on_btWLoad_clicked" swapped="no"/>
                   </object>
                   <packing>
@@ -1598,6 +1622,7 @@
                   <object class="GtkComboBox" id="cbVInputType">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="tooltip_text" translatable="yes">Tipo de "v"</property>
                     <property name="model">lsInputType</property>
                     <property name="active">0</property>
                     <child>
@@ -1618,6 +1643,7 @@
                   <object class="GtkComboBox" id="cbWInputType">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="tooltip_text" translatable="yes">Tipo de "w"</property>
                     <property name="model">lsInputType</property>
                     <property name="active">0</property>
                     <child>
