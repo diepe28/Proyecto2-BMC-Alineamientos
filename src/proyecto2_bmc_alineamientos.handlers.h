@@ -75,4 +75,5 @@ gint app_entry_set_source(GtkEntry* entry, gchar* source);
 void showIsland(int index);
 void showNextIsland();
 void showPrevIsland();
+void freeResults();
 #endif

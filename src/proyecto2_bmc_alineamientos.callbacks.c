@@ -184,7 +184,7 @@ void on_rbCustomValues_toggled(GtkRadioButton* sender) {
 /* ---------------------------------------------------------------- */
 gboolean on_popup_delete_event(GtkWidget* sender, GdkEvent* event) {
 	gtk_widget_hide(sender);
-	
+	freeResults();
 	return TRUE;
 }
 /* ---------------------------------------------------------------- */

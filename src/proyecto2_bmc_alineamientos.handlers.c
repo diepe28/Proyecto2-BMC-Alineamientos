@@ -381,3 +381,11 @@ void loadBenchmarkImage() {
 	);
 }
 /* ---------------------------------------------------------------- */
+void freeResults() {
+	if (nwBenchmarkResult != NULL)
+		nw_benchmark_result_free(nwBenchmarkResult);
+	if (swBenchmarkResult != NULL)
+		sw_benchmark_result_free(swBenchmarkResult);
+	nwBenchmarkResult = NULL;
+	swBenchmarkResult = NULL;
+}
