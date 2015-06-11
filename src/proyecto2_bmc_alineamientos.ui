@@ -724,6 +724,8 @@
                   <object class="GtkLabel" id="lFreeGaps">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="margin_left">5</property>
+                    <property name="margin_top">5</property>
                     <property name="xalign">0</property>
                     <property name="yalign">0</property>
                     <property name="label" translatable="yes">Gaps gratis</property>
@@ -748,6 +750,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
+                        <property name="margin_left">10</property>
                         <property name="xalign">0</property>
                         <property name="draw_indicator">True</property>
                       </object>
@@ -763,6 +766,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
+                        <property name="margin_left">10</property>
                         <property name="xalign">0</property>
                         <property name="draw_indicator">True</property>
                       </object>
@@ -778,6 +782,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
+                        <property name="margin_left">10</property>
                         <property name="xalign">0</property>
                         <property name="draw_indicator">True</property>
                       </object>
@@ -793,6 +798,8 @@
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
+                        <property name="margin_left">10</property>
+                        <property name="margin_bottom">5</property>
                         <property name="xalign">0</property>
                         <property name="draw_indicator">True</property>
                       </object>
@@ -824,6 +831,8 @@
                   <object class="GtkLabel" id="lKBand">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="margin_left">5</property>
+                    <property name="margin_top">5</property>
                     <property name="xalign">0</property>
                     <property name="yalign">0</property>
                     <property name="label" translatable="yes">k-Band</property>
@@ -843,6 +852,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
+                    <property name="margin_left">5</property>
                     <property name="xalign">0</property>
                     <property name="draw_indicator">True</property>
                     <signal name="toggled" handler="on_cbKBand_toggled" swapped="no"/>
@@ -862,8 +872,9 @@
                       <object class="GtkLabel" id="lKValue">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="margin_left">15</property>
                         <property name="xalign">1</property>
-                        <property name="label" translatable="yes">Valor inicial de "k"</property>
+                        <property name="label" translatable="yes">Valor inicial de "k":</property>
                       </object>
                       <packing>
                         <property name="left_attach">0</property>
@@ -876,8 +887,9 @@
                       <object class="GtkLabel" id="lGrowthInterval">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="margin_left">15</property>
                         <property name="xalign">1</property>
-                        <property name="label" translatable="yes">Intérvalo de crecimiento</property>
+                        <property name="label" translatable="yes">Valor de crecimiento de "k":</property>
                       </object>
                       <packing>
                         <property name="left_attach">0</property>
@@ -890,6 +902,7 @@
                       <object class="GtkSpinButton" id="sbGrowthInterval">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
+                        <property name="margin_left">5</property>
                         <property name="adjustment">aGrowthInterval</property>
                         <property name="value">500</property>
                       </object>
@@ -904,6 +917,7 @@
                       <object class="GtkSpinButton" id="sbKValue">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
+                        <property name="margin_left">5</property>
                         <property name="adjustment">aKValue</property>
                         <property name="value">100</property>
                       </object>
@@ -928,6 +942,7 @@
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="halign">end</property>
+                    <property name="margin_right">5</property>
                     <signal name="clicked" handler="on_btGlobalAlignNW_clicked" swapped="no"/>
                   </object>
                   <packing>
@@ -962,6 +977,8 @@
                   <object class="GtkLabel" id="lIslands">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="margin_left">5</property>
+                    <property name="margin_top">5</property>
                     <property name="xalign">0</property>
                     <property name="yalign">0</property>
                     <property name="label" translatable="yes">Islas</property>
@@ -984,8 +1001,10 @@
                       <object class="GtkLabel" id="lMinIslands">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="margin_left">5</property>
+                        <property name="margin_right">5</property>
                         <property name="xalign">1</property>
-                        <property name="label" translatable="yes">Valor mínimo en las islas</property>
+                        <property name="label" translatable="yes">Puntaje mínimo para conservar islas:</property>
                       </object>
                       <packing>
                         <property name="left_attach">0</property>
@@ -1022,6 +1041,8 @@
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="halign">end</property>
+                    <property name="margin_right">5</property>
+                    <property name="margin_top">5</property>
                     <signal name="clicked" handler="on_btLocalAlignSW_clicked" swapped="no"/>
                   </object>
                   <packing>
@@ -1060,6 +1081,8 @@
                   <object class="GtkLabel" id="lThreads">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="margin_left">5</property>
+                    <property name="margin_top">5</property>
                     <property name="xalign">0</property>
                     <property name="yalign">0</property>
                     <property name="label" translatable="yes">Hilos de ejecución</property>
@@ -1082,8 +1105,10 @@
                       <object class="GtkLabel" id="lNThreads">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="margin_left">10</property>
+                        <property name="margin_bottom">5</property>
                         <property name="xalign">1</property>
-                        <property name="label" translatable="yes">Número de hilos</property>
+                        <property name="label" translatable="yes">Número de hilos: </property>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -1095,6 +1120,7 @@
                       <object class="GtkSpinButton" id="sbNThreads">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
+                        <property name="margin_bottom">5</property>
                         <property name="adjustment">aNThreads</property>
                         <property name="value">1</property>
                       </object>
@@ -1126,6 +1152,8 @@
                   <object class="GtkLabel" id="lScores">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="margin_left">5</property>
+                    <property name="margin_top">6</property>
                     <property name="xalign">0</property>
                     <property name="yalign">0</property>
                     <property name="label" translatable="yes">Puntaje de aciertos/desaciertos</property>
@@ -1145,6 +1173,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
+                    <property name="margin_left">10</property>
                     <property name="xalign">0</property>
                     <property name="active">True</property>
                     <property name="draw_indicator">True</property>
@@ -1166,7 +1195,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="xalign">1</property>
-                        <property name="label" translatable="yes">Acierto</property>
+                        <property name="label" translatable="yes">Acierto:</property>
                       </object>
                       <packing>
                         <property name="left_attach">0</property>
@@ -1179,8 +1208,9 @@
                       <object class="GtkLabel" id="lMissmatch">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="margin_left">38</property>
                         <property name="xalign">1</property>
-                        <property name="label" translatable="yes">Desacierto</property>
+                        <property name="label" translatable="yes">Desacierto:</property>
                       </object>
                       <packing>
                         <property name="left_attach">0</property>
@@ -1193,6 +1223,7 @@
                       <object class="GtkSpinButton" id="sbMatch">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
+                        <property name="margin_left">5</property>
                         <property name="adjustment">aMatch</property>
                         <property name="value">1</property>
                       </object>
@@ -1207,6 +1238,7 @@
                       <object class="GtkSpinButton" id="sbMissmatch">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
+                        <property name="margin_left">5</property>
                         <property name="adjustment">aMissmatch</property>
                         <property name="value">-1</property>
                       </object>
@@ -1226,10 +1258,11 @@
                 </child>
                 <child>
                   <object class="GtkRadioButton" id="rbSubstitutionMatrix">
-                    <property name="label" translatable="yes">Tabla estandar para aminoácidos</property>
+                    <property name="label" translatable="yes">Tabla estándar para aminoácidos</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
+                    <property name="margin_left">10</property>
                     <property name="xalign">0</property>
                     <property name="active">True</property>
                     <property name="draw_indicator">True</property>
@@ -1246,6 +1279,8 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="halign">start</property>
+                    <property name="margin_left">110</property>
+                    <property name="margin_bottom">5</property>
                     <property name="model">lsSubstitutionMatrix</property>
                     <property name="active">0</property>
                     <child>
@@ -1276,6 +1311,8 @@
                   <object class="GtkLabel" id="lGapPenalty">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="margin_left">5</property>
+                    <property name="margin_top">5</property>
                     <property name="xalign">0</property>
                     <property name="yalign">0</property>
                     <property name="label" translatable="yes">Gap penalty</property>
@@ -1298,8 +1335,11 @@
                       <object class="GtkLabel" id="lF">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="margin_left">30</property>
+                        <property name="margin_right">5</property>
+                        <property name="margin_bottom">8</property>
                         <property name="xalign">1</property>
-                        <property name="label" translatable="yes">Ecuación afín:</property>
+                        <property name="label" translatable="yes">Función afín:</property>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -1311,6 +1351,7 @@
                       <object class="GtkSpinButton" id="sbF">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
+                        <property name="margin_bottom">8</property>
                         <property name="adjustment">aF</property>
                       </object>
                       <packing>
@@ -1323,8 +1364,9 @@
                       <object class="GtkLabel" id="lK">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="margin_bottom">8</property>
                         <property name="xalign">1</property>
-                        <property name="label" translatable="yes">+ k*</property>
+                        <property name="label" translatable="yes">+ k *</property>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -1336,6 +1378,7 @@
                       <object class="GtkSpinButton" id="sbK">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
+                        <property name="margin_bottom">8</property>
                         <property name="adjustment">aK</property>
                         <property name="value">-2</property>
                       </object>
@@ -1361,7 +1404,7 @@
               <object class="GtkLabel" id="lPanelSettLegend">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">Opciones de configuración</property>
+                <property name="label" translatable="yes">Configuración General</property>
               </object>
               <packing>
                 <property name="position">2</property>
