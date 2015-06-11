@@ -196,8 +196,8 @@ void app_widget_show_nwpopup(
 	
 	GtkWidget* popup = GTK_WIDGET(app_builder_get_popup());
 
-	gchar* sSeq1Length = (gchar*) g_malloc(sizeof(gchar) * (log10(lengthV) + 1));
-	gchar* sSeq2Length = (gchar*) g_malloc(sizeof(gchar) * (log10(lengthW) + 1));
+	gchar* sSeq1Length = (gchar*) g_malloc(sizeof(gchar)*(log10(lengthV) + 1));
+	gchar* sSeq2Length = (gchar*) g_malloc(sizeof(gchar)*(log10(lengthW) + 1));
 
 	sprintf(sSeq1Length, "%d", lengthV);
 	sprintf(sSeq2Length, "%d", lengthW);
@@ -280,8 +280,8 @@ void app_widget_show_swpopup(
 
 	gtk_label_set_text(GTK_LABEL(app_builder_get_lAlgTypeValue()), "Local");
 	
-	gchar* sSeq1Length = (gchar*) g_malloc(sizeof(gchar) * (log10(lengthV) + 1));
-	gchar* sSeq2Length = (gchar*) g_malloc(sizeof(gchar) * (log10(lengthW) + 1));
+	gchar* sSeq1Length = (gchar*) g_malloc(sizeof(gchar)*(log10(lengthV) + 1));
+	gchar* sSeq2Length = (gchar*) g_malloc(sizeof(gchar)*(log10(lengthW) + 1));
 
 	sprintf(sSeq1Length, "%d", lengthV);
 	sprintf(sSeq2Length, "%d", lengthW);
@@ -310,7 +310,7 @@ gint app_entry_set_source(GtkEntry* entry, gchar* source) {
 	gint size = ftell(file);
 	fseek(file, 0L, SEEK_SET);
 	
-	gchar* value = g_malloc(sizeof(gchar) * size);
+	gchar* value = g_malloc(sizeof(gchar)*size);
 	gint result = fscanf(file, "%s", value);
 
 	gtk_entry_set_text(entry, value);
@@ -382,10 +382,13 @@ void loadBenchmarkImage() {
 }
 /* ---------------------------------------------------------------- */
 void freeResults() {
-	if (nwBenchmarkResult != NULL)
+	if (nwBenchmarkResult != NULL) {
 		nw_benchmark_result_free(nwBenchmarkResult);
-	if (swBenchmarkResult != NULL)
+	}
+	if (swBenchmarkResult != NULL) {
 		sw_benchmark_result_free(swBenchmarkResult);
+	}
 	nwBenchmarkResult = NULL;
 	swBenchmarkResult = NULL;
 }
+/* ---------------------------------------------------------------- */

@@ -19,6 +19,7 @@ void gridview_cell_colorize(GtkTreeViewColumn* column, GtkCellRenderer* cellrend
 	const gchar* text = g_value_get_string(value);
 
 	g_object_set(cellrenderer, "foreground-set", FALSE, NULL);
+	g_object_set(cellrenderer, "background-set", FALSE, NULL);
 	
 	if (g_strcmp0(text, CELL_A_LEFTWARDS) == 0) {
 		g_object_set(cellrenderer, "text", CELL_ARROW_LEFTWARDS, NULL);
@@ -81,6 +82,15 @@ void gridview_cell_colorize(GtkTreeViewColumn* column, GtkCellRenderer* cellrend
 		
 		g_object_set(cellrenderer, "foreground-set", TRUE, NULL);
 		g_object_set(cellrenderer, "foreground", "red", NULL);
+	}
+	
+	if (text[strlen(text) - 1] == '*') {
+		gchar* newtext = g_strjoinv("", g_strsplit(text, "*", CELL_MAX_SIZE));
+		
+		g_object_set(cellrenderer, "text", newtext, NULL);
+		
+		g_object_set(cellrenderer, "background-set", TRUE, NULL);
+		g_object_set(cellrenderer, "background", "lightgray", NULL);
 	}
 	
 	g_value_unset(value);
@@ -191,16 +201,16 @@ void gridview_databind(GtkWidget* gridview, Cell*** datasource, gchar* col0, gch
 
 	for (i=0; i<rowslen + 1; i++) {
 		for (j=0; j<colslen + 2; j++) {
+			sprintf(value, "%s", CELL_A_NULL);
+			
+			sprintf(arrou, "%s", CELL_A_NULL);
+			sprintf(arron, "%s", CELL_A_NULL);
+			sprintf(arrol, "%s", CELL_A_NULL);
+			
 			if (j == 0) {
-				if (i == 0) {
-					sprintf(value, "%s", "");
-				} else {
+				if (i > 0) {
 					sprintf(value, "%c", col0[i - 1]);
 				}
-				
-				sprintf(arrou, "%s", CELL_A_NULL);
-				sprintf(arron, "%s", CELL_A_NULL);
-				sprintf(arrol, "%s", CELL_A_NULL);
 			} else {
 				switch (index) {
 					case BODY_A:
@@ -220,51 +230,18 @@ void gridview_databind(GtkWidget* gridview, Cell*** datasource, gchar* col0, gch
 				if (ivalue == -1000000) {
 					sprintf(value, "%s", "-INF");
 				} else {
-					sprintf(value, "%d", ivalue);
-				}
-				
-				switch (iflags) {
-					case COMES_FROM_UP:
-						sprintf(arrou, "1%c", bodies[index]);
-						sprintf(arron, "%s", CELL_A_NULL);
-						sprintf(arrol, "%s", CELL_A_NULL);
-					break;
-					case COMES_FROM_DIAGONAL:
-						sprintf(arrou, "%s", CELL_A_NULL);
-						sprintf(arron, "6%c", bodies[index]);
-						sprintf(arrol, "%s", CELL_A_NULL);
-					break;
-					case COMES_FROM_LEFT:
-						sprintf(arrou, "%s", CELL_A_NULL);
-						sprintf(arron, "%s", CELL_A_NULL);
-						sprintf(arrol, "0%c", bodies[index]);
-					break;
-				}
-				/*
-				switch (datasource[i][j - 1]->flags_b) {
-					case COMES_FROM_UP:
-						sprintf(arrou, "%s", CELL_B_UPWARDS);
-					break;
-					case COMES_FROM_DIAGONAL:
-						sprintf(arron, "%s", CELL_B_NORTHWEST);
-					break;
-					case COMES_FROM_LEFT:
-						sprintf(arrol, "%s", CELL_B_LEFTWARDS);
-					break;
+					sprintf(value, "%d%s", ivalue, (iflags&IS_PAINTED)!=0? "*": "");
 				}
 
-				switch (datasource[i][j - 1]->flags_a) {
-					case COMES_FROM_UP:
-						sprintf(arrou, "%s", CELL_A_UPWARDS);
-					break;
-					case COMES_FROM_DIAGONAL:
-						sprintf(arron, "%s", CELL_A_NORTHWEST);
-					break;
-					case COMES_FROM_LEFT:
-						sprintf(arrol, "%s", CELL_A_LEFTWARDS);
-					break;
+				if ((iflags & COMES_FROM_UP) != 0) {
+					sprintf(arrou, "1%c", bodies[index]);
 				}
-				*/
+				if ((iflags & COMES_FROM_DIAGONAL) != 0) {
+					sprintf(arron, "6%c", bodies[index]);
+				}
+				if ((iflags & COMES_FROM_LEFT) != 0) {
+					sprintf(arrol, "0%c", bodies[index]);
+				}
 			}
 
 			//                              row, col

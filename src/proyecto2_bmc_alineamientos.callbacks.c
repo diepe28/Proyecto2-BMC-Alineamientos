@@ -7,6 +7,8 @@
 #ifndef CALLBACKS
 #define CALLBACKS
 
+const gchar* authors[4] = {"Olger Calderón Achío", "Wilberth Castro Fuentes", "Diego Pérez Arroyo", NULL};
+
 /* ---------------------------------------------------------------- */
 void on_window_init(GtkBuilder* sender) {
 	app_set_builder(sender);
@@ -50,7 +52,6 @@ void on_btGlobalAlignNW_clicked(GtkButton* sender) {
 	gint numberOfThreads = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbNThreads()));
 	
 	gint index = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbGotoValue()));
-
 
 	//TODO GET SUBSTITUTION_MATRIXES
 	ScoringOptions* scoringOptions = ScoringOptions_new(
@@ -212,34 +213,28 @@ void on_cbGotoValue_changed(GtkComboBox* sender) {
 	g_critical("cbGotoValue changed!");
 }
 /* ---------------------------------------------------------------- */
-
-const gchar* authors[4] = { "Olger Calderón Achío", "Wilberth Castro Fuentes", "Diego Pérez Arroyo", NULL};
-
-void
-on_helpmenuitem_activate (GtkMenuItem *menuitem,
-               gpointer     user_data) 
-{
+void on_helpmenuitem_activate(GtkMenuItem *menuitem, gpointer user_data) {
 	GtkAboutDialog *dialog = GTK_ABOUT_DIALOG(gtk_about_dialog_new());
 	gtk_about_dialog_set_program_name(GTK_ABOUT_DIALOG(dialog), "Alineador de Hileras");
-	gtk_about_dialog_set_comments(GTK_ABOUT_DIALOG(dialog), 
-	                              "Proyecto #2 del curso: Introducción a la Biología Molecular Computacional.");
+	gtk_about_dialog_set_comments(
+		GTK_ABOUT_DIALOG(dialog), 
+	  "Proyecto #2 del curso: Introducción a la Biología Molecular Computacional."
+	);
 
 	GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file("src/icon.png", NULL);
 	gtk_about_dialog_set_logo(dialog, pixbuf);
-    g_object_unref(pixbuf);
+	g_object_unref(pixbuf);
 	pixbuf = NULL; 
 	
 	gtk_about_dialog_set_authors(dialog, authors);
-	gtk_dialog_run(GTK_DIALOG (dialog));
+	gtk_dialog_run(GTK_DIALOG(dialog));
 	gtk_widget_destroy(GTK_WIDGET(dialog));
 }
-
-void
-on_menuitem_exit (GtkMenuItem *menuitem,
-               gpointer     user_data) 
-{
+/* ---------------------------------------------------------------- */
+void on_menuitem_exit(GtkMenuItem *menuitem, gpointer user_data) {
 	GtkWindow* mainWindow = GTK_WINDOW(app_builder_get_window());
-	GtkApplication* application = gtk_window_get_application (mainWindow);
-	g_application_quit (G_APPLICATION(application));
+	GtkApplication* application = gtk_window_get_application(mainWindow);
+	g_application_quit(G_APPLICATION(application));
 }
+/* ---------------------------------------------------------------- */
 #endif
