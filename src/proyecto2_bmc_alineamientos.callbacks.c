@@ -45,6 +45,8 @@ void on_btGlobalAlignNW_clicked(GtkButton* sender) {
 	gint kbandValue = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbKValue()));
 	gint kbandGrowth = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbGrowthInterval()));
 	gint numberOfThreads = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbNThreads()));
+	
+	gint index = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbGotoValue()));
 
 
 	//TODO GET SUBSTITUTION_MATRIXES
@@ -73,6 +75,7 @@ void on_btGlobalAlignNW_clicked(GtkButton* sender) {
 		w,
 		strlen(v),
 		strlen(w),
+		index,
 		vtype,
 		wtype,
 		scoringOptions,
@@ -194,4 +197,16 @@ void on_tbNext_clicked(GtkButton* sender) {
 void on_tbPrev_clicked(GtkButton* sender) { 
 	showPrevIsland();
 }
+/* ---------------------------------------------------------------- */
+void on_cbGotoValue_changed(GtkComboBox* sender) {
+	gchar* v = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txV()));
+	gchar* w = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txW()));
+	
+	gint index = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbGotoValue()));
+	
+	app_widget_refresh_nwpopup(v, w, strlen(v), strlen(w), index);
+	
+	g_critical("cbGotoValue changed!");
+}
+/* ---------------------------------------------------------------- */
 #endif
