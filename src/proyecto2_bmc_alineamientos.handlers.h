@@ -6,6 +6,7 @@
 #define HANDLERS_H
 
 void app_set_builder(GtkBuilder* value);
+GObject* app_builder_get_window();
 GObject* app_builder_get_cbKBand();
 GObject* app_builder_get_sbGrowthInterval();
 GObject* app_builder_get_sbKValue();

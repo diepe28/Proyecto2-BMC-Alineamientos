@@ -13,9 +13,12 @@ void on_window_init(GtkBuilder* sender) {
 
 	gtk_widget_set_sensitive(GTK_WIDGET(app_builder_get_sbGrowthInterval()), FALSE);
 	gtk_widget_set_sensitive(GTK_WIDGET(app_builder_get_sbKValue()), FALSE);
-
 	gtk_widget_set_sensitive(GTK_WIDGET(app_builder_get_cbSubstitutionMatrix()), FALSE);
 
+	GtkWindow* mainWindow = GTK_WINDOW(app_builder_get_window());
+	gtk_window_set_icon_from_file (mainWindow, "src/icon_window.png", NULL);
+	gtk_window_set_default_icon_from_file ("src/icon_window.png", NULL);
+	
 	GtkWidget* gridview = GTK_WIDGET(app_builder_get_gridview());
 	gridview_init(gridview);
 }
@@ -209,4 +212,34 @@ void on_cbGotoValue_changed(GtkComboBox* sender) {
 	g_critical("cbGotoValue changed!");
 }
 /* ---------------------------------------------------------------- */
+
+const gchar* authors[4] = { "Olger Calderón Achío", "Wilberth Castro Fuentes", "Diego Pérez Arroyo", NULL};
+
+void
+on_helpmenuitem_activate (GtkMenuItem *menuitem,
+               gpointer     user_data) 
+{
+	GtkAboutDialog *dialog = GTK_ABOUT_DIALOG(gtk_about_dialog_new());
+	gtk_about_dialog_set_program_name(GTK_ABOUT_DIALOG(dialog), "Alineador de Hileras");
+	gtk_about_dialog_set_comments(GTK_ABOUT_DIALOG(dialog), 
+	                              "Proyecto #2 del curso: Introducción a la Biología Molecular Computacional.");
+
+	GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file("src/icon.png", NULL);
+	gtk_about_dialog_set_logo(dialog, pixbuf);
+    g_object_unref(pixbuf);
+	pixbuf = NULL; 
+	
+	gtk_about_dialog_set_authors(dialog, authors);
+	gtk_dialog_run(GTK_DIALOG (dialog));
+	gtk_widget_destroy(GTK_WIDGET(dialog));
+}
+
+void
+on_menuitem_exit (GtkMenuItem *menuitem,
+               gpointer     user_data) 
+{
+	GtkWindow* mainWindow = GTK_WINDOW(app_builder_get_window());
+	GtkApplication* application = gtk_window_get_application (mainWindow);
+	g_application_quit (G_APPLICATION(application));
+}
 #endif

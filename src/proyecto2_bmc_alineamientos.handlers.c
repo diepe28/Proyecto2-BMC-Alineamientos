@@ -18,6 +18,10 @@ void app_set_builder(GtkBuilder* value) {
 	builder = g_object_ref(value);
 }
 /* ---------------------------------------------------------------- */
+GObject* app_builder_get_window() {
+	return gtk_builder_get_object(builder, "window");
+}
+/* ---------------------------------------------------------------- */
 GObject* app_builder_get_cbKBand() {
 	return gtk_builder_get_object(builder, "cbKBand");
 }
