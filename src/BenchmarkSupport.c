@@ -21,19 +21,48 @@ static void print_matrix(Cell*** matrix, gint m, gint n)
 	}
 }
 
+gboolean is_enough_ram_available(gulong requiredSize)
+{
+    FILE *meminfo = fopen("/proc/meminfo", "r");
+    if(meminfo == NULL) {
+        puts("Error while opening /proc/meminfo");
+		return TRUE;
+	}
+
+    gchar line[256];
+	gulong free_ram = 0;
+	gulong cached_ram = 0;
+	gulong buffered_ram = 0;
+	
+    while(fgets(line, sizeof(line), meminfo))
+    {
+        if(sscanf(line, "MemFree: %lu kB", &free_ram) == 1) continue;
+		if(sscanf(line, "Buffers: %lu kB", &buffered_ram) == 1) continue;
+		if(sscanf(line, "Cached: %lu kB", &cached_ram) == 1) continue;
+    }
+
+    fclose(meminfo);
+    if (free_ram == 0 && cached_ram == 0 && buffered_ram == 0)
+		return TRUE;
+
+	printf("Avalaible memory: %lu kB\n", free_ram + cached_ram + buffered_ram);
+	return (free_ram + cached_ram + buffered_ram) > requiredSize;
+}
+
 static Cell*** create_matrix(gint height, gint width) 
 {
 	gint i, j = 0;
+	gulong requiredMemory = (((height * width * sizeof(Cell)) + (height * width * sizeof(Cell*)) + (height * sizeof(Cell**))) / 1024) + 1024;
 
-	Cell*** matrix = (Cell***) g_try_malloc0 (sizeof(Cell**) * height);
+	printf("Required memory: %lu kB\n", requiredMemory);
+	if (!is_enough_ram_available(requiredMemory)) {
+		puts("Not enough memory...");
+		return NULL;
+	}
+
+	Cell*** matrix = (Cell***) g_malloc0 (sizeof(Cell**) * height);
 	for (i = 0; i < height; i++) {
-		matrix[i] = (Cell**) g_try_malloc0 (sizeof(Cell*) * width);
-		/* if (matrix[i] == NULL) {
-			for (j = 0; j < i; j++)
-				g_free (matrix[j]);
-			g_free (matrix);
-			return NULL;
-		} */
+		matrix[i] = (Cell**) g_malloc0 (sizeof(Cell*) * width);
 		for (j = 0; j < width; j++)
 			matrix[i][j] = cell_new (0, NONE);
 	}

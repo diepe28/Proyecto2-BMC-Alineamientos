@@ -33,7 +33,7 @@ main (int argc, char *argv[])
 	printf("PROTEIN: %s\n", protein);
 
 	printf("value of: %d\n",valueOfMatrix(BLOSUM_45, '*', '*'));*/
-	// testBenchmark ();
+	//testBenchmark ();
 	
 #ifdef ENABLE_NLS
 	bindtextdomain (GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
