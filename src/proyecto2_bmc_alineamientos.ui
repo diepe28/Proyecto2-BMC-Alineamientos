@@ -1713,6 +1713,7 @@
                     <property name="tooltip_text" translatable="yes">Tipo de "v"</property>
                     <property name="model">lsInputType</property>
                     <property name="active">0</property>
+                    <signal name="changed" handler="on_type_changed" swapped="no"/>
                     <child>
                       <object class="GtkCellRendererText" id="crVInputType"/>
                       <attributes>
@@ -1734,6 +1735,7 @@
                     <property name="tooltip_text" translatable="yes">Tipo de "w"</property>
                     <property name="model">lsInputType</property>
                     <property name="active">0</property>
+                    <signal name="changed" handler="on_type_changed" swapped="no"/>
                     <child>
                       <object class="GtkCellRendererText" id="crWInputType"/>
                       <attributes>

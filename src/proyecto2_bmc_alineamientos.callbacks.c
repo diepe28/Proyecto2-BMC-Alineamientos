@@ -7,7 +7,44 @@
 #ifndef CALLBACKS
 #define CALLBACKS
 
+typedef enum {
+	ADN = 0,
+	Protein = 1,
+	Text = 2
+} SequenceType;
+
 const gchar* authors[4] = {"Olger Calderón Achío", "Wilberth Castro Fuentes", "Diego Pérez Arroyo", NULL};
+
+static void show_warning(gchar* message) 
+{
+	GtkMessageDialog* dialog = NULL;
+	dialog = GTK_MESSAGE_DIALOG (gtk_message_dialog_new (
+			                     GTK_WINDOW(app_builder_get_window()),
+		                         GTK_DIALOG_MODAL,
+		                         GTK_MESSAGE_WARNING,
+		                         GTK_BUTTONS_CLOSE,
+	                             "%s",
+	                             message));
+	gtk_dialog_run(GTK_DIALOG(dialog));
+	gtk_widget_destroy(GTK_WIDGET(dialog));
+}
+
+static void update_substitution_matrix_dropdown()
+{
+	if (!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(app_builder_get_cbKBand()))) {
+		GtkToggleButton* rbSubstitutionMatrix = GTK_TOGGLE_BUTTON(app_builder_get_rbSubstitutionMatrix());
+		SequenceType seqType1 = (SequenceType) gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbVInputType()));
+		SequenceType seqType2 = (SequenceType) gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbWInputType()));
+		if (seqType1 != Protein && seqType2 != Protein) {
+			if (gtk_toggle_button_get_active(rbSubstitutionMatrix)) {
+				show_warning("La opción de matrices de sustitución será desactivada dado que ninguna de las secuencias es una proteína.");
+				gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(app_builder_get_rbCustomValues()), TRUE);
+			}
+			gtk_widget_set_sensitive(GTK_WIDGET(rbSubstitutionMatrix), FALSE);
+		} else
+			gtk_widget_set_sensitive(GTK_WIDGET(rbSubstitutionMatrix), TRUE);
+	}
+}
 
 static void deactivate_kband_incompatible_features() 
 {
@@ -26,11 +63,6 @@ static void deactivate_kband_incompatible_features()
 	gtk_widget_set_sensitive(GTK_WIDGET(spin_button), FALSE);
 }
 
-static void update_substitution_matrix_dropdown() 
-{
-	gtk_widget_set_sensitive(GTK_WIDGET(app_builder_get_rbSubstitutionMatrix()), TRUE);
-}
-
 static void activate_kband_incompatible_features()
 {
 	gtk_widget_set_sensitive(GTK_WIDGET(app_builder_get_cbVLeftFG()), TRUE);
@@ -38,6 +70,7 @@ static void activate_kband_incompatible_features()
 	gtk_widget_set_sensitive(GTK_WIDGET(app_builder_get_cbVRightFG()), TRUE);
 	gtk_widget_set_sensitive(GTK_WIDGET(app_builder_get_cbWRightFG()), TRUE);
 	gtk_widget_set_sensitive(GTK_WIDGET(app_builder_get_sbF()), TRUE);
+	gtk_widget_set_sensitive(GTK_WIDGET(app_builder_get_rbSubstitutionMatrix()), TRUE);
 	update_substitution_matrix_dropdown();
 }
 
@@ -48,7 +81,8 @@ void on_window_init(GtkBuilder* sender) {
 	gtk_widget_set_sensitive(GTK_WIDGET(app_builder_get_sbGrowthInterval()), FALSE);
 	gtk_widget_set_sensitive(GTK_WIDGET(app_builder_get_sbKValue()), FALSE);
 	gtk_widget_set_sensitive(GTK_WIDGET(app_builder_get_cbSubstitutionMatrix()), FALSE);
-
+	update_substitution_matrix_dropdown();
+	
 	GtkWindow* mainWindow = GTK_WINDOW(app_builder_get_window());
 	gtk_window_set_icon_from_file (mainWindow, "src/icon_window.png", NULL);
 	gtk_window_set_default_icon_from_file ("src/icon_window.png", NULL);
@@ -56,6 +90,14 @@ void on_window_init(GtkBuilder* sender) {
 	GtkWidget* gridview = GTK_WIDGET(app_builder_get_gridview());
 	gridview_init(gridview);
 }
+
+/* ---------------------------------------------------------------- */
+
+void on_type_changed(GtkComboBox* sender) 
+{
+	update_substitution_matrix_dropdown ();
+}
+
 /* ---------------------------------------------------------------- */
 
 gboolean on_cbKBand_toggled(GtkCheckButton* sender) {
