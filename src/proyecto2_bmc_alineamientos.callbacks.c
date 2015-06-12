@@ -89,17 +89,30 @@ static gboolean validate_sequences_types()
 
 static gboolean validate_ADN(const gchar* seq, gint size) 
 {
-	return FALSE;
+	gint i = 0;
+	for (i = 0; i < size; i++)
+		if (seq[i] != 'A' && seq[i] != 'G' && seq[i] != 'C' && seq[i] != 'T')
+			return FALSE;
+	return TRUE;
 }
 
 static gboolean validate_Protein(const gchar* seq, gint size) 
 {
-	return FALSE;
+	// TODO handle three letter code
+	gint i = 0;
+	for (i = 0; i < size; i++)
+		if (seq[i] < 'A' || seq[i] >= 'Z' || seq[i] == 'B' || seq[i] == 'J' || seq[i] == 'O' || seq[i] == 'U')
+			return FALSE;
+	return TRUE;
 }
 
 static gboolean validate_Text(const gchar* seq, gint size) 
 {
-	return FALSE;
+	gint i = 0;
+	for (i = 0; i < size; i++)
+		if (seq[i] < 32 || seq[i] >= 127)
+			return FALSE;
+	return TRUE;
 }
 
 static gboolean validate_sequences_characters(gint vSize, gint wSize) 
@@ -110,6 +123,16 @@ static gboolean validate_sequences_characters(gint vSize, gint wSize)
 	SequenceType seqTypeW = (SequenceType) gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbWInputType()));
 
 	gboolean result = FALSE;
+
+	if (vSize == 0) {
+		show_message("No se introdujo ninguna hilera para 'v'.", GTK_MESSAGE_ERROR);
+		return FALSE;
+	}
+
+	if (wSize == 0) {
+		show_message("No se introdujo ninguna hilera para 'w'.", GTK_MESSAGE_ERROR);
+		return FALSE;
+	}
 	
 	switch (seqTypeV) {
 		case ADN:
@@ -122,7 +145,7 @@ static gboolean validate_sequences_characters(gint vSize, gint wSize)
 			break;
 		case Text:
 			result = validate_Text(v, vSize);
-			if (!result) show_message("La secuencia 'v' no está en un formato válido.", GTK_MESSAGE_ERROR);
+			if (!result) show_message("La secuencia 'v' no está en un formato válido (ASCII, caracteres imprimibles).", GTK_MESSAGE_ERROR);
 			break;
 	}
 
@@ -138,7 +161,7 @@ static gboolean validate_sequences_characters(gint vSize, gint wSize)
 				break;
 			case Text:
 				result = validate_Text(w, wSize);
-				if (!result) show_message("La secuencia 'w' no está en un formato válido.", GTK_MESSAGE_ERROR);
+				if (!result) show_message("La secuencia 'w' no está en un formato válido (ASCII, caracteres imprimibles).", GTK_MESSAGE_ERROR);
 				break;
 		}
 	}
