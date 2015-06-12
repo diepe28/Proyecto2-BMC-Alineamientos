@@ -26,14 +26,19 @@ static void deactivate_kband_incompatible_features()
 	gtk_widget_set_sensitive(GTK_WIDGET(spin_button), FALSE);
 }
 
+static void update_substitution_matrix_dropdown() 
+{
+	gtk_widget_set_sensitive(GTK_WIDGET(app_builder_get_rbSubstitutionMatrix()), TRUE);
+}
+
 static void activate_kband_incompatible_features()
 {
 	gtk_widget_set_sensitive(GTK_WIDGET(app_builder_get_cbVLeftFG()), TRUE);
 	gtk_widget_set_sensitive(GTK_WIDGET(app_builder_get_cbWLeftFG()), TRUE);
 	gtk_widget_set_sensitive(GTK_WIDGET(app_builder_get_cbVRightFG()), TRUE);
 	gtk_widget_set_sensitive(GTK_WIDGET(app_builder_get_cbWRightFG()), TRUE);
-	gtk_widget_set_sensitive(GTK_WIDGET(app_builder_get_rbSubstitutionMatrix()), TRUE);
 	gtk_widget_set_sensitive(GTK_WIDGET(app_builder_get_sbF()), TRUE);
+	update_substitution_matrix_dropdown();
 }
 
 /* ---------------------------------------------------------------- */
