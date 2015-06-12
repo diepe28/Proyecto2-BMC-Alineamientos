@@ -87,6 +87,65 @@ static gboolean validate_sequences_types()
 	return TRUE;
 }
 
+static gboolean validate_ADN(const gchar* seq, gint size) 
+{
+	return FALSE;
+}
+
+static gboolean validate_Protein(const gchar* seq, gint size) 
+{
+	return FALSE;
+}
+
+static gboolean validate_Text(const gchar* seq, gint size) 
+{
+	return FALSE;
+}
+
+static gboolean validate_sequences_characters(gint vSize, gint wSize) 
+{
+	const gchar* v = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txV()));
+	const gchar* w = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txW()));
+	SequenceType seqTypeV = (SequenceType) gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbVInputType()));
+	SequenceType seqTypeW = (SequenceType) gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbWInputType()));
+
+	gboolean result = FALSE;
+	
+	switch (seqTypeV) {
+		case ADN:
+			result = validate_ADN(v, vSize);
+			if (!result) show_message("La secuencia 'v' no es una hilera de ADN válida.", GTK_MESSAGE_ERROR);
+			break;
+		case Protein:
+			result = validate_Protein(v, vSize);
+			if (!result) show_message("La secuencia 'v' no es una hilera de Proteína válida.", GTK_MESSAGE_ERROR);
+			break;
+		case Text:
+			result = validate_Text(v, vSize);
+			if (!result) show_message("La secuencia 'v' no está en un formato válido.", GTK_MESSAGE_ERROR);
+			break;
+	}
+
+	if (result) {
+		switch (seqTypeW) {
+			case ADN:
+				result = validate_ADN(w, wSize);
+				if (!result) show_message("La secuencia 'w' no es una hilera de ADN válida.", GTK_MESSAGE_ERROR);
+				break;
+			case Protein:
+				result = validate_Protein(w, wSize);
+				if (!result) show_message("La secuencia 'w' no es una hilera de Proteína válida.", GTK_MESSAGE_ERROR);
+				break;
+			case Text:
+				result = validate_Text(w, wSize);
+				if (!result) show_message("La secuencia 'w' no está en un formato válido.", GTK_MESSAGE_ERROR);
+				break;
+		}
+	}
+	
+	return result;
+}
+
 static gboolean validate_required_memory(gint seq1Size, gint seq2Size)
 {
 	gint width = seq1Size + 1;
@@ -127,7 +186,7 @@ static gboolean validate_required_memory(gint seq1Size, gint seq2Size)
 
 static gboolean preprocess_validation(gint seq1Size, gint seq2Size)
 {
-	return validate_sequences_types() && validate_required_memory(seq1Size, seq2Size);
+	return validate_sequences_types() && validate_sequences_characters(seq1Size, seq2Size) && validate_required_memory(seq1Size, seq2Size);
 }
 
 /* ---------------------------------------------------------------- */
