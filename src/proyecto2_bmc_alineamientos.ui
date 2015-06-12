@@ -1177,7 +1177,7 @@
                         <property name="can_focus">True</property>
                         <property name="tooltip_text" translatable="yes">El puntaje mínimo que debe tener una isla para ser mostrada en la pantalla de resultados</property>
                         <property name="adjustment">aMinIslands</property>
-                        <property name="value">1</property>
+                        <property name="value">50</property>
                       </object>
                       <packing>
                         <property name="left_attach">1</property>

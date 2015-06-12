@@ -100,7 +100,7 @@ void on_type_changed(GtkComboBox* sender)
 
 /* ---------------------------------------------------------------- */
 
-gboolean on_cbKBand_toggled(GtkCheckButton* sender) {
+void on_cbKBand_toggled(GtkCheckButton* sender) {
 	gboolean checked = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(sender));
 	if (checked) {
 		GtkMessageDialog* dialog = NULL;
@@ -131,8 +131,8 @@ gboolean on_cbKBand_toggled(GtkCheckButton* sender) {
 }
 /* ---------------------------------------------------------------- */
 void on_btGlobalAlignNW_clicked(GtkButton* sender) {
-	gchar* v = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txV()));
-	gchar* w = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txW()));
+	const gchar* v = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txV()));
+	const gchar* w = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txW()));
 	gint vtype = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbVInputType()));
 	gint wtype = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbWInputType()));
 	
