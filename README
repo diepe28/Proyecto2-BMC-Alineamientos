@@ -2,7 +2,6 @@
 INSTRUCCIONES DE INSTALACIÓN
 ----------------------------
 
-La aplicación solamente está soportada para compilar en Linux.
 El paquete está configurado para ser construido por autotools. Seguir las siguientes instrucciones:
 
 1) Instalar algunas dependencias en caso de que falten en el sistema:
