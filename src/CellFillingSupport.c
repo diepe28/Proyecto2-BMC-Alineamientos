@@ -1,9 +1,11 @@
 
 #include "CellFillingSupport.h"
 
-static gint value_from_matrix(gint (*substitutionMatrix)[26], gchar a, gchar b)
+static gint value_from_matrix(gint (*substitutionMatrix)[27], gchar a, gchar b)
 {
-	return substitutionMatrix[(gint)a - 65][(gint)b - 65];
+	gint firstIndex  = (a == '*') ? 26 : ((gint)a - 'A');
+	gint secondIndex = (b == '*') ? 26 : ((gint)b - 'A');
+	return substitutionMatrix[firstIndex][secondIndex];
 }
 
 static void fill_corner(Cell*** matrix, ScoringOptions* options, gint x, gint y, gboolean isLocalAlignment) 

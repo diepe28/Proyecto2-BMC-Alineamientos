@@ -100,9 +100,12 @@ static gboolean validate_Protein(const gchar* seq, gint size)
 {
 	// TODO handle three letter code
 	gint i = 0;
-	for (i = 0; i < size; i++)
+	for (i = 0; i < size; i++) {
+		if (seq[i] == '*')
+			break;
 		if (seq[i] < 'A' || seq[i] >= 'Z' || seq[i] == 'B' || seq[i] == 'J' || seq[i] == 'O' || seq[i] == 'U')
 			return FALSE;
+	}
 	return TRUE;
 }
 

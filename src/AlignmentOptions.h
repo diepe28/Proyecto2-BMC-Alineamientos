@@ -12,7 +12,7 @@ typedef struct {
 	gboolean freeLeftGapsForY;
 	gboolean freeRightGapsForX;
 	gboolean freeRightGapsForY;
-	gint (*substitutionMatrix)[26];
+	gint (*substitutionMatrix)[27];
 } ScoringOptions;
 
 typedef struct {
@@ -29,7 +29,7 @@ ScoringOptions* ScoringOptions_new(
 	gboolean freeLeftGapsForY,
 	gboolean freeRightGapsForX,
 	gboolean freeRightGapsForY,
-	gint (*substitutionMatrix)[26]
+	gint (*substitutionMatrix)[27]
 );
 
 KBandOptions* KBandOptions_new(

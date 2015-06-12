@@ -10,7 +10,7 @@ ScoringOptions* ScoringOptions_new(
 	gboolean freeLeftGapsForY,
     gboolean freeRightGapsForX,
     gboolean freeRightGapsForY,
-    gint (*substitutionMatrix)[26]
+    gint (*substitutionMatrix)[27]
 ) {
 	ScoringOptions* options = (ScoringOptions*) g_malloc(sizeof(ScoringOptions));
 	options->matchBonus = matchBonus;
