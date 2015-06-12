@@ -113,6 +113,46 @@ gchar* dnaToProtein(gchar* dna){
 	return protein;
 }
 
+gchar* threeLetterCodedProteinToOneLetterCodedProtein(gchar* seq, gint seqSize)
+{
+	if (seqSize % 3 != 0)
+		return NULL;
+	
+	gint i = 0, currentPosition = 0;
+	gint newSeqSize = seqSize / 3;
+	gchar* newSeq = (gchar*) g_malloc(sizeof(gchar) * (newSeqSize + 1));
+	while (currentPosition < seqSize) {
+		if (g_str_has_prefix(&(seq[currentPosition]), "Ala")) { newSeq[i++] = 'A'; currentPosition += 3; continue; }
+		if (g_str_has_prefix(&(seq[currentPosition]), "Arg")) { newSeq[i++] = 'R'; currentPosition += 3; continue; }
+		if (g_str_has_prefix(&(seq[currentPosition]), "Asn")) { newSeq[i++] = 'N'; currentPosition += 3; continue; }
+		if (g_str_has_prefix(&(seq[currentPosition]), "Asp")) { newSeq[i++] = 'D'; currentPosition += 3; continue; }
+		if (g_str_has_prefix(&(seq[currentPosition]), "Asx")) { newSeq[i++] = 'B'; currentPosition += 3; continue; }
+		if (g_str_has_prefix(&(seq[currentPosition]), "Cys")) { newSeq[i++] = 'C'; currentPosition += 3; continue; }
+		if (g_str_has_prefix(&(seq[currentPosition]), "Glu")) { newSeq[i++] = 'E'; currentPosition += 3; continue; }
+		if (g_str_has_prefix(&(seq[currentPosition]), "Gln")) { newSeq[i++] = 'Q'; currentPosition += 3; continue; }
+		if (g_str_has_prefix(&(seq[currentPosition]), "Glx")) { newSeq[i++] = 'Z'; currentPosition += 3; continue; }
+		if (g_str_has_prefix(&(seq[currentPosition]), "Gly")) { newSeq[i++] = 'G'; currentPosition += 3; continue; }
+		if (g_str_has_prefix(&(seq[currentPosition]), "His")) { newSeq[i++] = 'H'; currentPosition += 3; continue; }
+		if (g_str_has_prefix(&(seq[currentPosition]), "Ile")) { newSeq[i++] = 'I'; currentPosition += 3; continue; }
+		if (g_str_has_prefix(&(seq[currentPosition]), "Leu")) { newSeq[i++] = 'L'; currentPosition += 3; continue; }
+		if (g_str_has_prefix(&(seq[currentPosition]), "Lys")) { newSeq[i++] = 'K'; currentPosition += 3; continue; }
+		if (g_str_has_prefix(&(seq[currentPosition]), "Met")) { newSeq[i++] = 'M'; currentPosition += 3; continue; }
+		if (g_str_has_prefix(&(seq[currentPosition]), "Phe")) { newSeq[i++] = 'F'; currentPosition += 3; continue; }
+		if (g_str_has_prefix(&(seq[currentPosition]), "Pro")) { newSeq[i++] = 'P'; currentPosition += 3; continue; }
+		if (g_str_has_prefix(&(seq[currentPosition]), "Ser")) { newSeq[i++] = 'S'; currentPosition += 3; continue; }
+		if (g_str_has_prefix(&(seq[currentPosition]), "Thr")) { newSeq[i++] = 'T'; currentPosition += 3; continue; }
+		if (g_str_has_prefix(&(seq[currentPosition]), "Trp")) { newSeq[i++] = 'W'; currentPosition += 3; continue; }
+		if (g_str_has_prefix(&(seq[currentPosition]), "Tyr")) { newSeq[i++] = 'Y'; currentPosition += 3; continue; }
+		if (g_str_has_prefix(&(seq[currentPosition]), "Val")) { newSeq[i++] = 'V'; currentPosition += 3; continue; }
+		if (g_str_has_prefix(&(seq[currentPosition]), "***")) { newSeq[i++] = '*'; currentPosition += 3; continue; }
+		
+		g_free(newSeq);
+		return NULL;
+	}
+	newSeq[newSeqSize] = '\0';
+	return newSeq;
+}
+
 gchar* sequenceFromFile(gchar * filePath, gulong *length){
 	gulong fileSize = 0, i = 0;
 	gchar *sequence = NULL;

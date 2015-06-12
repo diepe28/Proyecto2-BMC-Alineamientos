@@ -13,5 +13,6 @@ void testLocalAlingment();
 void testGNUPLOT();
 void testFillingMatrix();
 void testBenchmark();
+void testConvertion();
 
 #endif

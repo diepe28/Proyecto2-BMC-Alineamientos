@@ -580,3 +580,11 @@ void testBenchmark()
 	g_io_channel_unref (channel1);
 	g_io_channel_unref (channel2);
 }
+
+void testConvertion() 
+{
+	gchar* original = "ValProProArgThrGlyArgThrAspGluAlaPhePheGlyLeuTyrValLeuMetHisPheArgAspThrValTyrHisCysMetAlaTyrProHisGluAlaProMetGlyGluArgTyrAlaGlyValLeuAsnProThrGlyAspAlaAsnPheSerLysLeuGlnLysTyrArg***";
+	gchar* new = threeLetterCodedProteinToOneLetterCodedProtein (original, strlen(original));
+	puts(new);
+	g_free(new);
+}

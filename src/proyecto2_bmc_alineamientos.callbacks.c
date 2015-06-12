@@ -98,12 +98,17 @@ static gboolean validate_ADN(const gchar* seq, gint size)
 
 static gboolean validate_Protein(const gchar* seq, gint size) 
 {
-	// TODO handle three letter code
+	gchar* convertedSequence = threeLetterCodedProteinToOneLetterCodedProtein (seq, size);
+	if (convertedSequence != NULL) {
+		g_free(convertedSequence);
+		return TRUE;
+	}
+	
 	gint i = 0;
 	for (i = 0; i < size; i++) {
 		if (seq[i] == '*')
-			break;
-		if (seq[i] < 'A' || seq[i] >= 'Z' || seq[i] == 'B' || seq[i] == 'J' || seq[i] == 'O' || seq[i] == 'U')
+			continue;
+		if (!g_ascii_isupper(seq[i]) || seq[i] == 'B' || seq[i] == 'J' || seq[i] == 'O' || seq[i] == 'U' || seq[i] == 'Z')
 			return FALSE;
 	}
 	return TRUE;
@@ -113,7 +118,7 @@ static gboolean validate_Text(const gchar* seq, gint size)
 {
 	gint i = 0;
 	for (i = 0; i < size; i++)
-		if (seq[i] < 32 || seq[i] >= 127)
+		if (!g_ascii_isprint(seq[i]))
 			return FALSE;
 	return TRUE;
 }
