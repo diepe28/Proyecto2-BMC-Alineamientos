@@ -87,9 +87,47 @@ static gboolean validate_sequences_types()
 	return TRUE;
 }
 
-static gboolean preprocess_validation()
+static gboolean validate_required_memory(gint seq1Size, gint seq2Size)
 {
-	return validate_sequences_types();
+	gint width = seq1Size + 1;
+	gint height = seq2Size + 1;
+	gulong requiredSize = (((height * width * sizeof(Cell)) + (height * width * sizeof(Cell*)) + (height * sizeof(Cell**)) + sizeof(Cell***)) / 1024) + 1024;
+	
+	FILE *meminfo = fopen("/proc/meminfo", "r");
+    if(meminfo == NULL) {
+        puts("Error while opening /proc/meminfo");
+		return TRUE;
+	}
+
+    gchar line[256];
+	gulong free_ram = 0;
+	gulong cached_ram = 0;
+	gulong buffered_ram = 0;
+	
+    while(fgets(line, sizeof(line), meminfo))
+    {
+        if(sscanf(line, "MemFree: %lu kB", &free_ram) == 1) continue;
+		if(sscanf(line, "Buffers: %lu kB", &buffered_ram) == 1) continue;
+		if(sscanf(line, "Cached: %lu kB", &cached_ram) == 1) continue;
+    }
+
+    fclose(meminfo);
+    if (free_ram == 0 && cached_ram == 0 && buffered_ram == 0)
+		return TRUE;
+
+	gboolean success = (free_ram + cached_ram + buffered_ram) > requiredSize;
+	if (!success) {
+		gchar text[200];
+		g_snprintf(text, sizeof(text), "No hay suficiente memoria RAM para procesar el alineamiento.\nMemoria requerida:  %lu kB\nMemoria disponible: %lu kB", requiredSize, free_ram + cached_ram + buffered_ram);
+		show_message(text, GTK_MESSAGE_ERROR);
+	}
+	
+	return success;
+}
+
+static gboolean preprocess_validation(gint seq1Size, gint seq2Size)
+{
+	return validate_sequences_types() && validate_required_memory(seq1Size, seq2Size);
 }
 
 /* ---------------------------------------------------------------- */
@@ -149,9 +187,11 @@ void on_cbKBand_toggled(GtkCheckButton* sender) {
 }
 /* ---------------------------------------------------------------- */
 void on_btGlobalAlignNW_clicked(GtkButton* sender) {
-	if (preprocess_validation()) {
-		const gchar* v = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txV()));
-		const gchar* w = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txW()));
+	const gchar* v = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txV()));
+	const gchar* w = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txW()));
+	gint vSize = strlen(v);
+	gint wSize = strlen(w);
+	if (preprocess_validation(vSize, wSize)) {
 		gint vtype = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbVInputType()));
 		gint wtype = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbWInputType()));
 	
@@ -194,8 +234,8 @@ void on_btGlobalAlignNW_clicked(GtkButton* sender) {
 		app_widget_show_nwpopup(
 			v,
 			w,
-			strlen(v),
-			strlen(w),
+			vSize,
+			wSize,
 			index,
 			vtype,
 			wtype,
@@ -255,10 +295,12 @@ void on_btWLoad_clicked(GtkButton* sender) {
 }
 /* ---------------------------------------------------------------- */
 void on_btLocalAlignSW_clicked(GtkButton* sender) {
-
-	if (preprocess_validation()) {
-		const gchar* v = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txV()));
-		const gchar* w = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txW()));
+	const gchar* v = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txV()));
+	const gchar* w = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txW()));
+	gint vSize = strlen(v);
+	gint wSize = strlen(w);
+	if (preprocess_validation(vSize, wSize)) {
+		
 		gint vtype = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbVInputType()));
 		gint wtype = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbWInputType()));
 	
@@ -284,8 +326,8 @@ void on_btLocalAlignSW_clicked(GtkButton* sender) {
 		app_widget_show_swpopup(
 			v,
 			w,
-			strlen(v),
-			strlen(w),
+			vSize,
+			wSize,
 			vtype,
 			wtype,
 			options,
