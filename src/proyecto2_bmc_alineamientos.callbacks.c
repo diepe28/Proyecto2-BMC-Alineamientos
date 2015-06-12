@@ -9,6 +9,33 @@
 
 const gchar* authors[4] = {"Olger Calderón Achío", "Wilberth Castro Fuentes", "Diego Pérez Arroyo", NULL};
 
+static void deactivate_kband_incompatible_features() 
+{
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(app_builder_get_cbVLeftFG()), FALSE);
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(app_builder_get_cbWLeftFG()), FALSE);
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(app_builder_get_cbVRightFG()), FALSE);
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(app_builder_get_cbWRightFG()), FALSE);
+	gtk_widget_set_sensitive(GTK_WIDGET(app_builder_get_cbVLeftFG()), FALSE);
+	gtk_widget_set_sensitive(GTK_WIDGET(app_builder_get_cbWLeftFG()), FALSE);
+	gtk_widget_set_sensitive(GTK_WIDGET(app_builder_get_cbVRightFG()), FALSE);
+	gtk_widget_set_sensitive(GTK_WIDGET(app_builder_get_cbWRightFG()), FALSE);
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(app_builder_get_rbCustomValues()), TRUE);
+	gtk_widget_set_sensitive(GTK_WIDGET(app_builder_get_rbSubstitutionMatrix()), FALSE);
+	GtkSpinButton* spin_button = GTK_SPIN_BUTTON(app_builder_get_sbF());
+	gtk_spin_button_set_value(spin_button, 0);
+	gtk_widget_set_sensitive(GTK_WIDGET(spin_button), FALSE);
+}
+
+static void activate_kband_incompatible_features()
+{
+	gtk_widget_set_sensitive(GTK_WIDGET(app_builder_get_cbVLeftFG()), TRUE);
+	gtk_widget_set_sensitive(GTK_WIDGET(app_builder_get_cbWLeftFG()), TRUE);
+	gtk_widget_set_sensitive(GTK_WIDGET(app_builder_get_cbVRightFG()), TRUE);
+	gtk_widget_set_sensitive(GTK_WIDGET(app_builder_get_cbWRightFG()), TRUE);
+	gtk_widget_set_sensitive(GTK_WIDGET(app_builder_get_rbSubstitutionMatrix()), TRUE);
+	gtk_widget_set_sensitive(GTK_WIDGET(app_builder_get_sbF()), TRUE);
+}
+
 /* ---------------------------------------------------------------- */
 void on_window_init(GtkBuilder* sender) {
 	app_set_builder(sender);
@@ -25,11 +52,35 @@ void on_window_init(GtkBuilder* sender) {
 	gridview_init(gridview);
 }
 /* ---------------------------------------------------------------- */
-void on_cbKBand_toggled(GtkCheckButton* sender) {
+
+gboolean on_cbKBand_toggled(GtkCheckButton* sender) {
 	gboolean checked = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(sender));
-	
-	gtk_widget_set_sensitive(GTK_WIDGET(app_builder_get_sbGrowthInterval()), checked);
-	gtk_widget_set_sensitive(GTK_WIDGET(app_builder_get_sbKValue()), checked);
+	if (checked) {
+		GtkMessageDialog* dialog = NULL;
+		dialog = GTK_MESSAGE_DIALOG (gtk_message_dialog_new (
+			                         GTK_WINDOW(app_builder_get_window()),
+		                             GTK_DIALOG_MODAL,
+		                             GTK_MESSAGE_QUESTION,
+		                             GTK_BUTTONS_YES_NO,
+		                             "Si se activa esta opción las siguientes características serán desactivadas: funciones de penalización afines, gaps gratis y matrices de sustitución. ¿Desea continuar?"));
+		gint result = gtk_dialog_run (GTK_DIALOG (dialog));
+		switch (result)
+		{
+			case GTK_RESPONSE_YES:
+				gtk_widget_set_sensitive(GTK_WIDGET(app_builder_get_sbGrowthInterval()), TRUE);
+				gtk_widget_set_sensitive(GTK_WIDGET(app_builder_get_sbKValue()), TRUE);
+				deactivate_kband_incompatible_features();
+				break;
+			default:
+				gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(sender), FALSE);
+				break;
+		}
+		gtk_widget_destroy (GTK_WIDGET(dialog));
+	} else {
+		gtk_widget_set_sensitive(GTK_WIDGET(app_builder_get_sbGrowthInterval()), FALSE);
+		gtk_widget_set_sensitive(GTK_WIDGET(app_builder_get_sbKValue()), FALSE);
+		activate_kband_incompatible_features();
+	}
 }
 /* ---------------------------------------------------------------- */
 void on_btGlobalAlignNW_clicked(GtkButton* sender) {

@@ -46,6 +46,10 @@ GObject* app_builder_get_rbCustomValues() {
 	return gtk_builder_get_object(builder, "rbCustomValues");
 }
 /* ---------------------------------------------------------------- */
+GObject* app_builder_get_rbSubstitutionMatrix() {
+	return gtk_builder_get_object(builder, "rbSubstitutionMatrix");
+}
+/* ---------------------------------------------------------------- */
 GObject* app_builder_get_sbMatch() {
 	return gtk_builder_get_object(builder, "sbMatch");
 }

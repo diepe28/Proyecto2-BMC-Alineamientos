@@ -13,6 +13,7 @@ GObject* app_builder_get_sbKValue();
 GObject* app_builder_get_txV();
 GObject* app_builder_get_txW();
 GObject* app_builder_get_rbCustomValues();
+GObject* app_builder_get_rbSubstitutionMatrix();
 GObject* app_builder_get_sbMatch();
 GObject* app_builder_get_sbMissmatch();
 GObject* app_builder_get_sbF();
