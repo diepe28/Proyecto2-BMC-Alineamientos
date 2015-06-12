@@ -15,13 +15,15 @@ typedef enum {
 
 const gchar* authors[4] = {"Olger Calderón Achío", "Wilberth Castro Fuentes", "Diego Pérez Arroyo", NULL};
 
-static void show_warning(gchar* message) 
+// Helper functions
+
+static void show_message(gchar* message, GtkMessageType type) 
 {
 	GtkMessageDialog* dialog = NULL;
 	dialog = GTK_MESSAGE_DIALOG (gtk_message_dialog_new (
 			                     GTK_WINDOW(app_builder_get_window()),
 		                         GTK_DIALOG_MODAL,
-		                         GTK_MESSAGE_WARNING,
+		                         type,
 		                         GTK_BUTTONS_CLOSE,
 	                             "%s",
 	                             message));
@@ -37,7 +39,7 @@ static void update_substitution_matrix_dropdown()
 		SequenceType seqType2 = (SequenceType) gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbWInputType()));
 		if (seqType1 != Protein && seqType2 != Protein) {
 			if (gtk_toggle_button_get_active(rbSubstitutionMatrix)) {
-				show_warning("La opción de matrices de sustitución será desactivada dado que ninguna de las secuencias es una proteína.");
+				show_message("La opción de matrices de sustitución será desactivada dado que ninguna de las secuencias es una proteína.", GTK_MESSAGE_WARNING);
 				gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(app_builder_get_rbCustomValues()), TRUE);
 			}
 			gtk_widget_set_sensitive(GTK_WIDGET(rbSubstitutionMatrix), FALSE);
@@ -72,6 +74,22 @@ static void activate_kband_incompatible_features()
 	gtk_widget_set_sensitive(GTK_WIDGET(app_builder_get_sbF()), TRUE);
 	gtk_widget_set_sensitive(GTK_WIDGET(app_builder_get_rbSubstitutionMatrix()), TRUE);
 	update_substitution_matrix_dropdown();
+}
+
+static gboolean validate_sequences_types() 
+{
+	SequenceType seqType1 = (SequenceType) gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbVInputType()));
+	SequenceType seqType2 = (SequenceType) gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbWInputType()));
+	if (seqType1 != seqType2 && !((seqType1 == ADN && seqType2 == Protein) || (seqType1 == Protein && seqType2 == ADN))) {
+		show_message("Los tipos seleccionados para las hileras son incompatibles.", GTK_MESSAGE_ERROR);
+		return FALSE;
+	}
+	return TRUE;
+}
+
+static gboolean preprocess_validation()
+{
+	return validate_sequences_types();
 }
 
 /* ---------------------------------------------------------------- */
@@ -131,61 +149,63 @@ void on_cbKBand_toggled(GtkCheckButton* sender) {
 }
 /* ---------------------------------------------------------------- */
 void on_btGlobalAlignNW_clicked(GtkButton* sender) {
-	const gchar* v = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txV()));
-	const gchar* w = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txW()));
-	gint vtype = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbVInputType()));
-	gint wtype = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbWInputType()));
+	if (preprocess_validation()) {
+		const gchar* v = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txV()));
+		const gchar* w = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txW()));
+		gint vtype = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbVInputType()));
+		gint wtype = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbWInputType()));
 	
-	gint matchbonus = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbMatch()));
-	gint missmatchbonus = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbMissmatch()));
-	gint gappenalty1 = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbF()));
-	gint gappenalty2 = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbK()));
-	gboolean freeleftgapsv = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(app_builder_get_cbVLeftFG()));
-	gboolean freeleftgapsw = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(app_builder_get_cbWLeftFG()));
-	gboolean freerightgapsv = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(app_builder_get_cbVRightFG()));
-	gboolean freerightgapsw = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(app_builder_get_cbWRightFG()));
-	gboolean usingKBand = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(app_builder_get_cbKBand()));
-	gint kbandValue = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbKValue()));
-	gint kbandGrowth = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbGrowthInterval()));
-	gint numberOfThreads = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbNThreads()));
+		gint matchbonus = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbMatch()));
+		gint missmatchbonus = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbMissmatch()));
+		gint gappenalty1 = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbF()));
+		gint gappenalty2 = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbK()));
+		gboolean freeleftgapsv = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(app_builder_get_cbVLeftFG()));
+		gboolean freeleftgapsw = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(app_builder_get_cbWLeftFG()));
+		gboolean freerightgapsv = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(app_builder_get_cbVRightFG()));
+		gboolean freerightgapsw = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(app_builder_get_cbWRightFG()));
+		gboolean usingKBand = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(app_builder_get_cbKBand()));
+		gint kbandValue = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbKValue()));
+		gint kbandGrowth = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbGrowthInterval()));
+		gint numberOfThreads = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbNThreads()));
 	
-	gint index = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbGotoValue()));
+		gint index = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbGotoValue()));
 
-	//TODO GET SUBSTITUTION_MATRIXES
-	ScoringOptions* scoringOptions = ScoringOptions_new(
-		matchbonus,
-		missmatchbonus,
-		gappenalty1,
-		gappenalty2,
-		freeleftgapsv,
-		freeleftgapsw,
-		freerightgapsv,
-		freerightgapsw,
-		NULL
-	);
-
-	KBandOptions* kBandOptions = NULL;
-	if(usingKBand){
-		kBandOptions = KBandOptions_new(
-			kbandValue,
-			kbandGrowth
+		//TODO GET SUBSTITUTION_MATRIXES
+		ScoringOptions* scoringOptions = ScoringOptions_new(
+			matchbonus,
+			missmatchbonus,
+			gappenalty1,
+			gappenalty2,
+			freeleftgapsv,
+			freeleftgapsw,
+			freerightgapsv,
+			freerightgapsw,
+			NULL
 		);
-	}
-	
-	app_widget_show_nwpopup(
-		v,
-		w,
-		strlen(v),
-		strlen(w),
-		index,
-		vtype,
-		wtype,
-		scoringOptions,
-		kBandOptions,
-		numberOfThreads
-	);
 
-	loadBirdWatchImage();
+		KBandOptions* kBandOptions = NULL;
+		if(usingKBand){
+			kBandOptions = KBandOptions_new(
+				kbandValue,
+				kbandGrowth
+			);
+		}
+	
+		app_widget_show_nwpopup(
+			v,
+			w,
+			strlen(v),
+			strlen(w),
+			index,
+			vtype,
+			wtype,
+			scoringOptions,
+			kBandOptions,
+			numberOfThreads
+		);
+
+		loadBirdWatchImage();
+	}
 }
 /* ---------------------------------------------------------------- */
 void on_btVLoad_clicked(GtkButton* sender) {
@@ -235,41 +255,44 @@ void on_btWLoad_clicked(GtkButton* sender) {
 }
 /* ---------------------------------------------------------------- */
 void on_btLocalAlignSW_clicked(GtkButton* sender) {
-	gchar* v = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txV()));
-	gchar* w = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txW()));
-	gint vtype = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbVInputType()));
-	gint wtype = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbWInputType()));
-	
-	gint matchbonus = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbMatch()));
-	gint missmatchbonus = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbMissmatch()));
-	gint gappenalty1 = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbF()));
-	gint gappenalty2 = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbK()));
-	gint numberOfThreads = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbNThreads()));
-	gint minValueIslands = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_spMinIslands()));
-	
-	ScoringOptions* options = ScoringOptions_new(
-		matchbonus,
-		missmatchbonus,
-		gappenalty1,
-		gappenalty2,
-		FALSE,
-		FALSE,
-		FALSE,
-		FALSE,
-		NULL
-	);
 
-	app_widget_show_swpopup(
-		v,
-		w,
-		strlen(v),
-		strlen(w),
-		vtype,
-		wtype,
-		options,
-		minValueIslands,
-		numberOfThreads
-	);
+	if (preprocess_validation()) {
+		const gchar* v = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txV()));
+		const gchar* w = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txW()));
+		gint vtype = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbVInputType()));
+		gint wtype = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbWInputType()));
+	
+		gint matchbonus = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbMatch()));
+		gint missmatchbonus = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbMissmatch()));
+		gint gappenalty1 = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbF()));
+		gint gappenalty2 = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbK()));
+		gint numberOfThreads = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbNThreads()));
+		gint minValueIslands = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_spMinIslands()));
+	
+		ScoringOptions* options = ScoringOptions_new(
+			matchbonus,
+			missmatchbonus,
+			gappenalty1,
+			gappenalty2,
+			FALSE,
+			FALSE,
+			FALSE,
+			FALSE,
+			NULL
+		);
+
+		app_widget_show_swpopup(
+			v,
+			w,
+			strlen(v),
+			strlen(w),
+			vtype,
+			wtype,
+			options,
+			minValueIslands,
+			numberOfThreads
+		);
+	}
 }
 /* ---------------------------------------------------------------- */
 void on_rbCustomValues_toggled(GtkRadioButton* sender) {
