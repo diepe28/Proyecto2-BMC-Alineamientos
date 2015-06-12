@@ -12,5 +12,5 @@ gchar* APP_SEQUENCE_TYPE(gint stype);
 gint createBirdWatchGraphNW(Island* island, gint rows, gint cols);
 gint createBirdWatchGraphSW(GSList* islands, gint rows, gint cols);
 gchar* dnaToProtein(gchar* dna);
-gchar* threeLetterCodedProteinToOneLetterCodedProtein(gchar* seq, gint seqSize);
+gchar* threeLetterCodedProteinToOneLetterCodedProtein(const gchar* seq, gint seqSize);
 #endif

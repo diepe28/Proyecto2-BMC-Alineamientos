@@ -99,7 +99,7 @@ gchar codonToOneLetter(gchar codon[3]){
 
 gchar* dnaToProtein(gchar* dna){
 	int dnaLength = strlen(dna), currentCodon = 0, i = 0, codonCount = (int) (dnaLength / 3);
-	gchar* protein = (gchar*) g_malloc(codonCount * sizeof(gchar));
+	gchar* protein = (gchar*) g_malloc((codonCount + 1) * sizeof(gchar));
 	gchar codon[3];
 
 	for(; currentCodon < codonCount; i+=3, currentCodon++){
@@ -113,7 +113,7 @@ gchar* dnaToProtein(gchar* dna){
 	return protein;
 }
 
-gchar* threeLetterCodedProteinToOneLetterCodedProtein(gchar* seq, gint seqSize)
+gchar* threeLetterCodedProteinToOneLetterCodedProtein(const gchar* seq, gint seqSize)
 {
 	if (seqSize % 3 != 0)
 		return NULL;

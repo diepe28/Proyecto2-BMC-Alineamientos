@@ -47,7 +47,9 @@ proyecto2_bmc_alineamientos_SOURCES = \
 	BenchmarkSupport.c \
 	BenchmarkSupport.h \
 	Gridview.c \
-	Gridview.h	
+	Gridview.h \
+	icon.png \
+	icon_window.png	
 
 
 proyecto2_bmc_alineamientos_LDFLAGS = \

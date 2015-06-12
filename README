@@ -1,0 +1,42 @@
+----------------------------
+INSTRUCCIONES DE INSTALACIÓN
+----------------------------
+
+La aplicación solamente está soportada para compilar en Linux.
+El paquete está configurado para ser construido por autotools. Seguir las siguientes instrucciones:
+
+1) Instalar algunas dependencias en caso de que falten en el sistema:
+
+apt-get install intltool
+apt-get install gtk+-3.0
+.
+.
+.
+apt-get install gnuplot
+
+
+2) Correr en el directorio del proyecto:
+
+./configure
+
+En caso de que falte alguna dependencia, se le advertirá que debe instalarla.
+
+
+3) Correr:
+
+make
+
+
+4) Correr
+
+sudo make install
+
+
+5) Correr
+
+proyecto2_bmc_alineamientos
+
+
+6) Si desea desinstalar la aplicación, entonces correr en el directorio del proyecto:
+
+sudo make uninstall
