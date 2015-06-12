@@ -91,7 +91,7 @@ static gboolean validate_required_memory(gint seq1Size, gint seq2Size)
 {
 	gint width = seq1Size + 1;
 	gint height = seq2Size + 1;
-	gulong requiredSize = (((height * width * sizeof(Cell)) + (height * width * sizeof(Cell*)) + (height * sizeof(Cell**)) + sizeof(Cell***)) / 1024) + 1024;
+	gulong requiredSize = (((height * width * sizeof(Cell)) + (height * width * sizeof(Cell*)) + (height * sizeof(Cell**))) / 1024) + 1024;
 	
 	FILE *meminfo = fopen("/proc/meminfo", "r");
     if(meminfo == NULL) {
