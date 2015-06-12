@@ -359,24 +359,25 @@ void loadBirdWatchImage() {
 	GError* gerror = 0;
 	gtk_image_clear(iimage);
 	
-	int width = gtk_widget_get_allocated_width(wimage);
-	int heigth = gtk_widget_get_allocated_height(wimage);
+	int width = 230; // = gtk_widget_get_allocated_width(wimage);
+	int heigth = 230; // = gtk_widget_get_allocated_height(wimage);
+	/*
 	if (width < 100) {
 		width = 400;
 	}
 	if (heigth < 100) {
 		heigth = 350;
 	}
-	
+	*/
 	GdkPixbuf* pixbuf = gdk_pixbuf_new_from_file("BIRD_WATCH.png", &gerror); 
 	GdkPixbuf* resized = gdk_pixbuf_scale_simple(pixbuf, width, heigth, GDK_INTERP_BILINEAR);
 	gtk_image_set_from_pixbuf(iimage, resized);
 }
 /* ---------------------------------------------------------------- */
 void loadBenchmarkImage() {
-	GtkWidget* wimage = GTK_WIDGET(app_builder_get_BenchmarkImage());
+	GtkImage* image = GTK_IMAGE(app_builder_get_BenchmarkImage());
 	gtk_image_set_from_file(
-		GTK_IMAGE(app_builder_get_BenchmarkImage()),
+		image,
 	  "BENCHMARK.png"
 	);
 }

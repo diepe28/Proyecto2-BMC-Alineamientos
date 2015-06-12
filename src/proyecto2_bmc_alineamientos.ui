@@ -52,16 +52,20 @@
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
   </object>
-  <object class="GtkSpinButton" id="spNIslands">
-    <property name="visible">True</property>
-    <property name="can_focus">True</property>
-    <property name="adjustment">aNIslands</property>
-    <property name="value">1</property>
-  </object>
   <object class="GtkAdjustment" id="aNThreads">
     <property name="lower">1</property>
     <property name="upper">100</property>
     <property name="value">1</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="aXPage">
+    <property name="upper">250</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="aYPage">
+    <property name="upper">250</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
   </object>
@@ -83,6 +87,8 @@
     </data>
   </object>
   <object class="GtkWindow" id="popup">
+    <property name="width_request">800</property>
+    <property name="height_request">600</property>
     <property name="can_focus">False</property>
     <property name="title" translatable="yes">Resultados del Alineamiento</property>
     <property name="modal">True</property>
@@ -116,7 +122,6 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="spacing">8</property>
-                <property name="homogeneous">True</property>
                 <child>
                   <object class="GtkScrolledWindow" id="panelResScrolls">
                     <property name="visible">True</property>
@@ -129,7 +134,6 @@
                         <property name="can_focus">True</property>
                         <property name="hexpand">True</property>
                         <property name="vexpand">True</property>
-                        <property name="enable_grid_lines">both</property>
                         <child internal-child="selection">
                           <object class="GtkTreeSelection" id="gridview-selection"/>
                         </child>
@@ -363,42 +367,6 @@
                             <property name="height">1</property>
                           </packing>
                         </child>
-                        <child>
-                          <object class="GtkLabel" id="lGoto">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="xalign">1</property>
-                            <property name="yalign">0</property>
-                            <property name="label" translatable="yes">Tabla:</property>
-                          </object>
-                          <packing>
-                            <property name="left_attach">0</property>
-                            <property name="top_attach">7</property>
-                            <property name="width">1</property>
-                            <property name="height">1</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkComboBox" id="cbGotoValue">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="model">lsGotoValue</property>
-                            <property name="active">0</property>
-                            <signal name="changed" handler="on_cbGotoValue_changed" swapped="no"/>
-                            <child>
-                              <object class="GtkCellRendererText" id="crGotoValue"/>
-                              <attributes>
-                                <attribute name="text">0</attribute>
-                              </attributes>
-                            </child>
-                          </object>
-                          <packing>
-                            <property name="left_attach">1</property>
-                            <property name="top_attach">7</property>
-                            <property name="width">1</property>
-                            <property name="height">1</property>
-                          </packing>
-                        </child>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -407,26 +375,143 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkScrolledWindow" id="panelPerScrolls1">
+                      <object class="GtkBox" id="panelImgBirdWatch">
                         <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="shadow_type">in</property>
+                        <property name="can_focus">False</property>
+                        <property name="orientation">vertical</property>
                         <child>
-                          <object class="GtkViewport" id="viewport2">
+                          <object class="GtkScrolledWindow" id="panelPerScrolls1">
+                            <property name="height_request">250</property>
                             <property name="visible">True</property>
-                            <property name="can_focus">False</property>
+                            <property name="can_focus">True</property>
+                            <property name="valign">start</property>
+                            <property name="shadow_type">in</property>
                             <child>
-                              <object class="GtkImage" id="imgBirdWatch">
+                              <object class="GtkViewport" id="viewport2">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="stock">gtk-missing-image</property>
+                                <child>
+                                  <object class="GtkImage" id="imgBirdWatch">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="stock">gtk-missing-image</property>
+                                  </object>
+                                </child>
                               </object>
                             </child>
                           </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkGrid" id="cpanelImgBirdWatch">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="row_spacing">4</property>
+                            <property name="column_spacing">4</property>
+                            <property name="column_homogeneous">True</property>
+                            <child>
+                              <object class="GtkLabel" id="lX">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="label" translatable="yes">X</property>
+                              </object>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="top_attach">0</property>
+                                <property name="width">1</property>
+                                <property name="height">1</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkLabel" id="lY">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="label" translatable="yes">Y</property>
+                              </object>
+                              <packing>
+                                <property name="left_attach">2</property>
+                                <property name="top_attach">0</property>
+                                <property name="width">1</property>
+                                <property name="height">1</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkComboBox" id="cbGotoValue">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="model">lsGotoValue</property>
+                                <property name="active">0</property>
+                                <signal name="changed" handler="on_cbGotoValue_changed" swapped="no"/>
+                                <child>
+                                  <object class="GtkCellRendererText" id="crGotoValue"/>
+                                  <attributes>
+                                    <attribute name="text">0</attribute>
+                                  </attributes>
+                                </child>
+                              </object>
+                              <packing>
+                                <property name="left_attach">0</property>
+                                <property name="top_attach">1</property>
+                                <property name="width">1</property>
+                                <property name="height">1</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkSpinButton" id="sbX">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="adjustment">aXPage</property>
+                                <signal name="value-changed" handler="on_sbX_value_changed" swapped="no"/>
+                              </object>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="top_attach">1</property>
+                                <property name="width">1</property>
+                                <property name="height">1</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkSpinButton" id="sbY">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="adjustment">aYPage</property>
+                                <signal name="value-changed" handler="on_sbY_value_changed" swapped="no"/>
+                              </object>
+                              <packing>
+                                <property name="left_attach">2</property>
+                                <property name="top_attach">1</property>
+                                <property name="width">1</property>
+                                <property name="height">1</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkLabel" id="lGoto">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="label" translatable="yes">Tabla</property>
+                              </object>
+                              <packing>
+                                <property name="left_attach">0</property>
+                                <property name="top_attach">0</property>
+                                <property name="width">1</property>
+                                <property name="height">1</property>
+                              </packing>
+                            </child>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="padding">4</property>
+                            <property name="position">1</property>
+                          </packing>
                         </child>
                       </object>
                       <packing>
-                        <property name="expand">True</property>
+                        <property name="expand">False</property>
                         <property name="fill">True</property>
                         <property name="position">2</property>
                       </packing>

@@ -237,4 +237,12 @@ void on_menuitem_exit(GtkMenuItem *menuitem, gpointer user_data) {
 	g_application_quit(G_APPLICATION(application));
 }
 /* ---------------------------------------------------------------- */
+void on_sbX_value_changed(GtkSpinButton *sender) {
+	g_critical("sbX changed!");
+}
+/* ---------------------------------------------------------------- */
+void on_sbY_value_changed(GtkSpinButton *sender) {
+	g_critical("sbY changed!");
+}
+/* ---------------------------------------------------------------- */
 #endif
