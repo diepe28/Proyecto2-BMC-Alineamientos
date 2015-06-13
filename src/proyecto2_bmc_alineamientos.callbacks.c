@@ -25,7 +25,39 @@ const gchar* authors[4] = {"Olger Calderón Achío", "Wilberth Castro Fuentes", 
 
 // Helper Functions
 
-// static void check
+static gchar* pre_process_sequence(gchar* inputSequence, gint seqSize, gchar seqID, gboolean* wasConverted) 
+{
+	SequenceType seqType = (seqID == 'v') ? 
+		(SequenceType) gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbVInputType())) :
+		(SequenceType) gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbWInputType()));
+	SequenceType otherSeqType = (seqID == 'w') ?
+		(SequenceType) gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbVInputType())) :
+		(SequenceType) gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbWInputType()));
+
+	gchar* newSequence = NULL;
+	switch (seqType) 
+	{
+		case Text:
+			*wasConverted = FALSE;
+			return inputSequence;
+		case Protein:
+			newSequence = threeLetterCodedProteinToOneLetterCodedProtein(inputSequence, seqSize);
+			if (newSequence != NULL) {
+				*wasConverted = TRUE;
+				return newSequence;
+			}
+			break;
+		case ADN:
+			if (otherSeqType == Protein) {
+				newSequence = dnaToProtein(inputSequence);
+				*wasConverted = TRUE;
+				return newSequence;
+			}
+			break;
+	}
+	*wasConverted = FALSE;
+	return inputSequence;
+}
 
 static void set_substitution_matrix(ScoringOptions* options) 
 {
@@ -312,6 +344,8 @@ void on_cbKBand_toggled(GtkCheckButton* sender) {
 	}
 }
 /* ---------------------------------------------------------------- */
+gchar* tempV = NULL;
+gchar* tempW = NULL;
 void on_btGlobalAlignNW_clicked(GtkButton* sender) {
 	gchar* v = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txV()));
 	gchar* w = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txW()));
@@ -361,6 +395,15 @@ void on_btGlobalAlignNW_clicked(GtkButton* sender) {
 				kbandGrowth
 			);
 		}
+
+		gboolean wasVConverted = FALSE;
+		gboolean wasWConverted = FALSE;
+		v = pre_process_sequence(v, vSize, 'v', &wasVConverted);
+		w = pre_process_sequence(w, wSize, 'w', &wasWConverted);
+		if (wasVConverted)
+			tempV = v;
+		if (wasWConverted)
+			tempW = w;
 	
 		app_widget_show_nwpopup(
 			v,
@@ -458,6 +501,15 @@ void on_btLocalAlignSW_clicked(GtkButton* sender) {
 		);
 		set_substitution_matrix(options);
 
+		gboolean wasVConverted = FALSE;
+		gboolean wasWConverted = FALSE;
+		v = pre_process_sequence(v, vSize, 'v', &wasVConverted);
+		w = pre_process_sequence(w, wSize, 'w', &wasWConverted);
+		if (wasVConverted)
+			tempV = v;
+		if (wasWConverted)
+			tempW = w;
+
 		app_widget_show_swpopup(
 			v,
 			w,
@@ -484,6 +536,14 @@ void on_rbCustomValues_toggled(GtkRadioButton* sender) {
 gboolean on_popup_delete_event(GtkWidget* sender, GdkEvent* event) {
 	gtk_widget_hide(sender);
 	freeResults();
+	if (tempV != NULL) {
+		g_free(tempV);
+		tempV = NULL;
+	}
+	if (tempW != NULL) {
+		g_free(tempW);
+		tempW = NULL;
+	}
 	return TRUE;
 }
 /* ---------------------------------------------------------------- */
