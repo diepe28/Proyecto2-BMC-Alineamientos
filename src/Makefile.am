@@ -36,8 +36,6 @@ proyecto2_bmc_alineamientos_SOURCES = \
 	FillingAlgorithms.h \
 	Island.h \
 	Island.c \
-	TestingFunctions.c \
-	TestingFunctions.h \
 	SubstitutionMatrixes.h \
 	SubstitutionMatrixes.c \
 	proyecto2_bmc_alineamientos.callbacks.c \
