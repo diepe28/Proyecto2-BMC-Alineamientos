@@ -567,10 +567,7 @@ void on_tbPrev_clicked(GtkButton* sender) {
 	showPrevIsland();
 }
 /* ---------------------------------------------------------------- */
-void on_cbGotoValue_changed(GtkComboBox* sender) {
-	if(!USING_GAP_BLOCKS)
-		return;
-	
+void on_cbGotoValue_changed(GtkComboBox* sender) {	
 	gchar* v = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txV()));
 	gchar* w = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txW()));
 
@@ -618,10 +615,7 @@ void on_sbY_value_changed(GtkSpinButton *sender) {
 	g_critical("sbY changed!");
 }
 /* ---------------------------------------------------------------- */
-void on_page_changed(GObject* sender) {
-	if(!USING_GAP_BLOCKS)
-		return;
-	
+void on_page_changed(GObject* sender) {	
 	gint zpage = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbGotoValue()));
 	
 	gint xpage = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbX()));
