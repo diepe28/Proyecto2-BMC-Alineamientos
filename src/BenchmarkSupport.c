@@ -86,7 +86,7 @@ NWBenchmarkResult* execute_nw_benchmark(gchar* seq1, gchar* seq2, gint seq1Lengt
 	benchmarkResult->kbandExecutionTimes = kbandExecutionTimes;
 	benchmarkResult->numberOfRuns = numberOfThreads;
 	benchmarkResult->seq1Length = seq1Length;
-	benchmarkResult->seq2Length = seq1Length;
+	benchmarkResult->seq2Length = seq2Length;
 	return benchmarkResult;
 }
 
@@ -125,7 +125,7 @@ SWBenchmarkResult* execute_sw_benchmark(gchar* seq1, gchar* seq2, gint seq1Lengt
 	benchmarkResult->fullExecutionTimes = fullExecutionTimes;
 	benchmarkResult->numberOfRuns = numberOfThreads;
 	benchmarkResult->seq1Length = seq1Length;
-	benchmarkResult->seq2Length = seq1Length;
+	benchmarkResult->seq2Length = seq2Length;
 	return benchmarkResult;
 }
 
