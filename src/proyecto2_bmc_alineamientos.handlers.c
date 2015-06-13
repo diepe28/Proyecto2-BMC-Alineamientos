@@ -284,7 +284,7 @@ void app_widget_refresh_popup(
 	gint pagesize,
 	gboolean localAlignment
 ) {
-	gboolean usingGapBlock = scoringOptions->gapOpeningPenalty != 0;
+	gboolean usingGapBlock = gtk_widget_get_sensitive(GTK_WIDGET(app_builder_get_cbGotoValue()));
 	
 	GtkWidget* gridview = GTK_WIDGET(app_builder_get_gridview());
 
