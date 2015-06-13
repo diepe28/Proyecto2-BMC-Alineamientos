@@ -84,3 +84,14 @@ gboolean cell_isFlagSet(Cell* this, guint flag, char matrix){
 		   matrix == 'B'? cell_isFlagBSet (this,flag) :
 		cell_isFlagCSet (this, flag);
 }
+
+gint cell_getValue(Cell* this, char matrix) {
+	switch (matrix) {
+		case 'A':
+			return this->value_a;
+		case 'B':
+			return this->value_b;
+		case 'C':
+			return this->value_c;
+	}
+}

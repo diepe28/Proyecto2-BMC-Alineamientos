@@ -1,4 +1,5 @@
 #include "Gridview.h"
+#include "TestingFunctions.h"
 
 /* ---------------------------------------------------------------- */
 void gridview_model_set_value(GtkTreeModel* model, gint row, gint column, gchar* text) {
@@ -13,7 +14,13 @@ void gridview_model_set_value(GtkTreeModel* model, gint row, gint column, gchar*
 	gtk_tree_path_free(path);
 }
 /* ---------------------------------------------------------------- */
-void gridview_cell_colorize(GtkTreeViewColumn* column, GtkCellRenderer* cellrenderer, GtkTreeModel* model, GtkTreeIter* iter, gpointer colid) {
+void gridview_cell_colorize(
+	GtkTreeViewColumn* column,
+	GtkCellRenderer* cellrenderer,
+	GtkTreeModel* model,
+	GtkTreeIter* iter,
+	gpointer colid
+) {
 	GValue* value = g_slice_alloc0(sizeof(GValue));
 	gtk_tree_model_get_value(model, iter, GPOINTER_TO_INT(colid), value);
 	const gchar* text = g_value_get_string(value);
@@ -83,11 +90,11 @@ void gridview_cell_colorize(GtkTreeViewColumn* column, GtkCellRenderer* cellrend
 		g_object_set(cellrenderer, "foreground-set", TRUE, NULL);
 		g_object_set(cellrenderer, "foreground", "red", NULL);
 	}
-	
-	if (text[strlen(text) - 1] == '*') {
-		gchar* newtext = g_strjoinv("", g_strsplit(text, "*", CELL_MAX_SIZE));
+
+	if (text[strlen(text)-1] == '*') {
+		text = g_strjoinv("", g_strsplit(text, "*", CELL_MAX_SIZE));
 		
-		g_object_set(cellrenderer, "text", newtext, NULL);
+		g_object_set(cellrenderer, "text", text, NULL);
 		
 		g_object_set(cellrenderer, "background-set", TRUE, NULL);
 		g_object_set(cellrenderer, "background", "lightgray", NULL);
@@ -177,82 +184,84 @@ void gridview_init(GtkWidget* gridview) {
 	}
 }
 /* ---------------------------------------------------------------- */
-void gridview_databind(GtkWidget* gridview, Cell*** datasource, gchar* col0, gchar* head, gint rowslen, gint colslen, gint index) {
-	gridview_resize(gridview, rowslen, colslen);
+void gridview_databind(
+	GtkWidget* gridview,
+	Cell*** datasource,
+	gchar* col0,
+	gchar* head,
+	gint rowslen,
+	gint colslen,
+	gint zpage,
+	gint xpage,
+	gint ypage,
+	gint pagesize
+) {
+	gridview_resize(gridview, pagesize - 1, pagesize - 1);
 	GtkTreeModel* model = gtk_tree_view_get_model(GTK_TREE_VIEW(gridview));
 	GtkTreeViewColumn* column;
 
-	gint i = 0;
-	gint j;
+	gint xfirst = xpage*pagesize;
+	gint xlast = xfirst + pagesize - 1;
+	gint yfirst = ypage*pagesize;
+	gint ylast = yfirst + pagesize - 1;
+	
+	gint i;
+	gint j = 1;
 	gint ivalue;
-	guint iflags;
 	gchar value[CELL_MAX_SIZE];
-	gchar arrou[CELL_MAX_SIZE];
-	gchar arron[CELL_MAX_SIZE];
-	gchar arrol[CELL_MAX_SIZE];
+	gchar arrow[CELL_MAX_SIZE];
 
 	gchar bodies[3] = {'A', 'B', 'C'};
+	guint comesf[3] = {COMES_FROM_DIAGONAL, COMES_FROM_LEFT, COMES_FROM_UP};
 
-	for (i=0; i<colslen; i++) {
-		column = gtk_tree_view_get_column(GTK_TREE_VIEW(gridview), i*2 + 3);
-		sprintf(value, "%c", head[i]);
+	for (i=xfirst-1; i<xlast; i++) {
+		column = gtk_tree_view_get_column(GTK_TREE_VIEW(gridview), j);
+		sprintf(value, "%c",  0<=i && i<colslen ? head[i] : '\0');
 		gtk_tree_view_column_set_title(column, value);
-	}
 
-	for (i=0; i<rowslen + 1; i++) {
-		for (j=0; j<colslen + 2; j++) {
+		j += 2;
+	}
+	
+	for (i=yfirst; i<ylast+1; i++) {
+		for (j=xfirst; j<xlast+2; j++) {
 			sprintf(value, "%s", CELL_A_NULL);
+			sprintf(arrow, "%s", CELL_ARROW_NULL);
 			
-			sprintf(arrou, "%s", CELL_A_NULL);
-			sprintf(arron, "%s", CELL_A_NULL);
-			sprintf(arrol, "%s", CELL_A_NULL);
-			
-			if (j == 0) {
-				if (i > 0) {
+			if (j == xfirst) {
+				if (0 < i && i <= colslen) {
 					sprintf(value, "%c", col0[i - 1]);
 				}
-			} else {
-				switch (index) {
-					case BODY_A:
-						ivalue = datasource[i][j - 1]->value_a;
-						iflags = datasource[i][j - 1]->flags_a;
-					break;
-					case BODY_B:
-						ivalue = datasource[i][j - 1]->value_b;
-						iflags = datasource[i][j - 1]->flags_b;
-					break;
-					case BODY_C:
-						ivalue = datasource[i][j - 1]->value_c;
-						iflags = datasource[i][j - 1]->flags_c;
-					break;
-				}
+			} else if (i<rowslen+1 && j<colslen+2) {
+				ivalue = cell_getValue(datasource[i][j - 1], bodies[zpage]);
 				
 				if (ivalue == -1000000) {
 					sprintf(value, "%s", "-INF");
 				} else {
-					sprintf(value, "%d%s", ivalue, (iflags&IS_PAINTED)!=0? "*": "");
+					sprintf(value, "%d%s", ivalue, cell_isFlagSet(datasource[i][j - 1], IS_PAINTED, bodies[zpage])? "*": "");
 				}
 
-				if ((iflags & COMES_FROM_UP) != 0) {
-					sprintf(arrou, "1%c", bodies[index]);
+				if (cell_isFlagSet(datasource[i][j - 1], comesf[zpage], 'C')) {
+					sprintf(arrow, "%dC", comesf[zpage]);
 				}
-				if ((iflags & COMES_FROM_DIAGONAL) != 0) {
-					sprintf(arron, "6%c", bodies[index]);
+				if (cell_isFlagSet(datasource[i][j - 1], comesf[zpage], 'B')) {
+					sprintf(arrow, "%dB", comesf[zpage]);
 				}
-				if ((iflags & COMES_FROM_LEFT) != 0) {
-					sprintf(arrol, "0%c", bodies[index]);
+				if (cell_isFlagSet(datasource[i][j - 1], comesf[zpage], 'A')) {
+					sprintf(arrow, "%dA", comesf[zpage]);
 				}
 			}
 
-			//                              row, col
-			gridview_model_set_value(model, i*2, j==0? 0: j*2-1, value);
+			//                                       row, col
+			gridview_model_set_value(model, (i-yfirst)*2, (j-xfirst)==0? 0: (j-xfirst)*2-1, value);
 
-			if (i > 0) {
-				gridview_model_set_value(model, i*2-1, j*2-1, arrou);
+			if (i > yfirst && comesf[zpage] == COMES_FROM_UP) {
+				gridview_model_set_value(model, (i-yfirst)*2-1, (j-xfirst)*2-1, arrow);
 			}
-			if (j > 1) {
-				gridview_model_set_value(model, i*2-1, j*2-2, arron);
-				gridview_model_set_value(model, i*2, j*2-2, arrol);
+			if (i > yfirst && j > xfirst + 1 && comesf[zpage] == COMES_FROM_DIAGONAL) {
+				gridview_model_set_value(model, (i-yfirst)*2-1, (j-xfirst)*2-2, arrow);
+			}
+			if (j > xfirst + 1 && comesf[zpage] == COMES_FROM_LEFT) {
+				gridview_model_set_value(model, (i-yfirst)*2, (j-xfirst)*2-2, arrow);
 			}
 		}
 	}

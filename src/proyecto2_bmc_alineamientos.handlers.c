@@ -146,6 +146,26 @@ GObject* app_builder_get_cbGotoValue() {
 	return gtk_builder_get_object(builder, "cbGotoValue");
 }
 /* ---------------------------------------------------------------- */
+GObject* app_builder_get_sbPageSize() {
+	return gtk_builder_get_object(builder, "sbPageSize");
+}
+/* ---------------------------------------------------------------- */
+GObject* app_builder_get_sbX() {
+	return gtk_builder_get_object(builder, "sbX");
+}
+/* ---------------------------------------------------------------- */
+GObject* app_builder_get_sbY() {
+	return gtk_builder_get_object(builder, "sbY");
+}
+/* ---------------------------------------------------------------- */
+GObject* app_builder_get_aXPage() {
+	return gtk_builder_get_object(builder, "aXPage");
+}
+/* ---------------------------------------------------------------- */
+GObject* app_builder_get_aYPage() {
+	return gtk_builder_get_object(builder, "aYPage");
+}
+/* ---------------------------------------------------------------- */
 GObject* app_builder_get_spMinIslands() {
 	return gtk_builder_get_object(builder, "spMinIslands");
 }
@@ -167,7 +187,10 @@ void app_widget_show_nwpopup(
 	gchar* w,
 	gint lengthV,
 	gint lengthW,
-	gint index,
+	gint zpage,
+	gint xpage,
+	gint ypage,
+	gint pagesize,
 	gint vType,
 	gint wType,
 	ScoringOptions* scoringOptions,
@@ -186,7 +209,7 @@ void app_widget_show_nwpopup(
 
 	GtkWidget* gridview = GTK_WIDGET(app_builder_get_gridview());
 	
-	gridview_databind(gridview, nwBenchmarkResult->similarityMatrix, w, v, lengthW, lengthV, index);
+	gridview_databind(gridview, nwBenchmarkResult->similarityMatrix, w, v, lengthW, lengthV, zpage, xpage, ypage, pagesize);
 	
 	Island* alignment = nwBenchmarkResult->alignment;
 	gulong* executionTimes = nwBenchmarkResult->fullExecutionTimes;
@@ -230,6 +253,15 @@ void app_widget_show_nwpopup(
 
 	loadBirdWatchImage();
 	loadBenchmarkImage();
+
+	lengthV += 1;
+	lengthW += 2;
+	gint xpages = (gint) (lengthV - lengthV%pagesize)/pagesize + (lengthV%pagesize>0? 1: 0);
+	gint ypages = (gint) (lengthW - lengthW%pagesize)/pagesize + (lengthW%pagesize>0? 1: 0);
+	
+	gtk_adjustment_configure(GTK_ADJUSTMENT(app_builder_get_aXPage()), 1, 1, xpages, 1, 10, 0);
+	gtk_adjustment_configure(GTK_ADJUSTMENT(app_builder_get_aYPage()), 1, 1, ypages, 1, 10, 0);
+	
 	gtk_widget_show_all(popup);
 }
 /* ---------------------------------------------------------------- */
@@ -238,7 +270,10 @@ void app_widget_refresh_nwpopup(
 	gchar* w,
 	gint lengthV,
 	gint lengthW,
-	gint index
+	gint zpage,
+	gint xpage,
+	gint ypage,
+	gint pagesize
 ) {
 	GtkWidget* gridview = GTK_WIDGET(app_builder_get_gridview());
 	
@@ -249,7 +284,10 @@ void app_widget_refresh_nwpopup(
 		v,
 		lengthV,
 		lengthW,
-		index
+		zpage,
+		xpage,
+		ypage,
+		pagesize
 	);
 }
 /* ---------------------------------------------------------------- */

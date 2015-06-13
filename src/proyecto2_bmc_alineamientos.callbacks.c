@@ -298,7 +298,12 @@ void on_btGlobalAlignNW_clicked(GtkButton* sender) {
 		gint kbandGrowth = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbGrowthInterval()));
 		gint numberOfThreads = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbNThreads()));
 	
-		gint index = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbGotoValue()));
+		gint zpage = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbGotoValue()));
+	
+		gint xpage = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbX()));
+		gint ypage = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbY()));
+	
+		gint pagesize = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbPageSize()));
 
 		//TODO GET SUBSTITUTION_MATRIXES
 		ScoringOptions* scoringOptions = ScoringOptions_new(
@@ -326,7 +331,10 @@ void on_btGlobalAlignNW_clicked(GtkButton* sender) {
 			w,
 			vSize,
 			wSize,
-			index,
+			zpage,
+			xpage - 1,
+			ypage - 1,
+			pagesize,
 			vtype,
 			wtype,
 			scoringOptions,
@@ -459,9 +467,14 @@ void on_cbGotoValue_changed(GtkComboBox* sender) {
 	gchar* v = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txV()));
 	gchar* w = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txW()));
 	
-	gint index = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbGotoValue()));
+	gint zpage = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbGotoValue()));
+
+	gint xpage = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbX()));
+	gint ypage = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbY()));
+
+	gint pagesize = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbPageSize()));
 	
-	app_widget_refresh_nwpopup(v, w, strlen(v), strlen(w), index);
+	app_widget_refresh_nwpopup(v, w, strlen(v), strlen(w), zpage, xpage, ypage, pagesize);
 	
 	g_critical("cbGotoValue changed!");
 }
@@ -496,6 +509,20 @@ void on_sbX_value_changed(GtkSpinButton *sender) {
 /* ---------------------------------------------------------------- */
 void on_sbY_value_changed(GtkSpinButton *sender) {
 	g_critical("sbY changed!");
+}
+/* ---------------------------------------------------------------- */
+void on_page_changed(GObject* sender) {
+	gint zpage = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbGotoValue()));
+	
+	gint xpage = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbX()));
+	gint ypage = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbY()));
+	
+	gint pagesize = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbPageSize()));
+	
+	gchar* v = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txV()));
+	gchar* w = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txW()));
+	
+	app_widget_refresh_nwpopup(v, w, strlen(v), strlen(w), zpage, xpage - 1, ypage - 1, pagesize);
 }
 /* ---------------------------------------------------------------- */
 #endif

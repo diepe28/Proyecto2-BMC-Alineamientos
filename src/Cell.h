@@ -39,4 +39,5 @@ gboolean cell_isFlagASet(Cell*, guint flag);
 gboolean cell_isFlagBSet(Cell*, guint flag);
 gboolean cell_isFlagCSet(Cell*, guint flag);
 gboolean cell_isFlagSet(Cell*, guint flag, char matrix);
+gint cell_getValue(Cell*, char matrix);
 #endif
