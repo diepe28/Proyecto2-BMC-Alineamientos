@@ -13,9 +13,41 @@ typedef enum {
 	Text = 2
 } SequenceType;
 
+typedef enum {
+	BLOSUM_45_Matrix = 0,
+	BLOSUM_62_Matrix = 1,
+	BLOSUM_80_Matrix = 2,
+	PAM_70_Matrix = 3,
+	PAM_250_Matrix = 4
+} SubstitutionMatrix;
+
 const gchar* authors[4] = {"Olger Calderón Achío", "Wilberth Castro Fuentes", "Diego Pérez Arroyo", NULL};
 
 // Helper functions
+
+static void set_substitution_matrix(ScoringOptions* options) 
+{
+	if (gtk_widget_get_sensitive(GTK_WIDGET(app_builder_get_cbSubstitutionMatrix()))) {
+		SubstitutionMatrix selectedMatrix = (SubstitutionMatrix) gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbSubstitutionMatrix()));
+		switch (selectedMatrix) {
+			case BLOSUM_45_Matrix:
+				options->substitutionMatrix = BLOSUM_45;
+				break;
+			case BLOSUM_62_Matrix:
+				options->substitutionMatrix = BLOSUM_62;
+				break;
+			case BLOSUM_80_Matrix:
+				options->substitutionMatrix = BLOSUM_80;
+				break;
+			case PAM_70_Matrix:
+				options->substitutionMatrix = PAM_70;
+				break;
+			case PAM_250_Matrix:
+				options->substitutionMatrix = PAM_250;
+				break;
+		}
+	}
+}
 
 static void show_message(gchar* message, GtkMessageType type) 
 {
@@ -305,7 +337,6 @@ void on_btGlobalAlignNW_clicked(GtkButton* sender) {
 	
 		gint pagesize = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbPageSize()));
 
-		//TODO GET SUBSTITUTION_MATRIXES
 		ScoringOptions* scoringOptions = ScoringOptions_new(
 			matchbonus,
 			missmatchbonus,
@@ -317,6 +348,7 @@ void on_btGlobalAlignNW_clicked(GtkButton* sender) {
 			freerightgapsw,
 			NULL
 		);
+		set_substitution_matrix(scoringOptions);
 
 		KBandOptions* kBandOptions = NULL;
 		if(usingKBand){
@@ -408,7 +440,7 @@ void on_btLocalAlignSW_clicked(GtkButton* sender) {
 		gint gappenalty2 = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbK()));
 		gint numberOfThreads = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbNThreads()));
 		gint minValueIslands = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_spMinIslands()));
-	
+
 		ScoringOptions* options = ScoringOptions_new(
 			matchbonus,
 			missmatchbonus,
@@ -420,6 +452,7 @@ void on_btLocalAlignSW_clicked(GtkButton* sender) {
 			FALSE,
 			NULL
 		);
+		set_substitution_matrix(options);
 
 		app_widget_show_swpopup(
 			v,

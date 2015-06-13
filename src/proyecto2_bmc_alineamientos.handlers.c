@@ -401,8 +401,8 @@ void loadBirdWatchImage() {
 	GError* gerror = 0;
 	gtk_image_clear(iimage);
 	
-	int width = 230; // = gtk_widget_get_allocated_width(wimage);
-	int heigth = 230; // = gtk_widget_get_allocated_height(wimage);
+	int width = 320; // = gtk_widget_get_allocated_width(wimage);
+	int heigth = 280; // = gtk_widget_get_allocated_height(wimage);
 	/*
 	if (width < 100) {
 		width = 400;
