@@ -770,7 +770,7 @@
         <col id="0" translatable="yes">BLOSUM80</col>
       </row>
       <row>
-        <col id="0" translatable="yes">PAM100</col>
+        <col id="0" translatable="yes">PAM70</col>
       </row>
       <row>
         <col id="0" translatable="yes">PAM250</col>

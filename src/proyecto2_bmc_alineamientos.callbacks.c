@@ -13,6 +13,14 @@ typedef enum {
 	Text = 2
 } SequenceType;
 
+typedef enum {
+	BLOSUM_45_Matrix = 0,
+	BLOSUM_62_Matrix = 1,
+	BLOSUM_80_Matrix = 2,
+	PAM_70_Matrix = 3,
+	PAM_250_Matrix = 4
+} SubstitutionMatrix;
+
 const gchar* authors[4] = {"Olger Calderón Achío", "Wilberth Castro Fuentes", "Diego Pérez Arroyo", NULL};
 
 // Helper functions
@@ -300,7 +308,27 @@ void on_btGlobalAlignNW_clicked(GtkButton* sender) {
 	
 		gint index = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbGotoValue()));
 
-		//TODO GET SUBSTITUTION_MATRIXES
+		gint (*substitutionMatrix)[27] = NULL;
+		if (gtk_widget_get_sensitive(GTK_WIDGET(app_builder_get_cbSubstitutionMatrix()))) {
+			SubstitutionMatrix selectedMatrix = (SubstitutionMatrix) gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbSubstitutionMatrix()));
+			switch (selectedMatrix) {
+				case BLOSUM_45_Matrix:
+					substitutionMatrix = BLOSUM_45;
+					break;
+				case BLOSUM_62_Matrix:
+					substitutionMatrix = BLOSUM_62;
+					break;
+				case BLOSUM_80_Matrix:
+					substitutionMatrix = BLOSUM_80;
+					break;
+				case PAM_70_Matrix:
+					substitutionMatrix = PAM_70;
+					break;
+				case PAM_250_Matrix:
+					substitutionMatrix = PAM_250;
+					break;
+			}
+		}
 		ScoringOptions* scoringOptions = ScoringOptions_new(
 			matchbonus,
 			missmatchbonus,
@@ -310,7 +338,7 @@ void on_btGlobalAlignNW_clicked(GtkButton* sender) {
 			freeleftgapsw,
 			freerightgapsv,
 			freerightgapsw,
-			NULL
+			substitutionMatrix
 		);
 
 		KBandOptions* kBandOptions = NULL;
@@ -400,7 +428,28 @@ void on_btLocalAlignSW_clicked(GtkButton* sender) {
 		gint gappenalty2 = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbK()));
 		gint numberOfThreads = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbNThreads()));
 		gint minValueIslands = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_spMinIslands()));
-	
+
+		gint (*substitutionMatrix)[27] = NULL;
+		if (gtk_widget_get_sensitive(GTK_WIDGET(app_builder_get_cbSubstitutionMatrix()))) {
+			SubstitutionMatrix selectedMatrix = (SubstitutionMatrix) gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbSubstitutionMatrix()));
+			switch (selectedMatrix) {
+				case BLOSUM_45_Matrix:
+					substitutionMatrix = BLOSUM_45;
+					break;
+				case BLOSUM_62_Matrix:
+					substitutionMatrix = BLOSUM_62;
+					break;
+				case BLOSUM_80_Matrix:
+					substitutionMatrix = BLOSUM_80;
+					break;
+				case PAM_70_Matrix:
+					substitutionMatrix = PAM_70;
+					break;
+				case PAM_250_Matrix:
+					substitutionMatrix = PAM_250;
+					break;
+			}
+		}
 		ScoringOptions* options = ScoringOptions_new(
 			matchbonus,
 			missmatchbonus,
@@ -410,7 +459,7 @@ void on_btLocalAlignSW_clicked(GtkButton* sender) {
 			FALSE,
 			FALSE,
 			FALSE,
-			NULL
+			substitutionMatrix
 		);
 
 		app_widget_show_swpopup(
