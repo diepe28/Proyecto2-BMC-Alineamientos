@@ -216,8 +216,11 @@ int createBenchmarkGraph(long* times, int n){
 			minTimeIndex = i;
 		}
 	}
-	
+
 	yMargin = (maxTime - minTime) / 4;
+	if(yMargin <= 0){
+		yMargin = maxTime / 4;
+	}
 	sprintf (xRangeCommand, "set xrange [%d:%d]", 0, n+1);
 	sprintf (yRangeCommand, "set yrange [%ld:%ld]", minTime - yMargin, maxTime + yMargin);
 	sprintf (lowestPoint, "set object circle at first %d,%ld radius char 1.5 fillcolor rgb '#007A00' fillstyle solid noborder",
@@ -246,7 +249,7 @@ int createBenchmarkGraph(long* times, int n){
 
 int createBenchmarkGraphKBand(long* times, long* timesKBand, int n){
 	char * commandsForGnuplot[] = {
-		"set terminal png large size 1080, 720",
+		"set terminal png large size 1080, 680",
 		"set output \"BENCHMARK.png\"",
 		"set style line 1 lc rgb '#0060ad' lt 1 lw 2 pt 7 ps 1", //black
 		"set style line 2 lc rgb '#33CC33' lt 1 lw 2 pt 7 ps 1.5", //green
@@ -304,6 +307,9 @@ int createBenchmarkGraphKBand(long* times, long* timesKBand, int n){
 	minTimeTotal = minTimeFull < minTimeKBand? minTimeFull : minTimeKBand;
 	
 	yMargin = (maxTimeTotal - minTimeTotal) / 4;
+	if(yMargin <= 0){
+		yMargin = maxTimeTotal / 4;
+	}
 	yMarginForLabel = (maxTimeTotal - minTimeTotal + 2*yMargin) / 20;
 	sprintf (xRangeCommand, "set xrange [%d:%d]", 0, n+1);
 	sprintf (yRangeCommand, "set yrange [%ld:%ld]", minTimeTotal - yMargin, maxTimeTotal + yMargin);
