@@ -48,5 +48,17 @@ void gridview_databind(GtkWidget* gridview,
 	gint ypage,
 	gint pagesize
 );
+void gridview_databind_plain(
+	GtkWidget* gridview,
+	Cell*** datasource,
+	gchar* col0,
+	gchar* head,
+	gint rowslen,
+	gint colslen,
+	gint zpage,
+	gint xpage,
+	gint ypage,
+	gint pagesize
+);
 
 #endif

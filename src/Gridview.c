@@ -268,3 +268,106 @@ void gridview_databind(
 	
 }
 /* ---------------------------------------------------------------- */
+void gridview_databind_plain(
+	GtkWidget* gridview,
+	Cell*** datasource,
+	gchar* col0,
+	gchar* head,
+	gint rowslen,
+	gint colslen,
+	gint zpage,
+	gint xpage,
+	gint ypage,
+	gint pagesize
+) {
+	g_critical("gridview_databind_plain");
+	gridview_resize(gridview, pagesize - 1, pagesize - 1);
+	GtkTreeModel* model = gtk_tree_view_get_model(GTK_TREE_VIEW(gridview));
+	GtkTreeViewColumn* column;
+
+	gint xfirst = xpage*pagesize;
+	gint xlast = xfirst + pagesize - 1;
+	gint yfirst = ypage*pagesize;
+	gint ylast = yfirst + pagesize - 1;
+
+	gint i;
+	gint j = 1;
+	gint ivalue;
+	guint iflags = 0;
+	gchar value[CELL_MAX_SIZE];
+	gchar arrou[CELL_MAX_SIZE];
+	gchar arron[CELL_MAX_SIZE];
+	gchar arrol[CELL_MAX_SIZE];
+
+	gchar bodies[3] = {'A', 'B', 'C'};
+
+	for (i=xfirst-1; i<xlast; i++) {
+		column = gtk_tree_view_get_column(GTK_TREE_VIEW(gridview), j);
+		sprintf(value, "%c",  0<=i && i<colslen ? head[i] : '\0');
+		gtk_tree_view_column_set_title(column, value);
+
+		j += 2;
+	}
+
+	for (i=yfirst; i<ylast+1; i++) {
+		for (j=xfirst; j<xlast+2; j++) {
+			sprintf(value, "%s", CELL_A_NULL);
+			
+			sprintf(arrou, "%s", CELL_ARROW_NULL);
+			sprintf(arron, "%s", CELL_ARROW_NULL);
+			sprintf(arrol, "%s", CELL_ARROW_NULL);
+			
+			if (j == xfirst) {
+				if (0 < i && i <= colslen) {
+					sprintf(value, "%c", col0[i - 1]);
+				}
+			} else if (i<rowslen+1 && j<colslen+2) {
+				switch (zpage) {
+					case 0:
+						ivalue = datasource[i][j - 1]->value_a;
+						iflags = datasource[i][j - 1]->flags_a;
+					break;
+					case 1:
+						ivalue = datasource[i][j - 1]->value_b;
+						iflags = datasource[i][j - 1]->flags_b;
+					break;
+					case 2:
+						ivalue = datasource[i][j - 1]->value_c;
+						iflags = datasource[i][j - 1]->flags_c;
+					break;
+				}
+				
+				if (ivalue == -1000000) {
+					sprintf(value, "%s", "-INF");
+				} else {
+					sprintf(value, "%d%s", ivalue, (iflags&IS_PAINTED)!=0? "*": "");
+				}
+
+				if ((iflags & COMES_FROM_UP) != 0) {
+					sprintf(arrou, "4%c", bodies[zpage]);
+				}
+				if ((iflags & COMES_FROM_DIAGONAL) != 0) {
+					sprintf(arron, "1%c", bodies[zpage]);
+				}
+				if ((iflags & COMES_FROM_LEFT) != 0) {
+					sprintf(arrol, "2%c", bodies[zpage]);
+				}
+			}
+
+			//                                       row, col
+			gridview_model_set_value(model, (i-yfirst)*2, (j-xfirst)==0? 0: (j-xfirst)*2-1, value);
+
+			if (i > yfirst) {
+				gridview_model_set_value(model, (i-yfirst)*2-1, (j-xfirst)*2-1, arrou);
+			}
+			if (i > yfirst && j > xfirst + 1) {
+				gridview_model_set_value(model, (i-yfirst)*2-1, (j-xfirst)*2-2, arron);
+			}
+			if (j > xfirst + 1) {
+				gridview_model_set_value(model, (i-yfirst)*2, (j-xfirst)*2-2, arrol);
+			}
+		}
+	}
+	
+}
+/* ---------------------------------------------------------------- */
