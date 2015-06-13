@@ -26,6 +26,20 @@ gboolean USING_GAP_BLOCKS = FALSE;
 
 // Helper Functions
 
+static void show_message(gchar* message, GtkMessageType type) 
+{
+	GtkMessageDialog* dialog = NULL;
+	dialog = GTK_MESSAGE_DIALOG (gtk_message_dialog_new (
+			                     GTK_WINDOW(app_builder_get_window()),
+		                         GTK_DIALOG_MODAL,
+		                         type,
+		                         GTK_BUTTONS_CLOSE,
+	                             "%s",
+	                             message));
+	gtk_dialog_run(GTK_DIALOG(dialog));
+	gtk_widget_destroy(GTK_WIDGET(dialog));
+}
+
 static gchar* pre_process_sequence(gchar* inputSequence, gint seqSize, gchar seqID, gboolean* wasConverted) 
 {
 	SequenceType seqType = (seqID == 'v') ? 
@@ -34,8 +48,9 @@ static gchar* pre_process_sequence(gchar* inputSequence, gint seqSize, gchar seq
 	SequenceType otherSeqType = (seqID == 'w') ?
 		(SequenceType) gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbVInputType())) :
 		(SequenceType) gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbWInputType()));
-
+	GtkEntry* sequenceEntry = (seqID == 'v') ? GTK_ENTRY(app_builder_get_txV()) : GTK_ENTRY(app_builder_get_txW());
 	gchar* newSequence = NULL;
+	gchar message[100];
 	switch (seqType) 
 	{
 		case Text:
@@ -44,6 +59,9 @@ static gchar* pre_process_sequence(gchar* inputSequence, gint seqSize, gchar seq
 		case Protein:
 			newSequence = threeLetterCodedProteinToOneLetterCodedProtein(inputSequence, seqSize);
 			if (newSequence != NULL) {
+				g_snprintf(message, sizeof(message), "Se transformó la hilera '%c' a código de proteína de una letra.", seqID);
+				show_message (message, GTK_MESSAGE_INFO);
+				gtk_entry_set_text (sequenceEntry, newSequence);
 				*wasConverted = TRUE;
 				return newSequence;
 			}
@@ -84,20 +102,6 @@ static void set_substitution_matrix(ScoringOptions* options)
 				break;
 		}
 	}
-}
-
-static void show_message(gchar* message, GtkMessageType type) 
-{
-	GtkMessageDialog* dialog = NULL;
-	dialog = GTK_MESSAGE_DIALOG (gtk_message_dialog_new (
-			                     GTK_WINDOW(app_builder_get_window()),
-		                         GTK_DIALOG_MODAL,
-		                         type,
-		                         GTK_BUTTONS_CLOSE,
-	                             "%s",
-	                             message));
-	gtk_dialog_run(GTK_DIALOG(dialog));
-	gtk_widget_destroy(GTK_WIDGET(dialog));
 }
 
 static void update_substitution_matrix_dropdown()
@@ -347,8 +351,7 @@ void on_cbKBand_toggled(GtkCheckButton* sender) {
 	}
 }
 /* ---------------------------------------------------------------- */
-gchar* tempV = NULL;
-gchar* tempW = NULL;
+
 void on_btGlobalAlignNW_clicked(GtkButton* sender) {
 	gchar* v = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txV()));
 	gchar* w = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txW()));
@@ -403,12 +406,12 @@ void on_btGlobalAlignNW_clicked(GtkButton* sender) {
 
 		gboolean wasVConverted = FALSE;
 		gboolean wasWConverted = FALSE;
-		v = pre_process_sequence(v, vSize, 'v', &wasVConverted);
-		w = pre_process_sequence(w, wSize, 'w', &wasWConverted);
+		pre_process_sequence(v, vSize, 'v', &wasVConverted);
+		pre_process_sequence(w, wSize, 'w', &wasWConverted);
 		if (wasVConverted)
-			tempV = v;
+			v = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txV()));
 		if (wasWConverted)
-			tempW = w;
+			w = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txW()));
 	
 		app_widget_show_nwpopup(
 			v,
@@ -510,12 +513,12 @@ void on_btLocalAlignSW_clicked(GtkButton* sender) {
 
 		gboolean wasVConverted = FALSE;
 		gboolean wasWConverted = FALSE;
-		v = pre_process_sequence(v, vSize, 'v', &wasVConverted);
-		w = pre_process_sequence(w, wSize, 'w', &wasWConverted);
+		pre_process_sequence(v, vSize, 'v', &wasVConverted);
+		pre_process_sequence(w, wSize, 'w', &wasWConverted);
 		if (wasVConverted)
-			tempV = v;
+			v = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txV()));
 		if (wasWConverted)
-			tempW = w;
+			w = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txW()));
 
 		app_widget_show_swpopup(
 			v,
@@ -543,14 +546,6 @@ void on_rbCustomValues_toggled(GtkRadioButton* sender) {
 gboolean on_popup_delete_event(GtkWidget* sender, GdkEvent* event) {
 	gtk_widget_hide(sender);
 	freeResults();
-	if (tempV != NULL) {
-		g_free(tempV);
-		tempV = NULL;
-	}
-	if (tempW != NULL) {
-		g_free(tempW);
-		tempW = NULL;
-	}
 	return TRUE;
 }
 /* ---------------------------------------------------------------- */
