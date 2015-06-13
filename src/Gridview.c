@@ -91,8 +91,8 @@ void gridview_cell_colorize(
 		g_object_set(cellrenderer, "foreground", "red", NULL);
 	}
 
-	if (text[strlen(text)-1] == '*') {
-		text = g_strjoinv("", g_strsplit(text, "*", CELL_MAX_SIZE));
+	if (text[strlen(text)-1] == '$') {
+		text = g_strjoinv("", g_strsplit(text, "$", CELL_MAX_SIZE));
 		
 		g_object_set(cellrenderer, "text", text, NULL);
 		
@@ -237,7 +237,7 @@ void gridview_databind(
 				if (ivalue == -1000000) {
 					sprintf(value, "%s", "-INF");
 				} else {
-					sprintf(value, "%d%s", ivalue, cell_isFlagSet(datasource[i][j - 1], IS_PAINTED, bodies[zpage])? "*": "");
+					sprintf(value, "%d%s", ivalue, cell_isFlagSet(datasource[i][j - 1], IS_PAINTED, bodies[zpage])? "$": "");
 				}
 
 				if (cell_isFlagSet(datasource[i][j - 1], comesf[zpage], 'C')) {
@@ -340,7 +340,7 @@ void gridview_databind_plain(
 				if (ivalue == -1000000) {
 					sprintf(value, "%s", "-INF");
 				} else {
-					sprintf(value, "%d%s", ivalue, (iflags&IS_PAINTED)!=0? "*": "");
+					sprintf(value, "%d%s", ivalue, (iflags&IS_PAINTED)!=0? "$": "");
 				}
 
 				if ((iflags & COMES_FROM_UP) != 0) {
