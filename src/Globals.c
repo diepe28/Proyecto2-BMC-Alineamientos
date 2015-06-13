@@ -1,8 +1,9 @@
 #include "Globals.h"
 
-char* SEQUENCE_TYPES[2] = {
+char* SEQUENCE_TYPES[3] = {
 	"ADN",
-	"Prote\xEDna"
+	"Proteina",
+	"Texto"
 };
 
 char AMINO_ACIDS[64]  = {
@@ -185,7 +186,7 @@ gint valueOfMatrix(gint matrix[27][27], gchar first, gchar second){
 
 int createBenchmarkGraph(long* times, int n){
 	char * commandsForGnuplot[] = {
-		"set terminal png large size 1080, 720",
+		"set terminal png large size 1080, 600",
 		"set output \"BENCHMARK.png\"",
 		"set style line 1 lc rgb 'black' lt 1 lw 2 pt 7 ps 1", //0060ad blue
 		"set style line 2 lc rgb '#33CC33' lt 1 lw 2 pt 7 ps 1.5", //green
@@ -249,7 +250,7 @@ int createBenchmarkGraph(long* times, int n){
 
 int createBenchmarkGraphKBand(long* times, long* timesKBand, int n){
 	char * commandsForGnuplot[] = {
-		"set terminal png large size 1080, 680",
+		"set terminal png large size 1080, 600",
 		"set output \"BENCHMARK.png\"",
 		"set style line 1 lc rgb '#0060ad' lt 1 lw 2 pt 7 ps 1", //black
 		"set style line 2 lc rgb '#33CC33' lt 1 lw 2 pt 7 ps 1.5", //green
