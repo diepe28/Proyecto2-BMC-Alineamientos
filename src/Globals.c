@@ -388,7 +388,7 @@ gint createBirdWatchGraphNW(Island* island, gint rows, gint cols, gint seq1Lengt
 		"set format y \"\"",
 		"set format x \"\"",
 		"set offset 1,1,1,1",
-		"plot 'birdWatchdata.temp' index 0 with linespoints ls 1, '' index 1 with linespoints ls 2"};
+		"plot 'birdWatchdata.temp' index 0 with linespoints ls 2, '' index 1 with linespoints ls 1"};
 	
 	gchar xRangeCommand[30], yRangeCommand[50];
 	gint i = 0, j = 0, numCommands = 10, minTimeIndex = 0, maxTimeIndex = 0, x, y;
@@ -402,17 +402,8 @@ gint createBirdWatchGraphNW(Island* island, gint rows, gint cols, gint seq1Lengt
 		
 	sprintf (xRangeCommand, "set xrange [%d:%d]", 0, cols);
 	sprintf (yRangeCommand, "set yrange [%d:%d]", 0, rows);
-	
-	GSList* iterator;
-	for(iterator = island->points; iterator; iterator = iterator->next){
-		x = (gint) (iterator->data);
-		iterator = iterator->next;
-		y = (gint) (iterator->data);
-		fprintf(tempFile, "%d %d \n", x , rows-y); //Write the data to a temporary file
-	}
 
 	if(k > -1){
-		fprintf(tempFile, "\n\n");
 		//write the data of the kband border to the temporary file
 		i, j = 0;
 		gint diff = ABS(seq1Length - seq2Length);
@@ -427,7 +418,18 @@ gint createBirdWatchGraphNW(Island* island, gint rows, gint cols, gint seq1Lengt
 				fprintf(tempFile, "%d %ld \n",i , rows -(j + k + 1));
 			}
 		}
+		fprintf(tempFile, "\n\n");
 	}
+	
+	GSList* iterator;
+	for(iterator = island->points; iterator; iterator = iterator->next){
+		x = (gint) (iterator->data);
+		iterator = iterator->next;
+		y = (gint) (iterator->data);
+		fprintf(tempFile, "%d %d \n", x , rows-y); //Write the data to a temporary file
+	}
+
+	
 	
 	fprintf(gnuplotPipe, "%s \n", xRangeCommand);
 	fprintf(gnuplotPipe, "%s \n", yRangeCommand);
