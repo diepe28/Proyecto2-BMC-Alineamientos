@@ -9,7 +9,7 @@ gchar* sequenceFromFile(gchar *, gulong *);
 //Assumming both chars ar capital
 gint valueOfMatrix(gint matrix[27][27], gchar first, gchar second);
 gchar* APP_SEQUENCE_TYPE(gint stype);
-gint createBirdWatchGraphNW(Island* island, gint rows, gint cols);
+gint createBirdWatchGraphNW(Island* island, gint rows, gint cols, gint seq1Length, gint seq2Length, gint k);
 gint createBirdWatchGraphSW(GSList* islands, gint rows, gint cols);
 gchar* dnaToProtein(gchar* dna);
 gchar* threeLetterCodedProteinToOneLetterCodedProtein(const gchar* seq, gint seqSize);

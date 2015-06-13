@@ -348,7 +348,7 @@ int createBenchmarkGraphKBand(long* times, long* timesKBand, int n){
 	for(i=0; i < n; i++){
 		fprintf(tempFile, "%d %ld \n", i+1, timesKBand[i]);
 	}
-	
+
 	fprintf(gnuplotPipe, "%s \n", xRangeCommand);
 	fprintf(gnuplotPipe, "%s \n", yRangeCommand);
 	
@@ -377,18 +377,18 @@ gchar* APP_SEQUENCE_TYPE(gint stype) {
 }
 
 
-gint createBirdWatchGraphNW(Island* island, gint rows, gint cols){
+gint createBirdWatchGraphNW(Island* island, gint rows, gint cols, gint seq1Length, gint seq2Length, gint k){
 	gchar * commandsForGnuplot[] = {
 		"set terminal png large size 1920, 1080",
 		"set output \"BIRD_WATCH.png\"",
 		"set style line 1 lc rgb '#0060ad' lt 1 lw 2 pt 7 ps 1", //0060ad blue
-		"set style line 2 lc rgb '#33CC33' lt 1 lw 2 pt 7 ps 1.5", //green
+		"set style line 2 lc rgb '#ff0000' lt 1 lw 2 pt 7 ps 1", //red
 		"set title \"Vista de pajaro alineamiento global\"",
 		"unset key",
 		"set format y \"\"",
 		"set format x \"\"",
 		"set offset 1,1,1,1",
-		"plot 'birdWatchdata.temp' index 0 with linespoints ls 1"};
+		"plot 'birdWatchdata.temp' index 0 with linespoints ls 1, '' index 1 with linespoints ls 2"};
 	
 	gchar xRangeCommand[30], yRangeCommand[50];
 	gint i = 0, j = 0, numCommands = 10, minTimeIndex = 0, maxTimeIndex = 0, x, y;
@@ -409,6 +409,24 @@ gint createBirdWatchGraphNW(Island* island, gint rows, gint cols){
 		iterator = iterator->next;
 		y = (gint) (iterator->data);
 		fprintf(tempFile, "%d %d \n", x , rows-y); //Write the data to a temporary file
+	}
+
+	if(k > -1){
+		fprintf(tempFile, "\n\n");
+		//write the data of the kband border to the temporary file
+		i, j = 0;
+		gint diff = ABS(seq1Length - seq2Length);
+		if (seq1Length < seq2Length) {
+			for (i = 0, j = 0; i < (seq1Length - k); i++, j++) {
+				fprintf(tempFile, "%d %ld \n",i + k + 1 , rows - j);
+				fprintf(tempFile, "%d %ld \n",i , rows- (j + diff + k + 1));
+			}	
+		} else {
+			for (i = 0, j = 0; i < (seq2Length - k); i++, j++) {
+				fprintf(tempFile, "%d %ld \n",i + diff + k + 1 , rows - j);
+				fprintf(tempFile, "%d %ld \n",i , rows -(j + k + 1));
+			}
+		}
 	}
 	
 	fprintf(gnuplotPipe, "%s \n", xRangeCommand);

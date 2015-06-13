@@ -222,7 +222,7 @@ void app_widget_show_nwpopup(
 	Island* alignment = nwBenchmarkResult->alignment;
 	gulong* executionTimes = nwBenchmarkResult->fullExecutionTimes;
 	gulong* executionTimesKband = nwBenchmarkResult->kbandExecutionTimes;
-	createBirdWatchGraphNW(alignment, lengthW, lengthV);
+	createBirdWatchGraphNW(alignment, lengthW, lengthV, lengthW, lengthV, nwBenchmarkResult->latestk);
 	if (executionTimesKband == NULL) {
 		createBenchmarkGraph(executionTimes, numberOfThreads);
 	} else {
@@ -445,8 +445,8 @@ void loadBirdWatchImage() {
 	GError* gerror = 0;
 	gtk_image_clear(iimage);
 	
-	int width = 320; // = gtk_widget_get_allocated_width(wimage);
-	int heigth = 280; // = gtk_widget_get_allocated_height(wimage);
+	int width = 300; // = gtk_widget_get_allocated_width(wimage);
+	int heigth = 260; // = gtk_widget_get_allocated_height(wimage);
 	/*
 	if (width < 100) {
 		width = 400;
