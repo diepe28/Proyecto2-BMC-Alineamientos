@@ -276,8 +276,8 @@ void app_widget_show_nwpopup(
 void app_widget_refresh_popup(
 	gchar* v, // v is up sequence
 	gchar* w,
-	gint lengthV,
 	gint lengthW,
+	gint lengthV,
 	gint zpage,
 	gint xpage,
 	gint ypage,
