@@ -261,6 +261,9 @@ void app_widget_show_nwpopup(
 	
 	gtk_adjustment_configure(GTK_ADJUSTMENT(app_builder_get_aXPage()), 1, 1, xpages, 1, 10, 0);
 	gtk_adjustment_configure(GTK_ADJUSTMENT(app_builder_get_aYPage()), 1, 1, ypages, 1, 10, 0);
+
+	gboolean usingGapBlock = scoringOptions->gapOpeningPenalty != 0;
+	gtk_widget_set_sensitive (app_builder_get_cbGotoValue(), usingGapBlock);
 	
 	gtk_widget_show_all(popup);
 }
@@ -337,6 +340,9 @@ void app_widget_show_swpopup(
 	showIsland(currentIslandIndex);
 	loadBirdWatchImage();
 	loadBenchmarkImage();
+
+	gboolean usingGapBlock = scoringOptions->gapOpeningPenalty != 0;
+	gtk_widget_set_sensitive (app_builder_get_cbGotoValue(), usingGapBlock);
 	
 	gtk_widget_show_all(popup);
 }

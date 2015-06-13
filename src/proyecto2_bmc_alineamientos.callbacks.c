@@ -23,6 +23,8 @@ typedef enum {
 
 const gchar* authors[4] = {"Olger Calderón Achío", "Wilberth Castro Fuentes", "Diego Pérez Arroyo", NULL};
 
+gboolean USING_GAP_BLOCKS = FALSE;
+
 // Helper functions
 
 static void set_substitution_matrix(ScoringOptions* options) 
@@ -319,7 +321,7 @@ void on_btGlobalAlignNW_clicked(GtkButton* sender) {
 	
 		gint matchbonus = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbMatch()));
 		gint missmatchbonus = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbMissmatch()));
-		gint gappenalty1 = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbF()));
+		gint openGapPenalty = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbF()));
 		gint gappenalty2 = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbK()));
 		gboolean freeleftgapsv = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(app_builder_get_cbVLeftFG()));
 		gboolean freeleftgapsw = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(app_builder_get_cbWLeftFG()));
@@ -337,10 +339,12 @@ void on_btGlobalAlignNW_clicked(GtkButton* sender) {
 	
 		gint pagesize = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbPageSize()));
 
+		USING_GAP_BLOCKS = openGapPenalty != 0;
+		
 		ScoringOptions* scoringOptions = ScoringOptions_new(
 			matchbonus,
 			missmatchbonus,
-			gappenalty1,
+			openGapPenalty,
 			gappenalty2,
 			freeleftgapsv,
 			freeleftgapsw,
@@ -441,6 +445,8 @@ void on_btLocalAlignSW_clicked(GtkButton* sender) {
 		gint numberOfThreads = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbNThreads()));
 		gint minValueIslands = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_spMinIslands()));
 
+		USING_GAP_BLOCKS = FALSE;
+		
 		ScoringOptions* options = ScoringOptions_new(
 			matchbonus,
 			missmatchbonus,
@@ -497,9 +503,12 @@ void on_tbPrev_clicked(GtkButton* sender) {
 }
 /* ---------------------------------------------------------------- */
 void on_cbGotoValue_changed(GtkComboBox* sender) {
+	if(!USING_GAP_BLOCKS)
+		return;
+	
 	gchar* v = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txV()));
 	gchar* w = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txW()));
-	
+
 	gint zpage = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbGotoValue()));
 
 	gint xpage = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbX()));
@@ -545,6 +554,9 @@ void on_sbY_value_changed(GtkSpinButton *sender) {
 }
 /* ---------------------------------------------------------------- */
 void on_page_changed(GObject* sender) {
+	if(!USING_GAP_BLOCKS)
+		return;
+	
 	gint zpage = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbGotoValue()));
 	
 	gint xpage = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbX()));
