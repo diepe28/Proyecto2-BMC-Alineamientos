@@ -318,7 +318,7 @@ void gridview_databind_plain(
 			sprintf(arrol, "%s", CELL_ARROW_NULL);
 			
 			if (j == xfirst) {
-				if (0 < i && i <= colslen) {
+				if (0 < i && i <= rowslen) {
 					sprintf(value, "%c", col0[i - 1]);
 				}
 			} else if (i<rowslen+1 && j<colslen+2) {
