@@ -1,5 +1,4 @@
 #include "Gridview.h"
-#include "TestingFunctions.h"
 
 /* ---------------------------------------------------------------- */
 void gridview_model_set_value(GtkTreeModel* model, gint row, gint column, gchar* text) {

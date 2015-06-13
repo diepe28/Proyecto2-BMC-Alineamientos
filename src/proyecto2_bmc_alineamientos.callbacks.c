@@ -291,7 +291,7 @@ static gboolean validate_required_memory(gint seq1Size, gint seq2Size)
 
 static gboolean preprocess_validation(gint seq1Size, gint seq2Size)
 {
-	return validate_sequences_types() && validate_sequences_characters(seq1Size, seq2Size) && validate_required_memory(seq1Size, seq2Size);
+	return validate_sequences_types() && validate_sequences_characters(seq1Size, seq2Size);
 }
 
 // End of Helper Functions
@@ -375,7 +375,23 @@ void on_btGlobalAlignNW_clicked(GtkButton* sender) {
 		gint kbandValue = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbKValue()));
 		gint kbandGrowth = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbGrowthInterval()));
 		gint numberOfThreads = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbNThreads()));
-	
+
+		gboolean wasVConverted = pre_process_sequence(v, vSize, 'v');
+		gboolean wasWConverted = pre_process_sequence(w, wSize, 'w');
+		if (wasVConverted) {
+			v = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txV()));
+			vSize = strlen(v);
+			vtype = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbVInputType()));
+		}
+		if (wasWConverted) {
+			w = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txW()));
+			wSize = strlen(w);
+			wtype = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbWInputType()));
+		}
+		
+		if (!validate_required_memory(vSize, wSize))
+			return;
+		
 		ScoringOptions* scoringOptions = ScoringOptions_new(
 			matchbonus,
 			missmatchbonus,
@@ -395,19 +411,6 @@ void on_btGlobalAlignNW_clicked(GtkButton* sender) {
 				kbandValue,
 				kbandGrowth
 			);
-		}
-
-		gboolean wasVConverted = pre_process_sequence(v, vSize, 'v');
-		gboolean wasWConverted = pre_process_sequence(w, wSize, 'w');
-		if (wasVConverted) {
-			v = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txV()));
-			vSize = strlen(v);
-			vtype = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbVInputType()));
-		}
-		if (wasWConverted) {
-			w = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txW()));
-			wSize = strlen(w);
-			wtype = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbWInputType()));
 		}
 
 		gint zpage = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbGotoValue()));
@@ -500,19 +503,6 @@ void on_btLocalAlignSW_clicked(GtkButton* sender) {
 		gint gappenalty2 = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbK()));
 		gint numberOfThreads = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbNThreads()));
 		gint minValueIslands = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_spMinIslands()));
-		
-		ScoringOptions* options = ScoringOptions_new(
-			matchbonus,
-			missmatchbonus,
-			gappenalty1,
-			gappenalty2,
-			FALSE,
-			FALSE,
-			FALSE,
-			FALSE,
-			NULL
-		);
-		set_substitution_matrix(options);
 
 		gboolean wasVConverted = pre_process_sequence(v, vSize, 'v');
 		gboolean wasWConverted = pre_process_sequence(w, wSize, 'w');
@@ -526,6 +516,22 @@ void on_btLocalAlignSW_clicked(GtkButton* sender) {
 			wSize = strlen(w);
 			wtype = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbWInputType()));
 		}
+		
+		if (!validate_required_memory(vSize, wSize))
+			return;
+		
+		ScoringOptions* options = ScoringOptions_new(
+			matchbonus,
+			missmatchbonus,
+			gappenalty1,
+			gappenalty2,
+			FALSE,
+			FALSE,
+			FALSE,
+			FALSE,
+			NULL
+		);
+		set_substitution_matrix(options);
 
 		app_widget_show_swpopup(
 			v,
