@@ -282,23 +282,39 @@ void app_widget_refresh_popup(
 	gint xpage,
 	gint ypage,
 	gint pagesize,
-    gboolean localAlignment
+	gboolean localAlignment
 ) {
+	gboolean usingGapBlock = scoringOptions->gapOpeningPenalty != 0;
+	
 	GtkWidget* gridview = GTK_WIDGET(app_builder_get_gridview());
 
-	gridview_databind(
-		gridview,
-		localAlignment? swBenchmarkResult->similarityMatrix : 
-						nwBenchmarkResult->similarityMatrix,
-		w,
-		v,
-		lengthV,
-		lengthW,
-		zpage,
-		xpage,
-		ypage,
-		pagesize
-	);
+	if (usingGapBlock) {
+		gridview_databind(
+			gridview,
+			localAlignment? swBenchmarkResult->similarityMatrix: nwBenchmarkResult->similarityMatrix,
+			w,
+			v,
+			lengthV,
+			lengthW,
+			zpage,
+			xpage,
+			ypage,
+			pagesize
+		);
+	} else {
+		gridview_databind_plain(
+			gridview,
+			localAlignment? swBenchmarkResult->similarityMatrix: nwBenchmarkResult->similarityMatrix,
+			w,
+			v,
+			lengthV,
+			lengthW,
+			zpage,
+			xpage,
+			ypage,
+			pagesize
+		);
+	}
 }
 /* ---------------------------------------------------------------- */
 void app_widget_show_swpopup(
