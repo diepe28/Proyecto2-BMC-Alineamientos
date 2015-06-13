@@ -355,8 +355,8 @@ void on_cbKBand_toggled(GtkCheckButton* sender) {
 
 void on_btGlobalAlignNW_clicked(GtkButton* sender) {
 	isLocalAlignment = FALSE;
-	gchar* v = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txV()));
-	gchar* w = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txW()));
+	const gchar* v = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txV()));
+	const gchar* w = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txW()));
 	gint vSize = strlen(v);
 	gint wSize = strlen(w);
 	if (preprocess_validation(vSize, wSize)) {
@@ -376,13 +376,6 @@ void on_btGlobalAlignNW_clicked(GtkButton* sender) {
 		gint kbandGrowth = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbGrowthInterval()));
 		gint numberOfThreads = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbNThreads()));
 	
-		gint zpage = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbGotoValue()));
-	
-		gint xpage = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbX()));
-		gint ypage = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbY()));
-	
-		gint pagesize = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbPageSize()));
-		
 		ScoringOptions* scoringOptions = ScoringOptions_new(
 			matchbonus,
 			missmatchbonus,
@@ -406,10 +399,23 @@ void on_btGlobalAlignNW_clicked(GtkButton* sender) {
 
 		gboolean wasVConverted = pre_process_sequence(v, vSize, 'v');
 		gboolean wasWConverted = pre_process_sequence(w, wSize, 'w');
-		if (wasVConverted)
+		if (wasVConverted) {
 			v = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txV()));
-		if (wasWConverted)
+			vSize = strlen(v);
+			vtype = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbVInputType()));
+		}
+		if (wasWConverted) {
 			w = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txW()));
+			wSize = strlen(w);
+			wtype = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbWInputType()));
+		}
+
+		gint zpage = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbGotoValue()));
+	
+		gint xpage = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbX()));
+		gint ypage = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbY()));
+	
+		gint pagesize = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(app_builder_get_sbPageSize()));
 	
 		app_widget_show_nwpopup(
 			v,
@@ -479,8 +485,8 @@ void on_btWLoad_clicked(GtkButton* sender) {
 /* ---------------------------------------------------------------- */
 void on_btLocalAlignSW_clicked(GtkButton* sender) {
 	isLocalAlignment = TRUE;
-	gchar* v = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txV()));
-	gchar* w = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txW()));
+	const gchar* v = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txV()));
+	const gchar* w = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txW()));
 	gint vSize = strlen(v);
 	gint wSize = strlen(w);
 	if (preprocess_validation(vSize, wSize)) {
@@ -510,10 +516,16 @@ void on_btLocalAlignSW_clicked(GtkButton* sender) {
 
 		gboolean wasVConverted = pre_process_sequence(v, vSize, 'v');
 		gboolean wasWConverted = pre_process_sequence(w, wSize, 'w');
-		if (wasVConverted)
+		if (wasVConverted) {
 			v = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txV()));
-		if (wasWConverted)
+			vSize = strlen(v);
+			vtype = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbVInputType()));
+		}
+		if (wasWConverted) {
 			w = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txW()));
+			wSize = strlen(w);
+			wtype = gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbWInputType()));
+		}
 
 		app_widget_show_swpopup(
 			v,
