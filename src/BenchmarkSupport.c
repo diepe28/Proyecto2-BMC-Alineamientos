@@ -37,6 +37,7 @@ NWBenchmarkResult* execute_nw_benchmark(gchar* seq1, gchar* seq2, gint seq1Lengt
 	Island* alignment = NULL;
 	gulong* fullExecutionTimes = NULL;
 	gulong* kbandExecutionTimes = NULL;
+	gint latestk = -1;
 
 	similarityMatrix = create_matrix (seq1Length + 1, seq2Length + 1);
 	fullExecutionTimes = (gulong*) g_malloc(sizeof(gulong) * numberOfThreads);
@@ -67,7 +68,7 @@ NWBenchmarkResult* execute_nw_benchmark(gchar* seq1, gchar* seq2, gint seq1Lengt
 				island_free(alignment);
 			
 			GTimer* timer = g_timer_new();
-			fill_similarity_matrix_kband(similarityMatrix, seq1, seq2, seq1Length, seq2Length, scoringOptions, kbandOptions, i + 1);
+			latestk = fill_similarity_matrix_kband(similarityMatrix, seq1, seq2, seq1Length, seq2Length, scoringOptions, kbandOptions, i + 1);
 			alignment = afterMatrixFilling_find_NW_Alignment(similarityMatrix, seq2, seq1, seq1Length, seq2Length, scoringOptions->freeRightGapsForX, scoringOptions->freeRightGapsForY, scoringOptions->gapOpeningPenalty != 0);
 			g_timer_stop(timer);
 			gulong fractional_part = 0;
@@ -87,6 +88,7 @@ NWBenchmarkResult* execute_nw_benchmark(gchar* seq1, gchar* seq2, gint seq1Lengt
 	benchmarkResult->numberOfRuns = numberOfThreads;
 	benchmarkResult->seq1Length = seq1Length;
 	benchmarkResult->seq2Length = seq2Length;
+	benchmarkResult->latestk = latestk;
 	return benchmarkResult;
 }
 

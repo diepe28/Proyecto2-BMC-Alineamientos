@@ -14,6 +14,7 @@ typedef struct {
 	gint numberOfRuns;
 	gint seq1Length;
 	gint seq2Length;
+	gint latestk;
 } NWBenchmarkResult;
 
 typedef struct {

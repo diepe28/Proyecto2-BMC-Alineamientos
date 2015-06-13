@@ -250,7 +250,7 @@ void fill_similarity_matrix_full(Cell*** matrix, gchar* seq1, gchar* seq2, gint 
 		fill_matrix_parallel (matrix, scoringOptions, seq1Length + 1, seq2Length + 1, seq1, seq2, isLocalAlignment, numberOfThreads);
 }
 
-void fill_similarity_matrix_kband(Cell*** matrix, gchar* seq1, gchar* seq2, gint seq1Length, gint seq2Length, ScoringOptions* scoringOptions, KBandOptions* kbandOptions, gint numberOfThreads) 
+gint fill_similarity_matrix_kband(Cell*** matrix, gchar* seq1, gchar* seq2, gint seq1Length, gint seq2Length, ScoringOptions* scoringOptions, KBandOptions* kbandOptions, gint numberOfThreads) 
 {
 	gint i = 0;
 	gint k = kbandOptions->kInitValue;
@@ -268,7 +268,7 @@ void fill_similarity_matrix_kband(Cell*** matrix, gchar* seq1, gchar* seq2, gint
 		gint bestScore = matrix[seq1Length][seq2Length]->value_a;
 		gint nextKBound = (2*(k + 1) + maxLength - minLength)*scoringOptions->gapExtensionPenalty + (minLength - (k + 1))*scoringOptions->matchBonus;
 		if (bestScore >= nextKBound)
-			return;
+			return k;
 		k += kbandOptions->kExtensionValue;
 	}
 
@@ -276,4 +276,5 @@ void fill_similarity_matrix_kband(Cell*** matrix, gchar* seq1, gchar* seq2, gint
 		fill_matrix (matrix, scoringOptions, 0, 0, seq1Length + 1, seq2Length + 1, seq1, seq2, FALSE);
 	else
 		fill_matrix_parallel (matrix, scoringOptions, seq1Length + 1, seq2Length + 1, seq1, seq2, FALSE, numberOfThreads);
+	return -1;
 }
