@@ -23,7 +23,9 @@ typedef enum {
 
 const gchar* authors[4] = {"Olger Calderón Achío", "Wilberth Castro Fuentes", "Diego Pérez Arroyo", NULL};
 
-// Helper functions
+// Helper Functions
+
+// static void check
 
 static void set_substitution_matrix(ScoringOptions* options) 
 {
@@ -252,6 +254,8 @@ static gboolean preprocess_validation(gint seq1Size, gint seq2Size)
 	return validate_sequences_types() && validate_sequences_characters(seq1Size, seq2Size) && validate_required_memory(seq1Size, seq2Size);
 }
 
+// End of Helper Functions
+
 /* ---------------------------------------------------------------- */
 void on_window_init(GtkBuilder* sender) {
 	app_set_builder(sender);
@@ -309,8 +313,8 @@ void on_cbKBand_toggled(GtkCheckButton* sender) {
 }
 /* ---------------------------------------------------------------- */
 void on_btGlobalAlignNW_clicked(GtkButton* sender) {
-	const gchar* v = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txV()));
-	const gchar* w = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txW()));
+	gchar* v = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txV()));
+	gchar* w = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txW()));
 	gint vSize = strlen(v);
 	gint wSize = strlen(w);
 	if (preprocess_validation(vSize, wSize)) {
@@ -417,8 +421,8 @@ void on_btWLoad_clicked(GtkButton* sender) {
 }
 /* ---------------------------------------------------------------- */
 void on_btLocalAlignSW_clicked(GtkButton* sender) {
-	const gchar* v = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txV()));
-	const gchar* w = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txW()));
+	gchar* v = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txV()));
+	gchar* w = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txW()));
 	gint vSize = strlen(v);
 	gint wSize = strlen(w);
 	if (preprocess_validation(vSize, wSize)) {
