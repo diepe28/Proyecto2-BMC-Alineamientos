@@ -39,7 +39,7 @@ static void show_message(gchar* message, GtkMessageType type)
 	gtk_widget_destroy(GTK_WIDGET(dialog));
 }
 
-static gchar* pre_process_sequence(gchar* inputSequence, gint seqSize, gchar seqID, gboolean* wasConverted) 
+static gboolean pre_process_sequence(gchar* inputSequence, gint seqSize, gchar seqID) 
 {
 	SequenceType seqType = (seqID == 'v') ? 
 		(SequenceType) gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbVInputType())) :
@@ -48,33 +48,35 @@ static gchar* pre_process_sequence(gchar* inputSequence, gint seqSize, gchar seq
 		(SequenceType) gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbVInputType())) :
 		(SequenceType) gtk_combo_box_get_active(GTK_COMBO_BOX(app_builder_get_cbWInputType()));
 	GtkEntry* sequenceEntry = (seqID == 'v') ? GTK_ENTRY(app_builder_get_txV()) : GTK_ENTRY(app_builder_get_txW());
+	GtkComboBox* seqComboBox = (seqID == 'v') ? GTK_COMBO_BOX(app_builder_get_cbVInputType()) : GTK_COMBO_BOX(app_builder_get_cbWInputType());
 	gchar* newSequence = NULL;
 	gchar message[100];
 	switch (seqType) 
 	{
 		case Text:
-			*wasConverted = FALSE;
-			return inputSequence;
+			return FALSE;
 		case Protein:
 			newSequence = threeLetterCodedProteinToOneLetterCodedProtein(inputSequence, seqSize);
 			if (newSequence != NULL) {
 				g_snprintf(message, sizeof(message), "Se transformó la hilera '%c' a código de proteína de una letra.", seqID);
 				show_message (message, GTK_MESSAGE_INFO);
 				gtk_entry_set_text (sequenceEntry, newSequence);
-				*wasConverted = TRUE;
-				return newSequence;
+				g_free(newSequence);
 			}
-			break;
+			return TRUE;
 		case ADN:
 			if (otherSeqType == Protein) {
 				newSequence = dnaToProtein(inputSequence);
-				*wasConverted = TRUE;
-				return newSequence;
+				g_snprintf(message, sizeof(message), "Se transformó la hilera '%c' a proteína usando el código genético.", seqID);
+				show_message (message, GTK_MESSAGE_INFO);
+				gtk_combo_box_set_active(seqComboBox, (gint)Protein);
+				gtk_entry_set_text (sequenceEntry, newSequence);
+				g_free(newSequence);
+				return TRUE;
 			}
 			break;
 	}
-	*wasConverted = FALSE;
-	return inputSequence;
+	return FALSE;
 }
 
 // Helper functions
@@ -402,10 +404,8 @@ void on_btGlobalAlignNW_clicked(GtkButton* sender) {
 			);
 		}
 
-		gboolean wasVConverted = FALSE;
-		gboolean wasWConverted = FALSE;
-		pre_process_sequence(v, vSize, 'v', &wasVConverted);
-		pre_process_sequence(w, wSize, 'w', &wasWConverted);
+		gboolean wasVConverted = pre_process_sequence(v, vSize, 'v');
+		gboolean wasWConverted = pre_process_sequence(w, wSize, 'w');
 		if (wasVConverted)
 			v = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txV()));
 		if (wasWConverted)
@@ -508,10 +508,8 @@ void on_btLocalAlignSW_clicked(GtkButton* sender) {
 		);
 		set_substitution_matrix(options);
 
-		gboolean wasVConverted = FALSE;
-		gboolean wasWConverted = FALSE;
-		pre_process_sequence(v, vSize, 'v', &wasVConverted);
-		pre_process_sequence(w, wSize, 'w', &wasWConverted);
+		gboolean wasVConverted = pre_process_sequence(v, vSize, 'v');
+		gboolean wasWConverted = pre_process_sequence(w, wSize, 'w');
 		if (wasVConverted)
 			v = gtk_entry_get_text(GTK_ENTRY(app_builder_get_txV()));
 		if (wasWConverted)
