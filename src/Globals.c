@@ -429,8 +429,6 @@ gint createBirdWatchGraphNW(Island* island, gint rows, gint cols, gint seq1Lengt
 		fprintf(tempFile, "%d %d \n", x , rows-y); //Write the data to a temporary file
 	}
 
-	
-	
 	fprintf(gnuplotPipe, "%s \n", xRangeCommand);
 	fprintf(gnuplotPipe, "%s \n", yRangeCommand);
 	
