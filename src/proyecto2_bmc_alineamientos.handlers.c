@@ -328,6 +328,10 @@ void app_widget_show_swpopup(
 	gint minValueIslands,
 	gint numberOfThreads
 ) {
+	gtk_combo_box_set_active(GTK_COMBO_BOX(app_builder_get_cbGotoValue()), 0);
+	gboolean usingGapBlock = scoringOptions->gapOpeningPenalty != 0;
+	gtk_widget_set_sensitive(GTK_WIDGET(app_builder_get_cbGotoValue()), usingGapBlock);
+	
 	swBenchmarkResult = execute_sw_benchmark(
 		w,
 		v,
@@ -339,7 +343,12 @@ void app_widget_show_swpopup(
 	);
 
 	GtkWidget* gridview = GTK_WIDGET(app_builder_get_gridview());
-	gridview_databind(gridview, swBenchmarkResult->similarityMatrix, w, v, lengthW, lengthV, 0, 0, 0, 10);
+
+	if (usingGapBlock) {
+		gridview_databind(gridview, swBenchmarkResult->similarityMatrix, w, v, lengthW, lengthV, 0, 0, 0, 10);
+	} else {
+		gridview_databind_plain(gridview, swBenchmarkResult->similarityMatrix, w, v, lengthW, lengthV, 0, 0, 0, 10);
+	}
 	
 	islandCount = g_slist_length(swBenchmarkResult->islands);
 	currentIslandIndex = 0;
@@ -367,10 +376,6 @@ void app_widget_show_swpopup(
 	showIsland(currentIslandIndex);
 	loadBirdWatchImage();
 	loadBenchmarkImage();
-
-	gtk_combo_box_set_active (GTK_COMBO_BOX(app_builder_get_cbGotoValue()), 0);
-	gboolean usingGapBlock = scoringOptions->gapOpeningPenalty != 0;
-	gtk_widget_set_sensitive (app_builder_get_cbGotoValue(), usingGapBlock);
 
 	gint pagesize = 10;
 	
