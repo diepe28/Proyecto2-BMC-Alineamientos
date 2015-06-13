@@ -62,7 +62,7 @@ void app_widget_show_nwpopup(
 	KBandOptions* kBandOptions,
 	gint numberOfThreads
 );
-void app_widget_refresh_nwpopup(
+void app_widget_refresh_popup(
 	gchar* v, // v is up sequence
 	gchar* w,
 	gint lengthV,
@@ -70,7 +70,8 @@ void app_widget_refresh_nwpopup(
 	gint index,
 	gint xpage,
 	gint ypage,
-	gint pagesize
+	gint pagesize,
+    gboolean localAlignment                        
 );
 void app_widget_show_swpopup(
 	gchar* v, // v is up sequence

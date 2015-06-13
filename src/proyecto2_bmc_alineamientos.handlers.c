@@ -269,7 +269,7 @@ void app_widget_show_nwpopup(
 	gtk_widget_show_all(popup);
 }
 /* ---------------------------------------------------------------- */
-void app_widget_refresh_nwpopup(
+void app_widget_refresh_popup(
 	gchar* v, // v is up sequence
 	gchar* w,
 	gint lengthV,
@@ -277,13 +277,15 @@ void app_widget_refresh_nwpopup(
 	gint zpage,
 	gint xpage,
 	gint ypage,
-	gint pagesize
+	gint pagesize,
+    gboolean localAlignment
 ) {
 	GtkWidget* gridview = GTK_WIDGET(app_builder_get_gridview());
-	
+
 	gridview_databind(
 		gridview,
-		nwBenchmarkResult->similarityMatrix,
+		localAlignment? swBenchmarkResult->similarityMatrix : 
+						nwBenchmarkResult->similarityMatrix,
 		w,
 		v,
 		lengthV,
@@ -316,8 +318,8 @@ void app_widget_show_swpopup(
 		numberOfThreads
 	);
 
-	//GtkWidget* gridview = GTK_WIDGET(app_builder_get_gridview());
-	//gridview_databind(gridview, swBenchmarkResult->similarityMatrix, w, v, lengthW, lengthV, zpage, xpage, ypage, pagesize);
+	GtkWidget* gridview = GTK_WIDGET(app_builder_get_gridview());
+	gridview_databind(gridview, swBenchmarkResult->similarityMatrix, w, v, lengthW, lengthV, 0, 0, 0, 10);
 	
 	islandCount = g_slist_length(swBenchmarkResult->islands);
 	currentIslandIndex = 0;
