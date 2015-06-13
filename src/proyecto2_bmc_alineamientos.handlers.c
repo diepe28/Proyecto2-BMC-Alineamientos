@@ -371,6 +371,16 @@ void app_widget_show_swpopup(
 	gtk_combo_box_set_active (GTK_COMBO_BOX(app_builder_get_cbGotoValue()), 0);
 	gboolean usingGapBlock = scoringOptions->gapOpeningPenalty != 0;
 	gtk_widget_set_sensitive (app_builder_get_cbGotoValue(), usingGapBlock);
+
+	gint pagesize = 10;
+	
+	lengthV += 1;
+	lengthW += 2;
+	gint xpages = (gint) (lengthV - lengthV%pagesize)/pagesize + (lengthV%pagesize>0? 1: 0);
+	gint ypages = (gint) (lengthW - lengthW%pagesize)/pagesize + (lengthW%pagesize>0? 1: 0);
+	
+	gtk_adjustment_configure(GTK_ADJUSTMENT(app_builder_get_aXPage()), 1, 1, xpages, 1, 10, 0);
+	gtk_adjustment_configure(GTK_ADJUSTMENT(app_builder_get_aYPage()), 1, 1, ypages, 1, 10, 0);
 	
 	gtk_widget_show_all(popup);
 }
