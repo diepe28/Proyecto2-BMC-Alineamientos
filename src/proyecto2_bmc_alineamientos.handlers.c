@@ -210,6 +210,9 @@ void app_widget_show_nwpopup(
 		kBandOptions,
 		numberOfThreads
 	);
+	g_free(scoringOptions);
+	if (kBandOptions != NULL)
+		g_free(kBandOptions);
 
 	GtkWidget* gridview = GTK_WIDGET(app_builder_get_gridview());
 
@@ -231,13 +234,12 @@ void app_widget_show_nwpopup(
 	
 	GtkWidget* popup = GTK_WIDGET(app_builder_get_popup());
 
-	gchar* sSeq1Length = (gchar*) g_malloc(sizeof(gchar)*(log10(lengthV) + 1));
-	gchar* sSeq2Length = (gchar*) g_malloc(sizeof(gchar)*(log10(lengthW) + 1));
+	gchar sSeq1Length[50];
+	gchar sSeq2Length[50];
 
-	sprintf(sSeq1Length, "%d", lengthV);
-	sprintf(sSeq2Length, "%d", lengthW);
+	g_snprintf(sSeq1Length, 50, "%d", lengthV);
+	g_snprintf(sSeq2Length, 50, "%d", lengthW);
 
-	//TODO, check if is semi blobal alignment to set label 
 	gtk_label_set_text(GTK_LABEL(app_builder_get_lAlgTypeValue()), "Global");
 	
 	gtk_label_set_text(GTK_LABEL(app_builder_get_lVLengthValue()), sSeq1Length);
@@ -341,6 +343,7 @@ void app_widget_show_swpopup(
 		minValueIslands,
 		numberOfThreads
 	);
+	g_free(scoringOptions);
 
 	GtkWidget* gridview = GTK_WIDGET(app_builder_get_gridview());
 
@@ -450,19 +453,15 @@ void loadBirdWatchImage() {
 	GError* gerror = 0;
 	gtk_image_clear(iimage);
 	
-	int width = 300; // = gtk_widget_get_allocated_width(wimage);
-	int heigth = 260; // = gtk_widget_get_allocated_height(wimage);
-	/*
-	if (width < 100) {
-		width = 400;
-	}
-	if (heigth < 100) {
-		heigth = 350;
-	}
-	*/
+	int width = 300;
+	int heigth = 260;
+
 	GdkPixbuf* pixbuf = gdk_pixbuf_new_from_file("BIRD_WATCH.png", &gerror); 
 	GdkPixbuf* resized = gdk_pixbuf_scale_simple(pixbuf, width, heigth, GDK_INTERP_BILINEAR);
 	gtk_image_set_from_pixbuf(iimage, resized);
+	g_object_unref(pixbuf);
+	g_object_unref(resized);
+	
 }
 /* ---------------------------------------------------------------- */
 void loadBenchmarkImage() {

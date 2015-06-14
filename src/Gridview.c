@@ -91,15 +91,19 @@ void gridview_cell_colorize(
 	}
 
 	if (text[strlen(text)-1] == '$') {
-		text = g_strjoinv("", g_strsplit(text, "$", CELL_MAX_SIZE));
+		gchar** arrayOfStrings = g_strsplit(text, "$", CELL_MAX_SIZE);
+		text = g_strjoinv("", arrayOfStrings);
 		
 		g_object_set(cellrenderer, "text", text, NULL);
-		
 		g_object_set(cellrenderer, "background-set", TRUE, NULL);
 		g_object_set(cellrenderer, "background", "lightgray", NULL);
+		
+		g_free(text);
+		g_strfreev(arrayOfStrings);
 	}
 	
 	g_value_unset(value);
+	g_slice_free(GValue, value);
 }
 /* ---------------------------------------------------------------- */
 void gridview_resize(GtkWidget* gridview, gint rowslen, gint colslen) {
@@ -155,7 +159,9 @@ void gridview_resize(GtkWidget* gridview, gint rowslen, gint colslen) {
 		}
 
 		gtk_list_store_set_valuesv(row, &iter, colids, values, 2 + colslen*2);
-		
+
+		for (j=0; j<2+colslen*2; j++)
+			g_value_unset(&values[j]);
 		g_slice_free1(sizeof(GValue)*(2 + colslen*2), values);
 		g_slice_free1(sizeof(gint)*(2 + colslen*2), colids);
 	}
