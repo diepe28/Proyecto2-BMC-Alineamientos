@@ -90,7 +90,7 @@ void gridview_cell_colorize(
 		g_object_set(cellrenderer, "foreground", "red", NULL);
 	}
 
-	if (text[strlen(text)-1] == '$') {
+	if (text[0] != '\0' && text[strlen(text)-1] == '$') {
 		gchar** arrayOfStrings = g_strsplit(text, "$", CELL_MAX_SIZE);
 		text = g_strjoinv("", arrayOfStrings);
 		
@@ -308,7 +308,10 @@ void gridview_databind_plain(
 
 	for (i=xfirst-1; i<xlast; i++) {
 		column = gtk_tree_view_get_column(GTK_TREE_VIEW(gridview), j);
-		sprintf(value, "%c",  0<=i && i<colslen ? head[i] : '\0');
+		if (0<=i && i<colslen)
+			g_snprintf(value, CELL_MAX_SIZE, "%c", head[i]);
+		else
+			value[0] = '\0';
 		gtk_tree_view_column_set_title(column, value);
 
 		j += 2;
@@ -324,7 +327,7 @@ void gridview_databind_plain(
 			
 			if (j == xfirst) {
 				if (0 < i && i <= rowslen) {
-					sprintf(value, "%c", col0[i - 1]);
+					g_snprintf(value, CELL_MAX_SIZE, "%c", col0[i - 1]);
 				}
 			} else if (i<rowslen+1 && j<colslen+2) {
 				switch (zpage) {
@@ -345,17 +348,20 @@ void gridview_databind_plain(
 				if (ivalue == -1000000) {
 					sprintf(value, "%s", "-INF");
 				} else {
-					sprintf(value, "%d%s", ivalue, (iflags&IS_PAINTED)!=0? "$": "");
+					if ((iflags&IS_PAINTED)!=0)
+						g_snprintf(value, CELL_MAX_SIZE, "%d%c", ivalue, '$');
+					else
+						g_snprintf(value, CELL_MAX_SIZE, "%d", ivalue);
 				}
 
 				if ((iflags & COMES_FROM_UP) != 0) {
-					sprintf(arrou, "4%c", bodies[zpage]);
+					g_snprintf(arrou, CELL_MAX_SIZE, "4%c", bodies[zpage]);
 				}
 				if ((iflags & COMES_FROM_DIAGONAL) != 0) {
-					sprintf(arron, "1%c", bodies[zpage]);
+					g_snprintf(arron, CELL_MAX_SIZE, "1%c", bodies[zpage]);
 				}
 				if ((iflags & COMES_FROM_LEFT) != 0) {
-					sprintf(arrol, "2%c", bodies[zpage]);
+					g_snprintf(arrol, CELL_MAX_SIZE, "2%c", bodies[zpage]);
 				}
 			}
 

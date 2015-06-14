@@ -364,11 +364,11 @@ void app_widget_show_swpopup(
 
 	gtk_label_set_text(GTK_LABEL(app_builder_get_lAlgTypeValue()), "Local");
 	
-	gchar* sSeq1Length = (gchar*) g_malloc(sizeof(gchar)*(log10(lengthV) + 1));
-	gchar* sSeq2Length = (gchar*) g_malloc(sizeof(gchar)*(log10(lengthW) + 1));
+	gchar sSeq1Length[50];
+	gchar sSeq2Length[50];
 
-	sprintf(sSeq1Length, "%d", lengthV);
-	sprintf(sSeq2Length, "%d", lengthW);
+	g_snprintf(sSeq1Length, 50, "%d", lengthV);
+	g_snprintf(sSeq2Length, 50, "%d", lengthW);
 
 	gtk_label_set_text(GTK_LABEL(app_builder_get_lVLengthValue()), sSeq1Length);
 	gtk_label_set_text(GTK_LABEL(app_builder_get_lWLengthValue()), sSeq2Length);
